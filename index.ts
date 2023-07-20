@@ -38,6 +38,7 @@ interface Tile {
   isMonsterDown(): boolean;
   isTmpMonsterDown(): boolean;
   isMonsterLeft(): boolean;
+  isGameOver(): boolean;
   hasBomb(): boolean;
   draw(g: CanvasRenderingContext2D, x: number, y: number): void;
 }
@@ -58,6 +59,7 @@ class Air implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
   hasBomb() { return false; }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
   }
@@ -79,6 +81,8 @@ class Unbreakable implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
+
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -103,6 +107,8 @@ class Stone implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
+
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -127,6 +133,8 @@ class Bomb implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
+
   hasBomb() { return true; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -151,6 +159,7 @@ class BombClose implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
   hasBomb() { return true; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -175,6 +184,7 @@ class BombReallyClose implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
   hasBomb() { return true; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -199,6 +209,7 @@ class TmpFire implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -222,6 +233,7 @@ class Fire implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return true; }
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -246,6 +258,7 @@ class ExtraBomb implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -270,6 +283,8 @@ class MonsterUp implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return true; }
+
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -294,6 +309,8 @@ class MonsterRight implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return true; }
+
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -318,6 +335,8 @@ class TmpMonsterRight implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
+
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -341,6 +360,8 @@ class MonsterDown implements Tile {
   isMonsterDown() { return true; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return false; }
+  isGameOver() { return true; }
+
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -365,6 +386,7 @@ class TmpMonsterDown implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return true; }
   isMonsterLeft() { return false; }
+  isGameOver() { return false; }
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -388,6 +410,8 @@ class MonsterLeft implements Tile {
   isMonsterDown() { return false; }
   isTmpMonsterDown() { return false; }
   isMonsterLeft() { return true; }
+  isGameOver() { return true; }
+
   hasBomb() { return false; }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -559,13 +583,7 @@ function update() {
 }
 
 function checkIfGameOver() {
-  if (
-      map[playery][playerx].isFire() ||
-      map[playery][playerx].isMonsterDown() ||
-      map[playery][playerx].isMonsterUp() ||
-      map[playery][playerx].isMonsterLeft() ||
-      map[playery][playerx].isMonsterRight()
-  )
+  if (map[playery][playerx].isGameOver())
     gameOver = true;
 }
 
