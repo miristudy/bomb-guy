@@ -22,12 +22,143 @@ enum Tile {
     MONSTER_LEFT,
 }
 
-enum Input {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    PLACE,
+interface Input {
+    isUp(): boolean;
+    isDown(): boolean;
+    isLeft(): boolean;
+    isRight(): boolean;
+    isPlace(): boolean;
+    move(): void;
+}
+
+class Up implements Input {
+    isDown(): boolean {
+        return false;
+    }
+
+    isLeft(): boolean {
+        return false;
+    }
+
+    isPlace(): boolean {
+        return false;
+    }
+
+    isRight(): boolean {
+        return false;
+    }
+
+    isUp(): boolean {
+        return true;
+    }
+
+    move(): void {
+        move(0, -1);
+    }
+}
+
+class Down implements Input {
+    isDown(): boolean {
+        return true;
+    }
+
+    isLeft(): boolean {
+        return false;
+    }
+
+    isPlace(): boolean {
+        return false;
+    }
+
+    isRight(): boolean {
+        return false;
+    }
+
+    isUp(): boolean {
+        return false;
+    }
+
+    move(): void {
+        move(0, 1);
+    }
+}
+
+class Right implements Input {
+    isDown(): boolean {
+        return false;
+    }
+
+    isLeft(): boolean {
+        return false;
+    }
+
+    isPlace(): boolean {
+        return false;
+    }
+
+    isRight(): boolean {
+        return true;
+    }
+
+    isUp(): boolean {
+        return false;
+    }
+
+    move(): void {
+        move(1, 0);
+    }
+}
+
+class Left implements Input {
+    isDown(): boolean {
+        return false;
+    }
+
+    isLeft(): boolean {
+        return true;
+    }
+
+    isPlace(): boolean {
+        return false;
+    }
+
+    isRight(): boolean {
+        return false;
+    }
+
+    isUp(): boolean {
+        return false;
+    }
+
+    move(): void {
+        move(-1, 0);
+    }
+}
+
+class Place implements Input {
+    isDown(): boolean {
+        return false;
+    }
+
+    isLeft(): boolean {
+        return false;
+    }
+
+    isPlace(): boolean {
+        return true;
+    }
+
+    isRight(): boolean {
+        return false;
+    }
+
+    isUp(): boolean {
+        return false;
+    }
+
+    move(): void {
+        placeBomb();
+    }
 }
 
 let playerx = 1;
@@ -87,18 +218,10 @@ function placeBomb() {
     }
 }
 
-function handleInput(input: Input | Input.UP | Input.DOWN | Input.RIGHT | Input.PLACE) {
-    if (input === Input.LEFT) move(-1, 0);
-    else if (input === Input.RIGHT) move(1, 0);
-    else if (input === Input.UP) move(0, -1);
-    else if (input === Input.DOWN) move(0, 1);
-    else if (input === Input.PLACE) placeBomb();
-}
-
 function handleInputs() {
     while (!gameOver && inputs.length > 0) {
-        let current = inputs.pop();
-        handleInput(current);
+        let input = inputs.pop();
+        input.move();
     }
 }
 
@@ -254,9 +377,9 @@ const UP_KEY = "ArrowUp";
 const RIGHT_KEY = "ArrowRight";
 const DOWN_KEY = "ArrowDown";
 window.addEventListener("keydown", (e) => {
-    if (e.key === LEFT_KEY || e.key === "a") inputs.push(Input.LEFT);
-    else if (e.key === UP_KEY || e.key === "w") inputs.push(Input.UP);
-    else if (e.key === RIGHT_KEY || e.key === "d") inputs.push(Input.RIGHT);
-    else if (e.key === DOWN_KEY || e.key === "s") inputs.push(Input.DOWN);
-    else if (e.key === " ") inputs.push(Input.PLACE);
+    if (e.key === LEFT_KEY || e.key === "a") inputs.push(new Left());
+    else if (e.key === UP_KEY || e.key === "w") inputs.push(new Up());
+    else if (e.key === RIGHT_KEY || e.key === "d") inputs.push(new Right());
+    else if (e.key === DOWN_KEY || e.key === "s") inputs.push(new Down());
+    else if (e.key === " ") inputs.push(new Place());
 });
