@@ -22,6 +22,956 @@ enum Tile {
     MONSTER_LEFT,
 }
 
+interface NewTile {
+    isAir(): boolean;
+    isUnbreakable(): boolean;
+    isStone(): boolean;
+    isBomb(): boolean;
+    isBombClose(): boolean;
+    isBombReallyClose(): boolean;
+    isTmpFire(): boolean;
+    isFire(): boolean;
+    isExtraBomb(): boolean;
+    isMonsterUp(): boolean;
+    isMonsterRight(): boolean;
+    isTmpMonsterRight(): boolean;
+    isMonsterDown(): boolean;
+    isTmpMonsterDown(): boolean;
+    isMonsterLeft(): boolean;
+}
+
+class Air implements NewTile {
+    isAir(): boolean {
+        return true;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class Unbreakable implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return true;
+    }
+}
+
+class Stone implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return true;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class Bomb implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return true;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class BombClose implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return true;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+
+}
+
+class BombReallyClose implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return true;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class TmpFire implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return true;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class Fire implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+    
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return true;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class ExtraBomb implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return true;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class MonsterUp implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return true;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class MonsterRight implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return true;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class TmpMonsterRight implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return true;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class MonsterDown implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return true;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class TmpMonsterDown implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return false;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return true;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+class MonsterLeft implements NewTile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isBomb(): boolean {
+        return false;
+    }
+
+    isBombClose(): boolean {
+        return false;
+    }
+
+    isBombReallyClose(): boolean {
+        return false;
+    }
+
+    isExtraBomb(): boolean {
+        return false;
+    }
+
+    isFire(): boolean {
+        return false;
+    }
+
+    isMonsterDown(): boolean {
+        return false;
+    }
+
+    isMonsterLeft(): boolean {
+        return true;
+    }
+
+    isMonsterRight(): boolean {
+        return false;
+    }
+
+    isMonsterUp(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return false;
+    }
+
+    isTmpFire(): boolean {
+        return false;
+    }
+
+    isTmpMonsterDown(): boolean {
+        return false;
+    }
+
+    isTmpMonsterRight(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+}
+
+
 interface Input {
     isUp(): boolean;
     isDown(): boolean;
@@ -174,6 +1124,8 @@ let map: Tile[][] = [
     [1, 2, 2, 2, 2, 0, 0, 10, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+
+let newMap: NewTile[][];
 
 let inputs: Input[] = [];
 
