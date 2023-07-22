@@ -41,6 +41,7 @@ interface Tile {
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void;
     isGameOver(): Boolean;
+    isBombType(): Boolean;
 }
 
 class Air implements Tile {
@@ -108,6 +109,10 @@ class Air implements Tile {
     }
 
     isGameOver(): Boolean {
+        return false;
+    }
+
+    isBombType(): Boolean {
         return false;
     }
 }
@@ -181,6 +186,10 @@ class Unbreakable implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
+    isBombType(): Boolean {
+        return false;
+    }
 }
 
 class Stone implements Tile {
@@ -250,6 +259,10 @@ class Stone implements Tile {
     }
 
     isGameOver(): Boolean {
+        return false;
+    }
+
+    isBombType(): Boolean {
         return false;
     }
 }
@@ -323,6 +336,10 @@ class Bomb implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
+    isBombType(): Boolean {
+        return true;
+    }
 }
 
 class BombClose implements Tile {
@@ -393,6 +410,10 @@ class BombClose implements Tile {
 
     isGameOver(): Boolean {
         return false;
+    }
+
+    isBombType(): Boolean {
+        return true;
     }
 
 }
@@ -466,6 +487,10 @@ class BombReallyClose implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
+    isBombType(): Boolean {
+        return true;
+    }
 }
 
 class TmpFire implements Tile {
@@ -534,6 +559,10 @@ class TmpFire implements Tile {
     }
 
     isGameOver(): Boolean {
+        return false;
+    }
+
+    isBombType(): Boolean {
         return false;
     }
 }
@@ -607,6 +636,10 @@ class Fire implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
+    isBombType(): Boolean {
+        return false;
+    }
 }
 
 class ExtraBomb implements Tile {
@@ -676,6 +709,10 @@ class ExtraBomb implements Tile {
     }
 
     isGameOver(): Boolean {
+        return false;
+    }
+
+    isBombType(): Boolean {
         return false;
     }
 }
@@ -749,6 +786,10 @@ class MonsterUp implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
+    isBombType(): Boolean {
+        return false;
+    }
 }
 
 class MonsterRight implements Tile {
@@ -820,6 +861,10 @@ class MonsterRight implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
+    isBombType(): Boolean {
+        return false;
+    }
 }
 
 class TmpMonsterRight implements Tile {
@@ -888,6 +933,10 @@ class TmpMonsterRight implements Tile {
     }
 
     isGameOver(): Boolean {
+        return false;
+    }
+
+    isBombType(): Boolean {
         return false;
     }
 }
@@ -961,6 +1010,10 @@ class MonsterDown implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
+    isBombType(): Boolean {
+        return false;
+    }
 }
 
 class TmpMonsterDown implements Tile {
@@ -1029,6 +1082,10 @@ class TmpMonsterDown implements Tile {
     }
 
     isGameOver(): Boolean {
+        return false;
+    }
+
+    isBombType(): Boolean {
         return false;
     }
 }
@@ -1101,6 +1158,10 @@ class MonsterLeft implements Tile {
 
     isGameOver(): Boolean {
         return true;
+    }
+
+    isBombType(): Boolean {
+        return false;
     }
 }
 
@@ -1300,13 +1361,10 @@ function explode(x: number, y: number, type: Tile) {
     if (map[y][x].isStone()) {
         if (Math.random() < 0.1) map[y][x] = new ExtraBomb();
         else map[y][x] = type;
+    } else if (map[y][x].isBombType()) {
+        bombs++;
+        map[y][x] = type;
     } else if (!map[y][x].isUnbreakable()) {
-        if (
-            map[y][x].isBomb() ||
-            map[y][x].isBombClose() ||
-            map[y][x].isBombReallyClose()
-        )
-            bombs++;
         map[y][x] = type;
     }
 }
