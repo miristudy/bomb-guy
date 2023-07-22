@@ -279,21 +279,27 @@ class Stone implements Tile {
     }
 }
 
+enum BombStatus {
+    NORMAL, CLOSE, REALLY_CLOSE
+}
 class Bomb implements Tile {
+    constructor(private status: BombStatus) {
+    }
+
     isAir(): boolean {
         return false;
     }
 
     isBomb(): boolean {
-        return true;
+        return this.status === BombStatus.NORMAL;
     }
 
     isBombClose(): boolean {
-        return false;
+        return this.status === BombStatus.CLOSE;
     }
 
     isBombReallyClose(): boolean {
-        return false;
+        return this.status === BombStatus.REALLY_CLOSE;
     }
 
     isExtraBomb(): boolean {
@@ -341,165 +347,16 @@ class Bomb implements Tile {
     }
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillStyle = "#770000";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    isGameOver(): Boolean {
-        return false;
-    }
-
-    isBombType(): Boolean {
-        return true;
-    }
-
-    movePlayer(y: number, x: number): void {
-    }
-}
-
-class BombClose implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return true;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isStone(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isUnbreakable(): boolean {
-        return false;
-    }
-
-    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillStyle = "#cc0000";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    isGameOver(): Boolean {
-        return false;
-    }
-
-    isBombType(): Boolean {
-        return true;
-    }
-
-    movePlayer(y: number, x: number): void {
-    }
-
-}
-
-class BombReallyClose implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return true;
-    }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isStone(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isUnbreakable(): boolean {
-        return false;
-    }
-
-    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillStyle = "#ff0000";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        if (this.isBomb()) {
+            g.fillStyle = "#770000";
+            g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        } else if (this.isBombClose()) {
+            g.fillStyle = "#cc0000";
+            g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        } else if (this.isBombReallyClose()) {
+            g.fillStyle = "#ff0000";
+            g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
     }
 
     isGameOver(): Boolean {
@@ -1384,9 +1241,9 @@ let gameOver = false;
 function transformTile(tile: RawTile) {
     switch (tile) {
         case RawTile.AIR: return new Air();
-        case RawTile.BOMB: return new Bomb();
-        case RawTile.BOMB_CLOSE: return new BombClose();
-        case RawTile.BOMB_REALLY_CLOSE: return new BombReallyClose();
+        case RawTile.BOMB: return new Bomb(BombStatus.NORMAL);
+        case RawTile.BOMB_CLOSE: return new Bomb(BombStatus.CLOSE);
+        case RawTile.BOMB_REALLY_CLOSE: return new Bomb(BombStatus.REALLY_CLOSE);
         case RawTile.EXTRA_BOMB: return new ExtraBomb();
         case RawTile.FIRE: return new Fire();
         case RawTile.TMP_FIRE: return new TmpFire();
@@ -1414,7 +1271,7 @@ function transformMap() {
 
 function placeBomb() {
     if (bombs > 0) {
-        map[playery][playerx] = new Bomb();
+        map[playery][playerx] = new Bomb(BombStatus.NORMAL);
         bombs--;
     }
 }
@@ -1452,9 +1309,9 @@ function explodeTmpFire(x: number, y: number) {
 
 function updateTile(y: number, x: number) {
     if (map[y][x].isBomb()) {
-        map[y][x] = new BombClose();
+        map[y][x] = new Bomb(BombStatus.CLOSE);
     } else if (map[y][x].isBombClose()) {
-        map[y][x] = new BombReallyClose();
+        map[y][x] = new Bomb(BombStatus.REALLY_CLOSE);
     } else if (map[y][x].isBombReallyClose()) {
         explodeFire(x, y - 1);
         explodeTmpFire(x, y+1);
