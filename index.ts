@@ -38,8 +38,10 @@ interface Tile {
   isMonsterDown(): boolean;
   isTmpMonsterDown(): boolean;
   isMonsterLeft(): boolean;
+
   color(g: CanvasRenderingContext2D): void;
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void;
+  isGameOver(): boolean
 }
 
 class Air implements Tile {
@@ -107,6 +109,10 @@ class Air implements Tile {
   }
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+  }
+
+  isGameOver(): boolean {
+    return false;
   }
 
 }
@@ -180,6 +186,10 @@ class Unbreakable implements Tile {
     g.fillRect(x, y, w, h);
   }
 
+  isGameOver(): boolean {
+    return false;
+  }
+
 }
 
 class Stone implements Tile {
@@ -249,6 +259,10 @@ class Stone implements Tile {
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  isGameOver(): boolean {
+    return false;
   }
 
 }
@@ -322,6 +336,10 @@ class Bomb implements Tile {
     g.fillRect(x, y, w, h);
   }
 
+  isGameOver(): boolean {
+    return false;
+  }
+
 }
 
 class BombClose implements Tile {
@@ -391,6 +409,10 @@ class BombClose implements Tile {
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  isGameOver(): boolean {
+    return false;
   }
 
 }
@@ -464,6 +486,10 @@ class BombReallyClose implements Tile {
     g.fillRect(x, y, w, h);
   }
 
+  isGameOver(): boolean {
+    return false;
+  }
+
 }
 
 class TmpFire implements Tile {
@@ -532,6 +558,10 @@ class TmpFire implements Tile {
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  isGameOver(): boolean {
+    return false;
   }
 
 }
@@ -605,6 +635,10 @@ class Fire implements Tile {
     g.fillRect(x, y, w, h);
   }
 
+  isGameOver(): boolean {
+    return true;
+  }
+
 }
 
 class ExtraBomb implements Tile {
@@ -674,6 +708,10 @@ class ExtraBomb implements Tile {
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  isGameOver(): boolean {
+    return false;
   }
 
 }
@@ -747,6 +785,10 @@ class MonsterUp implements Tile {
     g.fillRect(x, y, w, h);
   }
 
+  isGameOver(): boolean {
+    return true;
+  }
+
 }
 
 class MonsterRight implements Tile {
@@ -818,6 +860,10 @@ class MonsterRight implements Tile {
     g.fillRect(x, y, w, h);
   }
 
+  isGameOver(): boolean {
+    return true;
+  }
+
 }
 
 class TmpMonsterRight implements Tile {
@@ -886,6 +932,10 @@ class TmpMonsterRight implements Tile {
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  isGameOver(): boolean {
+    return false;
   }
 
 }
@@ -959,6 +1009,10 @@ class MonsterDown implements Tile {
     g.fillRect(x, y, w, h);
   }
 
+  isGameOver(): boolean {
+    return true;
+  }
+
 }
 
 class TmpMonsterDown implements Tile {
@@ -1027,6 +1081,10 @@ class TmpMonsterDown implements Tile {
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  isGameOver(): boolean {
+    return false;
   }
 
 }
@@ -1098,6 +1156,10 @@ class MonsterLeft implements Tile {
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  isGameOver(): boolean {
+    return true;
   }
 }
 
@@ -1358,11 +1420,7 @@ function handleInputs() {
 }
 
 function isGameOver() {
-  return map[playery][playerx].isFire() ||
-      map[playery][playerx].isMonsterDown() ||
-      map[playery][playerx].isMonsterUp() ||
-      map[playery][playerx].isMonsterLeft() ||
-      map[playery][playerx].isMonsterRight();
+  return map[playery][playerx].isGameOver()
 }
 
 function updateMap() {
