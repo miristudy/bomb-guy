@@ -38,6 +38,8 @@ interface Tile {
     isMonsterDown(): boolean;
     isTmpMonsterDown(): boolean;
     isMonsterLeft(): boolean;
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void;
 }
 
 class Air implements Tile {
@@ -99,6 +101,9 @@ class Air implements Tile {
 
     isUnbreakable(): boolean {
         return false;
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
     }
 }
 
@@ -162,6 +167,11 @@ class Unbreakable implements Tile {
     isUnbreakable(): boolean {
         return true;
     }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#999999";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 class Stone implements Tile {
@@ -224,6 +234,11 @@ class Stone implements Tile {
     isUnbreakable(): boolean {
         return false;
     }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#0000cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 class Bomb implements Tile {
@@ -285,6 +300,11 @@ class Bomb implements Tile {
 
     isUnbreakable(): boolean {
         return false;
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#770000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -349,6 +369,11 @@ class BombClose implements Tile {
         return false;
     }
 
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc0000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
 }
 
 class BombReallyClose implements Tile {
@@ -410,6 +435,11 @@ class BombReallyClose implements Tile {
 
     isUnbreakable(): boolean {
         return false;
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#ff0000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -473,6 +503,10 @@ class TmpFire implements Tile {
     isUnbreakable(): boolean {
         return false;
     }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 class Fire implements Tile {
@@ -534,6 +568,11 @@ class Fire implements Tile {
 
     isUnbreakable(): boolean {
         return false;
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#ffcc00";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -597,6 +636,11 @@ class ExtraBomb implements Tile {
     isUnbreakable(): boolean {
         return false;
     }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#00cc00";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 class MonsterUp implements Tile {
@@ -658,6 +702,11 @@ class MonsterUp implements Tile {
 
     isUnbreakable(): boolean {
         return false;
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -721,6 +770,11 @@ class MonsterRight implements Tile {
     isUnbreakable(): boolean {
         return false;
     }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 class TmpMonsterRight implements Tile {
@@ -782,6 +836,10 @@ class TmpMonsterRight implements Tile {
 
     isUnbreakable(): boolean {
         return false;
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -845,6 +903,11 @@ class MonsterDown implements Tile {
     isUnbreakable(): boolean {
         return false;
     }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 class TmpMonsterDown implements Tile {
@@ -907,6 +970,10 @@ class TmpMonsterDown implements Tile {
     isUnbreakable(): boolean {
         return false;
     }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 class MonsterLeft implements Tile {
@@ -968,6 +1035,11 @@ class MonsterLeft implements Tile {
 
     isUnbreakable(): boolean {
         return false;
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -1293,33 +1365,10 @@ function createGraphics() {
     return g;
 }
 
-function changeGraphicColor(y: number, x: number, g: CanvasRenderingContext2D) {
-    if (map[y][x].isUnbreakable()) g.fillStyle = "#999999";
-    else if (map[y][x].isStone()) g.fillStyle = "#0000cc";
-    else if (map[y][x].isExtraBomb()) g.fillStyle = "#00cc00";
-    else if (map[y][x].isFire()) g.fillStyle = "#ffcc00";
-    else if (
-        map[y][x].isMonsterUp() ||
-        map[y][x].isMonsterLeft() ||
-        map[y][x].isMonsterRight() ||
-        map[y][x].isMonsterDown()
-    )
-        g.fillStyle = "#cc00cc";
-    else if (map[y][x].isBomb()) g.fillStyle = "#770000";
-    else if (map[y][x].isBombClose()) g.fillStyle = "#cc0000";
-    else if (map[y][x].isBombReallyClose()) g.fillStyle = "#ff0000";
-}
-
-function drawBlock(y: number, x: number, g: CanvasRenderingContext2D) {
-    if (!map[y][x].isAir())
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-}
-
 function drawMap(g: CanvasRenderingContext2D) {
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
-            changeGraphicColor(y, x, g);
-            drawBlock(y, x, g);
+            map[y][x].drawBlock(y, x, g);
         }
     }
 }
