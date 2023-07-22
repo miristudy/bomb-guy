@@ -42,6 +42,7 @@ interface Tile {
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void;
     isGameOver(): Boolean;
     isBombType(): Boolean;
+    movePlayer(y: number, x: number): void;
 }
 
 class Air implements Tile {
@@ -114,6 +115,11 @@ class Air implements Tile {
 
     isBombType(): Boolean {
         return false;
+    }
+
+    movePlayer(y: number, x: number): void {
+        playery += y;
+        playerx += x;
     }
 }
 
@@ -190,6 +196,9 @@ class Unbreakable implements Tile {
     isBombType(): Boolean {
         return false;
     }
+
+    movePlayer(y: number, x: number): void {
+    }
 }
 
 class Stone implements Tile {
@@ -265,6 +274,9 @@ class Stone implements Tile {
     isBombType(): Boolean {
         return false;
     }
+
+    movePlayer(y: number, x: number): void {
+    }
 }
 
 class Bomb implements Tile {
@@ -339,6 +351,9 @@ class Bomb implements Tile {
 
     isBombType(): Boolean {
         return true;
+    }
+
+    movePlayer(y: number, x: number): void {
     }
 }
 
@@ -416,6 +431,9 @@ class BombClose implements Tile {
         return true;
     }
 
+    movePlayer(y: number, x: number): void {
+    }
+
 }
 
 class BombReallyClose implements Tile {
@@ -491,6 +509,9 @@ class BombReallyClose implements Tile {
     isBombType(): Boolean {
         return true;
     }
+
+    movePlayer(y: number, x: number): void {
+    }
 }
 
 class TmpFire implements Tile {
@@ -565,6 +586,9 @@ class TmpFire implements Tile {
     isBombType(): Boolean {
         return false;
     }
+
+    movePlayer(y: number, x: number): void {
+    }
 }
 
 class Fire implements Tile {
@@ -579,7 +603,7 @@ class Fire implements Tile {
     isBombClose(): boolean {
         return false;
     }
-    
+
     isBombReallyClose(): boolean {
         return false;
     }
@@ -639,6 +663,11 @@ class Fire implements Tile {
 
     isBombType(): Boolean {
         return false;
+    }
+
+    movePlayer(y: number, x: number): void {
+        playery += y;
+        playerx += x;
     }
 }
 
@@ -715,6 +744,13 @@ class ExtraBomb implements Tile {
     isBombType(): Boolean {
         return false;
     }
+
+    movePlayer(y: number, x: number): void {
+        playery += y;
+        playerx += x;
+        bombs++;
+        map[playery][playerx] = new Air();
+    }
 }
 
 class MonsterUp implements Tile {
@@ -789,6 +825,9 @@ class MonsterUp implements Tile {
 
     isBombType(): Boolean {
         return false;
+    }
+
+    movePlayer(y: number, x: number): void {
     }
 }
 
@@ -865,6 +904,9 @@ class MonsterRight implements Tile {
     isBombType(): Boolean {
         return false;
     }
+
+    movePlayer(y: number, x: number): void {
+    }
 }
 
 class TmpMonsterRight implements Tile {
@@ -938,6 +980,9 @@ class TmpMonsterRight implements Tile {
 
     isBombType(): Boolean {
         return false;
+    }
+
+    movePlayer(y: number, x: number): void {
     }
 }
 
@@ -1014,6 +1059,9 @@ class MonsterDown implements Tile {
     isBombType(): Boolean {
         return false;
     }
+
+    movePlayer(y: number, x: number): void {
+    }
 }
 
 class TmpMonsterDown implements Tile {
@@ -1087,6 +1135,9 @@ class TmpMonsterDown implements Tile {
 
     isBombType(): Boolean {
         return false;
+    }
+
+    movePlayer(y: number, x: number): void {
     }
 }
 
@@ -1163,6 +1214,9 @@ class MonsterLeft implements Tile {
     isBombType(): Boolean {
         return false;
     }
+
+    movePlayer(y: number, x: number): void {
+    }
 }
 
 
@@ -1197,7 +1251,7 @@ class Up implements Input {
     }
 
     move(): void {
-        move(0, -1);
+        map[playery - 1][playerx].movePlayer(-1, 0);
     }
 }
 
@@ -1223,7 +1277,7 @@ class Down implements Input {
     }
 
     move(): void {
-        move(0, 1);
+        map[playery + 1][playerx].movePlayer(1, 0);
     }
 }
 
@@ -1249,7 +1303,7 @@ class Right implements Input {
     }
 
     move(): void {
-        move(1, 0);
+        map[playery][playerx + 1].movePlayer(0, 1);
     }
 }
 
@@ -1275,7 +1329,7 @@ class Left implements Input {
     }
 
     move(): void {
-        move(-1, 0);
+        map[playery][playerx - 1].movePlayer(0, -1);
     }
 }
 
@@ -1355,21 +1409,6 @@ function transformMap() {
         for (let x = 0; x < rawMap[y].length; x++) {
             map[y][x] = transformTile(rawMap[y][x]);
         }
-    }
-}
-
-function move(x: number, y: number) {
-    if (
-        map[playery + y][playerx + x].isAir() ||
-        map[playery + y][playerx + x].isFire()
-    ) {
-        playery += y;
-        playerx += x;
-    } else if (map[playery + y][playerx + x].isExtraBomb()) {
-        playery += y;
-        playerx += x;
-        bombs++;
-        map[playery][playerx] = new Air();
     }
 }
 
