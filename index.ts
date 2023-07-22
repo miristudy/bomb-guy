@@ -40,6 +40,7 @@ interface Tile {
     isMonsterLeft(): boolean;
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void;
+    isGameOver(): Boolean;
 }
 
 class Air implements Tile {
@@ -104,6 +105,10 @@ class Air implements Tile {
     }
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+    }
+
+    isGameOver(): Boolean {
+        return false;
     }
 }
 
@@ -172,6 +177,10 @@ class Unbreakable implements Tile {
         g.fillStyle = "#999999";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    isGameOver(): Boolean {
+        return false;
+    }
 }
 
 class Stone implements Tile {
@@ -239,6 +248,10 @@ class Stone implements Tile {
         g.fillStyle = "#0000cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    isGameOver(): Boolean {
+        return false;
+    }
 }
 
 class Bomb implements Tile {
@@ -305,6 +318,10 @@ class Bomb implements Tile {
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#770000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    isGameOver(): Boolean {
+        return false;
     }
 }
 
@@ -374,6 +391,10 @@ class BombClose implements Tile {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
+    isGameOver(): Boolean {
+        return false;
+    }
+
 }
 
 class BombReallyClose implements Tile {
@@ -441,6 +462,10 @@ class BombReallyClose implements Tile {
         g.fillStyle = "#ff0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    isGameOver(): Boolean {
+        return false;
+    }
 }
 
 class TmpFire implements Tile {
@@ -506,6 +531,10 @@ class TmpFire implements Tile {
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    isGameOver(): Boolean {
+        return false;
     }
 }
 
@@ -574,6 +603,10 @@ class Fire implements Tile {
         g.fillStyle = "#ffcc00";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    isGameOver(): Boolean {
+        return true;
+    }
 }
 
 class ExtraBomb implements Tile {
@@ -640,6 +673,10 @@ class ExtraBomb implements Tile {
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#00cc00";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    isGameOver(): Boolean {
+        return false;
     }
 }
 
@@ -708,6 +745,10 @@ class MonsterUp implements Tile {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    isGameOver(): Boolean {
+        return true;
+    }
 }
 
 class MonsterRight implements Tile {
@@ -775,6 +816,10 @@ class MonsterRight implements Tile {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    isGameOver(): Boolean {
+        return true;
+    }
 }
 
 class TmpMonsterRight implements Tile {
@@ -840,6 +885,10 @@ class TmpMonsterRight implements Tile {
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    isGameOver(): Boolean {
+        return false;
     }
 }
 
@@ -908,6 +957,10 @@ class MonsterDown implements Tile {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    isGameOver(): Boolean {
+        return true;
+    }
 }
 
 class TmpMonsterDown implements Tile {
@@ -973,6 +1026,10 @@ class TmpMonsterDown implements Tile {
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    isGameOver(): Boolean {
+        return false;
     }
 }
 
@@ -1040,6 +1097,10 @@ class MonsterLeft implements Tile {
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    isGameOver(): Boolean {
+        return true;
     }
 }
 
@@ -1339,14 +1400,9 @@ function updateMap() {
 }
 
 function markIfGameOver() {
-    if (
-        map[playery][playerx].isFire() ||
-        map[playery][playerx].isMonsterDown() ||
-        map[playery][playerx].isMonsterUp() ||
-        map[playery][playerx].isMonsterLeft() ||
-        map[playery][playerx].isMonsterRight()
-    )
+    if (map[playery][playerx].isGameOver()) {
         gameOver = true;
+    }
 }
 
 function update() {
