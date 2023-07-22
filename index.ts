@@ -1357,17 +1357,6 @@ function transformMap() {
         }
     }
 }
-function explode(x: number, y: number, type: Tile) {
-    if (map[y][x].isStone()) {
-        if (Math.random() < 0.1) map[y][x] = new ExtraBomb();
-        else map[y][x] = type;
-    } else if (map[y][x].isBombType()) {
-        bombs++;
-        map[y][x] = type;
-    } else if (!map[y][x].isUnbreakable()) {
-        map[y][x] = type;
-    }
-}
 
 function move(x: number, y: number) {
     if (
@@ -1398,16 +1387,40 @@ function handleInputs() {
     }
 }
 
+function explodeFire(x: number, y: number) {
+    if (map[y][x].isStone()) {
+        if (Math.random() < 0.1) map[y][x] = new ExtraBomb();
+        else map[y][x] = new Fire();
+    } else if (map[y][x].isBombType()) {
+        bombs++;
+        map[y][x] = new Fire();
+    } else if (!map[y][x].isUnbreakable()) {
+        map[y][x] = new Fire();
+    }
+}
+
+function explodeTmpFire(x: number, y: number) {
+    if (map[y][x].isStone()) {
+        if (Math.random() < 0.1) map[y][x] = new ExtraBomb();
+        else map[y][x] = new TmpFire();
+    } else if (map[y][x].isBombType()) {
+        bombs++;
+        map[y][x] = new TmpFire();
+    } else if (!map[y][x].isUnbreakable()) {
+        map[y][x] = new TmpFire();
+    }
+}
+
 function updateTile(y: number, x: number) {
     if (map[y][x].isBomb()) {
         map[y][x] = new BombClose();
     } else if (map[y][x].isBombClose()) {
         map[y][x] = new BombReallyClose();
     } else if (map[y][x].isBombReallyClose()) {
-        explode(x + 0, y - 1, new Fire());
-        explode(x + 0, y + 1, new TmpFire());
-        explode(x - 1, y + 0, new Fire());
-        explode(x + 1, y + 0, new TmpFire());
+        explodeFire(x, y - 1);
+        explodeTmpFire(x, y+1);
+        explodeFire(x - 1, y);
+        explodeTmpFire(x + 1, y);
         map[y][x] = new Fire();
         bombs++;
     } else if (map[y][x].isTmpFire()) {
