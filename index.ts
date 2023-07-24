@@ -44,6 +44,7 @@ interface Tile {
     movePlayer(y: number, x: number): void;
     close(): void;
     reallyClose(): void;
+    explodeFire(x: number, y: number): void;
 }
 
 class Air implements Tile {
@@ -122,6 +123,10 @@ class Air implements Tile {
     }
 
     reallyClose(): void {
+    }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
     }
 }
 
@@ -202,6 +207,9 @@ class Unbreakable implements Tile {
 
     reallyClose(): void {
     }
+
+    explodeFire(x: number, y: number): void {
+    }
 }
 
 class Stone implements Tile {
@@ -280,6 +288,14 @@ class Stone implements Tile {
     }
 
     reallyClose(): void {
+    }
+
+    explodeFire(x: number, y: number): void {
+        if (Math.random() < 0.1) {
+            map[y][x] = new ExtraBomb();
+            return;
+        }
+        map[y][x] = new Fire();
     }
 }
 
@@ -429,6 +445,11 @@ class Bomb implements Tile {
     reallyClose(): void {
         this.status = new ReallyClose();
     }
+
+    explodeFire(x: number, y: number): void {
+        bombs++;
+        map[y][x] = new Fire();
+    }
 }
 
 class TmpFire implements Tile {
@@ -506,6 +527,10 @@ class TmpFire implements Tile {
     }
 
     reallyClose(): void {
+    }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
     }
 }
 
@@ -587,6 +612,10 @@ class Fire implements Tile {
     }
 
     reallyClose(): void {
+    }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
     }
 }
 
@@ -671,6 +700,10 @@ class ExtraBomb implements Tile {
 
     reallyClose(): void {
     }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
+    }
 }
 
 class MonsterUp implements Tile {
@@ -749,6 +782,10 @@ class MonsterUp implements Tile {
     }
 
     reallyClose(): void {
+    }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
     }
 }
 
@@ -829,6 +866,10 @@ class MonsterRight implements Tile {
 
     reallyClose(): void {
     }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
+    }
 }
 
 class TmpMonsterRight implements Tile {
@@ -906,6 +947,10 @@ class TmpMonsterRight implements Tile {
     }
 
     reallyClose(): void {
+    }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
     }
 }
 
@@ -986,6 +1031,10 @@ class MonsterDown implements Tile {
 
     reallyClose(): void {
     }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
+    }
 }
 
 class TmpMonsterDown implements Tile {
@@ -1063,6 +1112,10 @@ class TmpMonsterDown implements Tile {
     }
 
     reallyClose(): void {
+    }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
     }
 }
 
@@ -1142,6 +1195,10 @@ class MonsterLeft implements Tile {
     }
 
     reallyClose(): void {
+    }
+
+    explodeFire(x: number, y: number): void {
+        map[y][x] = new Fire();
     }
 }
 
@@ -1353,15 +1410,7 @@ function handleInputs() {
 }
 
 function explodeFire(x: number, y: number) {
-    if (map[y][x].isStone()) {
-        if (Math.random() < 0.1) map[y][x] = new ExtraBomb();
-        else map[y][x] = new Fire();
-    } else if (map[y][x].isBombType()) {
-        bombs++;
-        map[y][x] = new Fire();
-    } else if (!map[y][x].isUnbreakable()) {
-        map[y][x] = new Fire();
-    }
+    map[y][x].explodeFire(x, y);
 }
 
 function explodeTmpFire(x: number, y: number) {
@@ -1382,9 +1431,9 @@ function updateTile(y: number, x: number) {
     } else if (map[y][x].isBombClose()) {
         map[y][x].reallyClose()
     } else if (map[y][x].isBombReallyClose()) {
-        explodeFire(x, y - 1);
+        map[y - 1][x].explodeFire(x, y - 1);
         explodeTmpFire(x, y+1);
-        explodeFire(x - 1, y);
+        map[y][x - 1].explodeFire(x - 1, y);
         explodeTmpFire(x + 1, y);
         map[y][x] = new Fire();
         bombs++;
