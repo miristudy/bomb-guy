@@ -291,21 +291,62 @@ class Stone implements Tile {
 
 }
 
+enum BombType {
+    NORMAL,
+    CLOSE,
+    REALLY_CLOSE
+}
+
+interface BombState{
+  isNormal(): boolean;
+  isClose(): boolean;
+  isReallyClose(): boolean;
+  color(g: CanvasRenderingContext2D): void,
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void
+}
+
+class Normal implements BombState{
+  isClose(): boolean {
+    return false;
+  }
+
+  isNormal(): boolean {
+    return true;
+  }
+
+  isReallyClose(): boolean {
+    return false;
+  }
+
+  color(g: CanvasRenderingContext2D): void {
+    g.fillStyle = "#770000";
+  }
+
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+    g.fillRect(x, y, w, h);
+  }
+
+}
+
 class Bomb implements Tile {
+
+  constructor(private bombState: BombState){
+  }
+
   isAir(): boolean {
     return false;
   }
 
   isBomb(): boolean {
-    return true;
+    return this.bombState.isNormal();
   }
 
   isBombClose(): boolean {
-    return false;
+    return this.bombState.isClose();
   }
 
   isBombReallyClose(): boolean {
-    return false;
+    return this.bombState.isReallyClose();
   }
 
   isExtraBomb(): boolean {
@@ -373,21 +414,49 @@ class Bomb implements Tile {
 
 }
 
+class Close implements BombState{
+
+
+  isClose(): boolean {
+    return true;
+  }
+
+  isNormal(): boolean {
+    return false;
+  }
+
+  isReallyClose(): boolean {
+    return false;
+  }
+
+  color(g: CanvasRenderingContext2D): void {
+    g.fillStyle = "#cc0000";
+  }
+
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+    g.fillRect(x, y, w, h);
+  }
+
+}
+
 class BombClose implements Tile {
+  constructor(private bombState: BombState){
+  }
+
   isAir(): boolean {
     return false;
   }
 
   isBomb(): boolean {
-    return false;
+    return this.bombState.isNormal();
   }
 
   isBombClose(): boolean {
-    return true;
+    return this.bombState.isClose();
   }
 
   isBombReallyClose(): boolean {
-    return false;
+    return this.bombState.isReallyClose();
   }
 
   isExtraBomb(): boolean {
@@ -455,21 +524,47 @@ class BombClose implements Tile {
 
 }
 
+class ReallyClose implements BombState{
+  isClose(): boolean {
+    return false;
+  }
+
+  isNormal(): boolean {
+    return false;
+  }
+
+  isReallyClose(): boolean {
+    return true;
+  }
+
+  color(g: CanvasRenderingContext2D): void {
+    g.fillStyle = "#ff0000";
+  }
+
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+    g.fillRect(x, y, w, h);
+  }
+
+}
+
 class BombReallyClose implements Tile {
+  constructor(private bombState: BombState){
+  }
+
   isAir(): boolean {
     return false;
   }
 
   isBomb(): boolean {
-    return false;
+    return this.bombState.isNormal();
   }
 
   isBombClose(): boolean {
-    return false;
+    return this.bombState.isClose();
   }
 
   isBombReallyClose(): boolean {
-    return true;
+    return this.bombState.isReallyClose();
   }
 
   isExtraBomb(): boolean {
@@ -1417,7 +1512,7 @@ class Place implements Input {
 
   move(): void {
     if (bombs > 0) {
-      map[playery][playerx] = new Bomb();
+      map[playery][playerx] = new Bomb(new Normal());
       bombs--;
     }
   }
@@ -1454,11 +1549,11 @@ function transformTile(rawMapElementElement: RawTile) {
     case RawTile.STONE:
       return new Stone();
     case RawTile.BOMB:
-      return new Bomb();
+      return new Bomb(new Normal());
     case RawTile.BOMB_CLOSE:
-      return new BombClose();
+      return new BombClose(new Close());
     case RawTile.BOMB_REALLY_CLOSE:
-      return new BombReallyClose();
+      return new BombReallyClose(new ReallyClose());
     case RawTile.TMP_FIRE:
       return new TmpFire();
     case RawTile.FIRE:
@@ -1518,9 +1613,9 @@ function updateMap() {
   for (let y = 1; y < map.length; y++) {
     for (let x = 1; x < map[y].length; x++) {
       if (map[y][x].isBomb()) {
-        map[y][x] = new BombClose();
+        map[y][x] = new BombClose(new Close());
       } else if (map[y][x].isBombClose()) {
-        map[y][x] = new BombReallyClose();
+        map[y][x] = new BombReallyClose(new ReallyClose());
       } else if (map[y][x].isBombReallyClose()) {
         explode(x + 0, y - 1, new Fire());
         explode(x + 0, y + 1, new TmpFire());
