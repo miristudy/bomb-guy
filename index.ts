@@ -291,12 +291,6 @@ class Stone implements Tile {
 
 }
 
-enum BombType {
-    NORMAL,
-    CLOSE,
-    REALLY_CLOSE
-}
-
 interface BombState{
   isNormal(): boolean;
   isClose(): boolean;
@@ -883,7 +877,21 @@ class ExtraBomb implements Tile {
 
 }
 
-class MonsterUp implements Tile {
+interface MonsterState {
+    isUp(): boolean,
+    isRight(): boolean,
+    isTmpRight(): boolean,
+    isDown(): boolean,
+    isTmpDown(): boolean,
+    isLeft(): boolean,
+    color(g: CanvasRenderingContext2D): void,
+    fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void
+}
+
+class Monster implements Tile {
+  constructor(private state: MonsterUpState) {
+  }
+
   isAir(): boolean {
     return false;
   }
@@ -909,19 +917,19 @@ class MonsterUp implements Tile {
   }
 
   isMonsterDown(): boolean {
-    return false;
+    return this.state.isDown();
   }
 
   isMonsterLeft(): boolean {
-    return false;
+    return this.state.isLeft();
   }
 
   isMonsterRight(): boolean {
-    return false;
+    return this.state.isRight();
   }
 
   isMonsterUp(): boolean {
-    return true;
+    return this.state.isUp();
   }
 
   isStone(): boolean {
@@ -933,11 +941,11 @@ class MonsterUp implements Tile {
   }
 
   isTmpMonsterDown(): boolean {
-    return false;
+    return this.state.isTmpDown();
   }
 
   isTmpMonsterRight(): boolean {
-    return false;
+    return this.state.isTmpRight();
   }
 
   isUnbreakable(): boolean {
@@ -965,67 +973,7 @@ class MonsterUp implements Tile {
 
 }
 
-class MonsterRight implements Tile {
-  isAir(): boolean {
-    return false;
-  }
-
-  isBomb(): boolean {
-    return false;
-  }
-
-  isBombClose(): boolean {
-    return false;
-  }
-
-  isBombReallyClose(): boolean {
-    return false;
-  }
-
-  isExtraBomb(): boolean {
-    return false;
-  }
-
-  isFire(): boolean {
-    return false;
-  }
-
-  isMonsterDown(): boolean {
-    return false;
-  }
-
-  isMonsterLeft(): boolean {
-    return false;
-  }
-
-  isMonsterRight(): boolean {
-    return true;
-  }
-
-  isMonsterUp(): boolean {
-    return false;
-  }
-
-  isStone(): boolean {
-    return false;
-  }
-
-  isTmpFire(): boolean {
-    return false;
-  }
-
-  isTmpMonsterDown(): boolean {
-    return false;
-  }
-
-  isTmpMonsterRight(): boolean {
-    return false;
-  }
-
-  isUnbreakable(): boolean {
-    return false;
-  }
-
+class MonsterUpState implements MonsterState{
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#cc00cc";
   }
@@ -1034,161 +982,33 @@ class MonsterRight implements Tile {
     g.fillRect(x, y, w, h);
   }
 
-  isGameOver(): boolean {
-    return true;
-  }
-
-  isBombType(): boolean {
+  isDown(): boolean {
     return false;
   }
 
-  move(x: number, y: number): void {
+  isLeft(): boolean {
+    return false;
+  }
+
+  isRight(): boolean {
+    return false;
+  }
+
+  isTmpDown(): boolean {
+    return false;
+  }
+
+  isTmpRight(): boolean {
+    return false;
+  }
+
+  isUp(): boolean {
+    return true;
   }
 
 }
 
-class TmpMonsterRight implements Tile {
-  isAir(): boolean {
-    return false;
-  }
-
-  isBomb(): boolean {
-    return false;
-  }
-
-  isBombClose(): boolean {
-    return false;
-  }
-
-  isBombReallyClose(): boolean {
-    return false;
-  }
-
-  isExtraBomb(): boolean {
-    return false;
-  }
-
-  isFire(): boolean {
-    return false;
-  }
-
-  isMonsterDown(): boolean {
-    return false;
-  }
-
-  isMonsterLeft(): boolean {
-    return false;
-  }
-
-  isMonsterRight(): boolean {
-    return false;
-  }
-
-  isMonsterUp(): boolean {
-    return false;
-  }
-
-  isStone(): boolean {
-    return false;
-  }
-
-  isTmpFire(): boolean {
-    return false;
-  }
-
-  isTmpMonsterDown(): boolean {
-    return false;
-  }
-
-  isTmpMonsterRight(): boolean {
-    return true;
-  }
-
-  isUnbreakable(): boolean {
-    return false;
-  }
-
-  color(g: CanvasRenderingContext2D): void {
-  }
-
-  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
-    g.fillRect(x, y, w, h);
-  }
-
-  isGameOver(): boolean {
-    return false;
-  }
-
-  isBombType(): boolean {
-    return false;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-}
-
-class MonsterDown implements Tile {
-  isAir(): boolean {
-    return false;
-  }
-
-  isBomb(): boolean {
-    return false;
-  }
-
-  isBombClose(): boolean {
-    return false;
-  }
-
-  isBombReallyClose(): boolean {
-    return false;
-  }
-
-  isExtraBomb(): boolean {
-    return false;
-  }
-
-  isFire(): boolean {
-    return false;
-  }
-
-  isMonsterDown(): boolean {
-    return true;
-  }
-
-  isMonsterLeft(): boolean {
-    return false;
-  }
-
-  isMonsterRight(): boolean {
-    return false;
-  }
-
-  isMonsterUp(): boolean {
-    return false;
-  }
-
-  isStone(): boolean {
-    return false;
-  }
-
-  isTmpFire(): boolean {
-    return false;
-  }
-
-  isTmpMonsterDown(): boolean {
-    return false;
-  }
-
-  isTmpMonsterRight(): boolean {
-    return false;
-  }
-
-  isUnbreakable(): boolean {
-    return false;
-  }
-
+class MonsterRightState implements MonsterState{
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#cc00cc";
   }
@@ -1197,80 +1017,33 @@ class MonsterDown implements Tile {
     g.fillRect(x, y, w, h);
   }
 
-  isGameOver(): boolean {
-    return true;
-  }
-
-  isBombType(): boolean {
+  isDown(): boolean {
     return false;
   }
 
-  move(x: number, y: number): void {
+  isLeft(): boolean {
+    return false;
+  }
+
+  isRight(): boolean {
+    return true;
+  }
+
+  isTmpDown(): boolean {
+    return false;
+  }
+
+  isTmpRight(): boolean {
+    return false;
+  }
+
+  isUp(): boolean {
+    return false;
   }
 
 }
 
-class TmpMonsterDown implements Tile {
-  isAir(): boolean {
-    return false;
-  }
-
-  isBomb(): boolean {
-    return false;
-  }
-
-  isBombClose(): boolean {
-    return false;
-  }
-
-  isBombReallyClose(): boolean {
-    return false;
-  }
-
-  isExtraBomb(): boolean {
-    return false;
-  }
-
-  isFire(): boolean {
-    return false;
-  }
-
-  isMonsterDown(): boolean {
-    return false;
-  }
-
-  isMonsterLeft(): boolean {
-    return false;
-  }
-
-  isMonsterRight(): boolean {
-    return false;
-  }
-
-  isMonsterUp(): boolean {
-    return false;
-  }
-
-  isStone(): boolean {
-    return false;
-  }
-
-  isTmpFire(): boolean {
-    return false;
-  }
-
-  isTmpMonsterDown(): boolean {
-    return true;
-  }
-
-  isTmpMonsterRight(): boolean {
-    return false;
-  }
-
-  isUnbreakable(): boolean {
-    return false;
-  }
-
+class TmpMonsterRightState implements MonsterState{
   color(g: CanvasRenderingContext2D): void {
   }
 
@@ -1278,80 +1051,33 @@ class TmpMonsterDown implements Tile {
     g.fillRect(x, y, w, h);
   }
 
-  isGameOver(): boolean {
+  isDown(): boolean {
     return false;
   }
 
-  isBombType(): boolean {
+  isLeft(): boolean {
     return false;
   }
 
-  move(x: number, y: number): void {
+  isRight(): boolean {
+    return false;
+  }
+
+  isTmpDown(): boolean {
+    return false;
+  }
+
+  isTmpRight(): boolean {
+    return true;
+  }
+
+  isUp(): boolean {
+    return false;
   }
 
 }
 
-class MonsterLeft implements Tile {
-  isAir(): boolean {
-    return false;
-  }
-
-  isBomb(): boolean {
-    return false;
-  }
-
-  isBombClose(): boolean {
-    return false;
-  }
-
-  isBombReallyClose(): boolean {
-    return false;
-  }
-
-  isExtraBomb(): boolean {
-    return false;
-  }
-
-  isFire(): boolean {
-    return false;
-  }
-
-  isMonsterDown(): boolean {
-    return false;
-  }
-
-  isMonsterLeft(): boolean {
-    return true;
-  }
-
-  isMonsterRight(): boolean {
-    return false;
-  }
-
-  isMonsterUp(): boolean {
-    return false;
-  }
-
-  isStone(): boolean {
-    return false;
-  }
-
-  isTmpFire(): boolean {
-    return false;
-  }
-
-  isTmpMonsterDown(): boolean {
-    return false;
-  }
-
-  isTmpMonsterRight(): boolean {
-    return false;
-  }
-
-  isUnbreakable(): boolean {
-    return false;
-  }
-
+class MonsterDownState implements MonsterState{
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#cc00cc";
   }
@@ -1360,16 +1086,99 @@ class MonsterLeft implements Tile {
     g.fillRect(x, y, w, h);
   }
 
-  isGameOver(): boolean {
+  isDown(): boolean {
     return true;
   }
 
-  isBombType(): boolean {
+  isLeft(): boolean {
     return false;
   }
 
-  move(x: number, y: number): void {
+  isRight(): boolean {
+    return false;
   }
+
+  isTmpDown(): boolean {
+    return false;
+  }
+
+  isTmpRight(): boolean {
+    return false;
+  }
+
+  isUp(): boolean {
+    return false;
+  }
+
+}
+
+class TmpMonsterDownState implements MonsterState{
+  color(g: CanvasRenderingContext2D): void {
+  }
+
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+    g.fillRect(x, y, w, h);
+  }
+
+  isDown(): boolean {
+    return false;
+  }
+
+  isLeft(): boolean {
+    return false;
+  }
+
+  isRight(): boolean {
+    return false;
+  }
+
+  isTmpDown(): boolean {
+    return true;
+  }
+
+  isTmpRight(): boolean {
+    return false;
+  }
+
+  isUp(): boolean {
+    return false;
+  }
+
+}
+
+class MonsterLeftState implements MonsterState{
+  color(g: CanvasRenderingContext2D): void {
+    g.fillStyle = "#cc00cc";
+  }
+
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+    g.fillRect(x, y, w, h);
+  }
+
+  isDown(): boolean {
+    return false;
+  }
+
+  isLeft(): boolean {
+    return true;
+  }
+
+  isRight(): boolean {
+    return false;
+  }
+
+  isTmpDown(): boolean {
+    return false;
+  }
+
+  isTmpRight(): boolean {
+    return false;
+  }
+
+  isUp(): boolean {
+    return false;
+  }
+
 }
 
 interface Input {
@@ -1551,9 +1360,9 @@ function transformTile(rawMapElementElement: RawTile) {
     case RawTile.BOMB:
       return new Bomb(new Normal());
     case RawTile.BOMB_CLOSE:
-      return new BombClose(new Close());
+      return new Bomb(new Close());
     case RawTile.BOMB_REALLY_CLOSE:
-      return new BombReallyClose(new ReallyClose());
+      return new Bomb(new ReallyClose());
     case RawTile.TMP_FIRE:
       return new TmpFire();
     case RawTile.FIRE:
@@ -1561,17 +1370,17 @@ function transformTile(rawMapElementElement: RawTile) {
     case RawTile.EXTRA_BOMB:
       return new ExtraBomb();
     case RawTile.MONSTER_UP:
-      return new MonsterUp();
+      return new Monster(new MonsterUpState());
     case RawTile.MONSTER_RIGHT:
-      return new MonsterRight();
+      return new Monster(new MonsterRightState());
     case RawTile.TMP_MONSTER_RIGHT:
-      return new TmpMonsterRight();
+      return new Monster(new TmpMonsterRightState());
     case RawTile.MONSTER_DOWN:
-      return new MonsterDown();
+      return new Monster(new MonsterDownState());
     case RawTile.TMP_MONSTER_DOWN:
-      return new TmpMonsterDown();
+      return new Monster(new TmpMonsterDownState());
     case RawTile.MONSTER_LEFT:
-      return new MonsterLeft();
+      return new Monster(new MonsterLeftState());
     default:
       throw new Error("Invalid rawMapElementElement");
   }
@@ -1628,36 +1437,36 @@ function updateMap() {
       } else if (map[y][x].isFire()) {
         map[y][x] = new Air();
       } else if (map[y][x].isTmpMonsterDown()) {
-        map[y][x] = new MonsterDown();
+        map[y][x] = new Monster(new MonsterDownState());
       } else if (map[y][x].isTmpMonsterRight()) {
-        map[y][x] = new MonsterRight();
+        map[y][x] = new Monster(new MonsterRightState());
       } else if (map[y][x].isMonsterRight()) {
         if (map[y][x + 1].isAir()) {
           map[y][x] = new Air();
-          map[y][x + 1] = new TmpMonsterRight();
+          map[y][x + 1] = new Monster(new TmpMonsterRightState());
         } else {
-          map[y][x] = new MonsterDown();
+          map[y][x] = new Monster(new MonsterDownState());
         }
       } else if (map[y][x].isMonsterDown()) {
         if (map[y + 1][x].isAir()) {
           map[y][x] = new Air();
-          map[y + 1][x] = new TmpMonsterDown();
+          map[y + 1][x] = new Monster(new TmpMonsterDownState());
         } else {
-          map[y][x] = new MonsterLeft();
+          map[y][x] = new Monster(new MonsterLeftState());
         }
       } else if (map[y][x].isMonsterLeft()) {
         if (map[y][x - 1].isAir()) {
           map[y][x] = new Air();
-          map[y][x - 1] = new MonsterLeft();
+          map[y][x - 1] = new Monster(new MonsterLeftState());
         } else {
-          map[y][x] = new MonsterUp();
+          map[y][x] = new Monster(new MonsterUpState());
         }
       } else if (map[y][x].isMonsterUp()) {
         if (map[y - 1][x].isAir()) {
           map[y][x] = new Air();
-          map[y - 1][x] = new MonsterUp();
+          map[y - 1][x] = new Monster(new MonsterUpState());
         } else {
-          map[y][x] = new MonsterRight();
+          map[y][x] = new Monster(new MonsterRightState());
         }
       }
     }
