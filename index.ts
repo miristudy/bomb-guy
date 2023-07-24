@@ -73,22 +73,22 @@ class Air implements Tile {
 
     updateMonsterUp(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y - 1][x] = new Monster(MonsterDirection.UP);
+        map[y - 1][x] = new Monster(new MonsterDirectionUp());
     }
 
     updateMonsterRight(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y][x + 1] = new TmpMonster(MonsterDirection.RIGHT);
+        map[y][x + 1] = new TmpMonster(new MonsterDirectionRight());
     }
 
     updateMonsterDown(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y + 1][x] = new TmpMonster(MonsterDirection.DOWN);
+        map[y + 1][x] = new TmpMonster(new MonsterDirectionDown());
     }
 
     updateMonsterLeft(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y][x - 1] = new Monster(MonsterDirection.LEFT);
+        map[y][x - 1] = new Monster(new MonsterDirectionLeft());
     }
 }
 
@@ -119,19 +119,19 @@ class Unbreakable implements Tile {
     }
 
     updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
+        map[y][x] = new Monster(new MonsterDirectionRight());
     }
 
     updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN)
+        map[y][x] = new Monster(new MonsterDirectionDown())
     }
 
     updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
+        map[y][x] = new Monster(new MonsterDirectionLeft());
     }
 
     updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
+        map[y][x] = new Monster(new MonsterDirectionUp());
     }
 }
 
@@ -165,19 +165,19 @@ class Stone implements Tile {
     }
 
     updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
+        map[y][x] = new Monster(new MonsterDirectionRight());
     }
 
     updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
+        map[y][x] = new Monster(new MonsterDirectionDown())
     }
 
     updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
+        map[y][x] = new Monster(new MonsterDirectionLeft());
     }
 
     updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
+        map[y][x] = new Monster(new MonsterDirectionUp());
     }
 }
 
@@ -240,19 +240,19 @@ class Bomb implements Tile {
     }
 
     updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
+        map[y][x] = new Monster(new MonsterDirectionRight());
     }
 
     updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
+        map[y][x] = new Monster(new MonsterDirectionDown())
     }
 
     updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
+        map[y][x] = new Monster(new MonsterDirectionLeft());
     }
 
     updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
+        map[y][x] = new Monster(new MonsterDirectionUp());
     }
 }
 
@@ -283,19 +283,19 @@ class TmpFire implements Tile {
     }
 
     updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
+        map[y][x] = new Monster(new MonsterDirectionRight());
     }
 
     updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
+        map[y][x] = new Monster(new MonsterDirectionDown())
     }
 
     updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
+        map[y][x] = new Monster(new MonsterDirectionLeft());
     }
 
     updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
+        map[y][x] = new Monster(new MonsterDirectionUp());
     }
 }
 
@@ -328,19 +328,19 @@ class Fire implements Tile {
     }
 
     updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
+        map[y][x] = new Monster(new MonsterDirectionRight());
     }
 
     updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
+        map[y][x] = new Monster(new MonsterDirectionDown())
     }
 
     updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
+        map[y][x] = new Monster(new MonsterDirectionLeft());
     }
 
     updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
+        map[y][x] = new Monster(new MonsterDirectionUp());
     }
 }
 
@@ -375,24 +375,48 @@ class ExtraBomb implements Tile {
     }
 
     updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
+        map[y][x] = new Monster(new MonsterDirectionRight());
     }
 
     updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
+        map[y][x] = new Monster(new MonsterDirectionDown())
     }
 
     updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
+        map[y][x] = new Monster(new MonsterDirectionLeft());
     }
 
     updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
+        map[y][x] = new Monster(new MonsterDirectionUp());
     }
 }
 
-enum MonsterDirection {
-    UP, RIGHT, DOWN, LEFT
+interface MonsterDirection {
+    updateTile(y: number, x: number): void;
+}
+
+class MonsterDirectionUp implements MonsterDirection {
+    updateTile(y: number, x: number) {
+        map[y - 1][x].updateMonsterUp(y, x);
+    }
+}
+
+class MonsterDirectionRight implements MonsterDirection {
+    updateTile(y: number, x: number) {
+        map[y][x + 1].updateMonsterRight(y, x);
+    }
+}
+
+class MonsterDirectionDown implements MonsterDirection {
+    updateTile(y: number, x: number) {
+        map[y + 1][x].updateMonsterDown(y, x);
+    }
+}
+
+class MonsterDirectionLeft implements MonsterDirection {
+    updateTile(y: number, x: number) {
+        map[y][x - 1].updateMonsterLeft(y, x);
+    }
 }
 
 class Monster implements Tile {
@@ -405,15 +429,7 @@ class Monster implements Tile {
     }
 
     updateTile(y: number, x: number) {
-        if (this.direction === MonsterDirection.UP) {
-            map[y - 1][x].updateMonsterUp(y, x);
-        } else if (this.direction === MonsterDirection.RIGHT) {
-            map[y][x + 1].updateMonsterRight(y, x);
-        } else if (this.direction === MonsterDirection.DOWN) {
-            map[y + 1][x].updateMonsterDown(y, x);
-        } else if (this.direction === MonsterDirection.LEFT) {
-            map[y][x - 1].updateMonsterLeft(y, x);
-        }
+        this.direction.updateTile(y, x);
     }
 
     draw(y: number, x: number, g: CanvasRenderingContext2D) {
@@ -435,19 +451,19 @@ class Monster implements Tile {
     }
 
     updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
+        map[y][x] = new Monster(new MonsterDirectionRight());
     }
 
     updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
+        map[y][x] = new Monster(new MonsterDirectionDown())
     }
 
     updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
+        map[y][x] = new Monster(new MonsterDirectionLeft());
     }
 
     updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
+        map[y][x] = new Monster(new MonsterDirectionUp());
     }
 }
 
@@ -482,19 +498,19 @@ class TmpMonster implements Tile {
     }
 
     updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
+        map[y][x] = new Monster(new MonsterDirectionRight());
     }
 
     updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
+        map[y][x] = new Monster(new MonsterDirectionDown())
     }
 
     updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
+        map[y][x] = new Monster(new MonsterDirectionLeft());
     }
 
     updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
+        map[y][x] = new Monster(new MonsterDirectionUp());
     }
 }
 
@@ -685,17 +701,17 @@ function transformTile(rawTile: RawTile): Tile {
         case RawTile.EXTRA_BOMB:
             return new ExtraBomb();
         case RawTile.MONSTER_UP:
-            return new Monster(MonsterDirection.UP);
+            return new Monster(new MonsterDirectionUp());
         case RawTile.MONSTER_RIGHT:
-            return new Monster(MonsterDirection.RIGHT);
+            return new Monster(new MonsterDirectionRight());
         case RawTile.TMP_MONSTER_RIGHT:
-            return new TmpMonster(MonsterDirection.RIGHT);
+            return new TmpMonster(new MonsterDirectionRight());
         case RawTile.MONSTER_DOWN:
-            return new Monster(MonsterDirection.DOWN);
+            return new Monster(new MonsterDirectionDown());
         case RawTile.TMP_MONSTER_DOWN:
-            return new TmpMonster(MonsterDirection.DOWN);
+            return new TmpMonster(new MonsterDirectionDown());
         case RawTile.MONSTER_LEFT:
-            return new Monster(MonsterDirection.LEFT);
+            return new Monster(new MonsterDirectionLeft());
         default:
             return assertExhausted(rawTile);
     }
