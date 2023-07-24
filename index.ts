@@ -78,12 +78,12 @@ class Air implements Tile {
 
     updateMonsterRight(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y][x + 1] = new TmpMonsterRight();
+        map[y][x + 1] = new TmpMonster(MonsterDirection.RIGHT);
     }
 
     updateMonsterDown(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y + 1][x] = new TmpMonsterDown();
+        map[y + 1][x] = new TmpMonster(MonsterDirection.DOWN);
     }
 
     updateMonsterLeft(y: number, x: number): void {
@@ -439,57 +439,17 @@ class Monster implements Tile {
     }
 }
 
-class TmpMonsterRight implements Tile {
+class TmpMonster implements Tile {
+
+    constructor(private monsterDirection: MonsterDirection) {
+    }
+
     move(x: number, y: number) {
         // do nothing
     }
 
     updateTile(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
-    }
-
-    draw(y: number, x: number, g: CanvasRenderingContext2D) {
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    explode(x: number, y: number, type: Tile) {
-        addBomb(y, x);
-        map[y][x] = type;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isKillable(): boolean {
-        return false;
-    }
-
-    updateMonsterUp(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.RIGHT);
-    }
-
-    updateMonsterRight(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
-    }
-
-    updateMonsterDown(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.LEFT);
-    }
-
-    updateMonsterLeft(y: number, x: number): void {
-        map[y][x] = new Monster(MonsterDirection.UP);
-    }
-}
-
-
-class TmpMonsterDown implements Tile {
-    move(x: number, y: number) {
-        // do nothing
-    }
-
-    updateTile(y: number, x: number) {
-        map[y][x] = new Monster(MonsterDirection.DOWN);
+        map[y][x] = new Monster(this.monsterDirection);
     }
 
     draw(y: number, x: number, g: CanvasRenderingContext2D) {
@@ -717,11 +677,11 @@ function transformTile(rawTile: RawTile): Tile {
         case RawTile.MONSTER_RIGHT:
             return new Monster(MonsterDirection.RIGHT);
         case RawTile.TMP_MONSTER_RIGHT:
-            return new TmpMonsterRight();
+            return new TmpMonster(MonsterDirection.RIGHT);
         case RawTile.MONSTER_DOWN:
             return new Monster(MonsterDirection.DOWN);
         case RawTile.TMP_MONSTER_DOWN:
-            return new TmpMonsterDown();
+            return new TmpMonster(MonsterDirection.DOWN);
         case RawTile.MONSTER_LEFT:
             return new Monster(MonsterDirection.LEFT);
         default:
