@@ -31,7 +31,6 @@ interface Tile {
     isBombReallyClose(): boolean;
     isTmpFire(): boolean;
     isFire(): boolean;
-    isExtraBomb(): boolean;
     isMonsterUp(): boolean;
     isMonsterRight(): boolean;
     isTmpMonsterRight(): boolean;
@@ -43,6 +42,8 @@ interface Tile {
     isGameOver(): Boolean;
     isBombType(): Boolean;
     movePlayer(y: number, x: number): void;
+    close(): void;
+    reallyClose(): void;
 }
 
 class Air implements Tile {
@@ -61,11 +62,6 @@ class Air implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -121,6 +117,12 @@ class Air implements Tile {
         playery += y;
         playerx += x;
     }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
+    }
 }
 
 class Unbreakable implements Tile {
@@ -139,11 +141,6 @@ class Unbreakable implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -199,6 +196,12 @@ class Unbreakable implements Tile {
 
     movePlayer(y: number, x: number): void {
     }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
+    }
 }
 
 class Stone implements Tile {
@@ -217,11 +220,6 @@ class Stone implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -276,6 +274,12 @@ class Stone implements Tile {
     }
 
     movePlayer(y: number, x: number): void {
+    }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
     }
 }
 
@@ -363,11 +367,6 @@ class Bomb implements Tile {
     isBombReallyClose(): boolean {
         return this.status.isReallyClose();
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -422,6 +421,14 @@ class Bomb implements Tile {
 
     movePlayer(y: number, x: number): void {
     }
+
+    close(): void {
+        this.status = new Close();
+    }
+
+    reallyClose(): void {
+        this.status = new ReallyClose();
+    }
 }
 
 class TmpFire implements Tile {
@@ -440,11 +447,6 @@ class TmpFire implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -499,6 +501,12 @@ class TmpFire implements Tile {
 
     movePlayer(y: number, x: number): void {
     }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
+    }
 }
 
 class Fire implements Tile {
@@ -517,11 +525,6 @@ class Fire implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return true;
     }
@@ -579,6 +582,12 @@ class Fire implements Tile {
         playery += y;
         playerx += x;
     }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
+    }
 }
 
 class ExtraBomb implements Tile {
@@ -597,11 +606,6 @@ class ExtraBomb implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return true;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -661,6 +665,12 @@ class ExtraBomb implements Tile {
         bombs++;
         map[playery][playerx] = new Air();
     }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
+    }
 }
 
 class MonsterUp implements Tile {
@@ -679,11 +689,6 @@ class MonsterUp implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -738,6 +743,12 @@ class MonsterUp implements Tile {
     }
 
     movePlayer(y: number, x: number): void {
+    }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
     }
 }
 
@@ -757,11 +768,6 @@ class MonsterRight implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -816,6 +822,12 @@ class MonsterRight implements Tile {
     }
 
     movePlayer(y: number, x: number): void {
+    }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
     }
 }
 
@@ -835,11 +847,6 @@ class TmpMonsterRight implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -893,6 +900,12 @@ class TmpMonsterRight implements Tile {
     }
 
     movePlayer(y: number, x: number): void {
+    }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
     }
 }
 
@@ -912,11 +925,6 @@ class MonsterDown implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -971,6 +979,12 @@ class MonsterDown implements Tile {
     }
 
     movePlayer(y: number, x: number): void {
+    }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
     }
 }
 
@@ -990,11 +1004,6 @@ class TmpMonsterDown implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -1049,6 +1058,12 @@ class TmpMonsterDown implements Tile {
 
     movePlayer(y: number, x: number): void {
     }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
+    }
 }
 
 class MonsterLeft implements Tile {
@@ -1067,11 +1082,6 @@ class MonsterLeft implements Tile {
     isBombReallyClose(): boolean {
         return false;
     }
-
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isFire(): boolean {
         return false;
     }
@@ -1126,6 +1136,12 @@ class MonsterLeft implements Tile {
     }
 
     movePlayer(y: number, x: number): void {
+    }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
     }
 }
 
@@ -1362,9 +1378,9 @@ function explodeTmpFire(x: number, y: number) {
 
 function updateTile(y: number, x: number) {
     if (map[y][x].isBomb()) {
-        map[y][x] = new Bomb(new Close());
+        map[y][x].close();
     } else if (map[y][x].isBombClose()) {
-        map[y][x] = new Bomb(new ReallyClose());
+        map[y][x].reallyClose()
     } else if (map[y][x].isBombReallyClose()) {
         explodeFire(x, y - 1);
         explodeTmpFire(x, y+1);
