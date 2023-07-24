@@ -181,8 +181,31 @@ class Stone implements Tile {
     }
 }
 
-enum BombState {
-    BOMB, CLOSE, REALLY_CLOSE
+interface BombState {
+    updateTile(y: number, x: number): void;
+}
+
+class BombStateBomb implements BombState {
+    updateTile(y: number, x: number) {
+        map[y][x] = new Bomb(new BombStateClose(), "#cc0000");
+    }
+}
+
+class BombStateClose implements BombState {
+    updateTile(y: number, x: number) {
+        map[y][x] = new Bomb(new BombStateReallyClose(), "#ff0000");
+    }
+}
+
+class BombStateReallyClose implements BombState {
+    updateTile(y: number, x: number) {
+        map[y - 1][x + 0].explode(x + 0, y - 1, new Fire());
+        map[y + 1][x + 0].explode(x + 0, y + 1, new TmpFire());
+        map[y + 0][x - 1].explode(x - 1, y + 0, new Fire());
+        map[y + 0][x + 1].explode(x + 1, y + 0, new TmpFire());
+        map[y][x] = new Fire();
+        bombs++;
+    }
 }
 
 class Bomb implements Tile {
@@ -195,18 +218,7 @@ class Bomb implements Tile {
     }
 
     updateTile(y: number, x: number) {
-        if (this.bombState === BombState.BOMB) {
-            map[y][x] = new Bomb(BombState.CLOSE, "#cc0000");
-        } else if (this.bombState === BombState.CLOSE) {
-            map[y][x] = new Bomb(BombState.REALLY_CLOSE, "#ff0000");
-        } else if (this.bombState === BombState.REALLY_CLOSE) {
-            map[y - 1][x + 0].explode(x + 0, y - 1, new Fire());
-            map[y + 1][x + 0].explode(x + 0, y + 1, new TmpFire());
-            map[y + 0][x - 1].explode(x - 1, y + 0, new Fire());
-            map[y + 0][x + 1].explode(x + 1, y + 0, new TmpFire());
-            map[y][x] = new Fire();
-            bombs++;
-        }
+        this.bombState.updateTile(y, x);
     }
 
     draw(y: number, x: number, g: CanvasRenderingContext2D) {
@@ -552,7 +564,7 @@ function move(x: number, y: number) {
 
 function placeBomb() {
     if (bombs > 0) {
-        map[playery][playerx] = new Bomb(BombState.BOMB, "770000");
+        map[playery][playerx] = new Bomb(new BombStateBomb(), "770000");
         bombs--;
     }
 }
@@ -661,11 +673,11 @@ function transformTile(rawTile: RawTile): Tile {
         case RawTile.STONE:
             return new Stone();
         case RawTile.BOMB:
-            return new Bomb(BombState.BOMB, "#770000");
+            return new Bomb(new BombStateBomb(), "#770000");
         case RawTile.BOMB_CLOSE:
-            return new Bomb(BombState.CLOSE, "#cc0000");
+            return new Bomb(new BombStateClose(), "#cc0000");
         case RawTile.BOMB_REALLY_CLOSE:
-            return new Bomb(BombState.REALLY_CLOSE, "#ff0000");
+            return new Bomb(new BombStateReallyClose(), "#ff0000");
         case RawTile.TMP_FIRE:
             return new TmpFire();
         case RawTile.FIRE:
