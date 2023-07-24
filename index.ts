@@ -27,7 +27,7 @@ interface Tile {
     updateTile(y: number, x: number): void;
     draw(y: number, x:number, g: CanvasRenderingContext2D): void;
     explode(x: number, y: number, type: Tile): void;
-    isBombOrClose(): boolean;
+    isBomb(): boolean;
     isKillable(): boolean;
     updateMonsterUp(y: number, x: number): void;
     updateMonsterRight(y: number, x: number): void;
@@ -54,7 +54,7 @@ class Air implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -101,7 +101,7 @@ class Unbreakable implements Tile {
     // do nothing
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -147,7 +147,7 @@ class Stone implements Tile {
       map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -170,19 +170,38 @@ class Stone implements Tile {
   updateMonsterLeft(y: number, x: number): void {
     map[y][x] = new MonsterUp();
   }
+}
+
+enum BombState {
+  BOMB, CLOSE, REALLY_CLOSE
 }
 
 class Bomb implements Tile {
+
+  constructor(private bombState: BombState, private color: string) {
+  }
+
   move(x: number, y: number) {
     // do nothing
   }
 
   updateTile(y: number, x: number) {
-    map[y][x] = new BombClose();
+    if (this.bombState === BombState.BOMB) {
+      map[y][x] = new Bomb(BombState.CLOSE, "#cc0000");
+    } else if (this.bombState === BombState.CLOSE) {
+      map[y][x] = new Bomb(BombState.REALLY_CLOSE, "#ff0000");
+    } else if (this.bombState === BombState.REALLY_CLOSE) {
+      map[y - 1][x + 0].explode(x + 0, y - 1, new Fire());
+      map[y + 1][x + 0].explode(x + 0, y + 1, new TmpFire());
+      map[y + 0][x - 1].explode(x - 1, y + 0, new Fire());
+      map[y + 0][x + 1].explode(x + 1, y + 0, new TmpFire());
+      map[y][x] = new Fire();
+      bombs++;
+    }
   }
 
   draw(y: number, x:number, g: CanvasRenderingContext2D) {
-    g.fillStyle = "#770000";
+    g.fillStyle = this.color;
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
@@ -191,100 +210,7 @@ class Bomb implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
-    return true;
-  }
-
-  isKillable(): boolean {
-    return false;
-  }
-
-  updateMonsterUp(y: number, x: number) {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(y: number, x: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(y: number, x: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(y: number, x: number): void {
-    map[y][x] = new MonsterUp();
-  }
-}
-
-class BombClose implements Tile {
-  move(x: number, y: number) {
-    // do nothing
-  }
-
-  updateTile(y: number, x: number) {
-    map[y][x] = new BombReallyClose();
-  }
-
-  draw(y: number, x:number, g: CanvasRenderingContext2D) {
-    g.fillStyle = "#cc0000";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  explode(x: number, y: number, type: Tile) {
-    addBomb(y, x);
-    map[y][x] = type;
-  }
-
-  isBombOrClose(): boolean {
-    return true;
-  }
-
-  isKillable(): boolean {
-    return false;
-  }
-
-  updateMonsterUp(y: number, x: number) {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(y: number, x: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(y: number, x: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(y: number, x: number): void {
-    map[y][x] = new MonsterUp();
-  }
-}
-
-class BombReallyClose implements Tile {
-  move(x: number, y: number) {
-    // do nothing
-  }
-
-  updateTile(y: number, x: number) {
-    map[y - 1][x + 0].explode(x + 0, y - 1, new Fire());
-    map[y + 1][x + 0].explode(x + 0, y + 1, new TmpFire());
-    map[y + 0][x - 1].explode(x - 1, y + 0, new Fire());
-    map[y + 0][x + 1].explode(x + 1, y + 0, new TmpFire());
-    map[y][x] = new Fire();
-    bombs++;
-  }
-
-  draw(y: number, x:number, g: CanvasRenderingContext2D) {
-    g.fillStyle = "#ff0000";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  explode(x: number, y: number, type: Tile) {
-    addBomb(y, x);
-    map[y][x] = type;
-  }
-
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return true;
   }
 
@@ -327,7 +253,7 @@ class TmpFire implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -372,7 +298,7 @@ class Fire implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -419,7 +345,7 @@ class ExtraBomb implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -463,7 +389,7 @@ class MonsterUp implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -507,7 +433,7 @@ class MonsterRight implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -550,7 +476,7 @@ class TmpMonsterRight implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -594,7 +520,7 @@ class MonsterDown implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -637,7 +563,7 @@ class TmpMonsterDown implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -681,7 +607,7 @@ class MonsterLeft implements Tile {
     map[y][x] = type;
   }
 
-  isBombOrClose(): boolean {
+  isBomb(): boolean {
     return false;
   }
 
@@ -762,7 +688,7 @@ let bombs = 1;
 let gameOver = false;
 
 function addBomb(y: number, x: number) {
-  if (map[y][x].isBombOrClose())
+  if (map[y][x].isBomb())
     bombs++;
 }
 
@@ -772,7 +698,7 @@ function move(x: number, y: number) {
 
 function placeBomb() {
   if (bombs > 0) {
-    map[playery][playerx] = new Bomb();
+    map[playery][playerx] = new Bomb(BombState.BOMB, "770000");
     bombs--;
   }
 }
@@ -881,11 +807,11 @@ function transformTile(rawTile: RawTile): Tile {
     case RawTile.STONE:
       return new Stone();
     case RawTile.BOMB:
-      return new Bomb();
+      return new Bomb(BombState.BOMB, "#770000");
     case RawTile.BOMB_CLOSE:
-      return new BombClose();
+      return new Bomb(BombState.CLOSE, "#cc0000");
     case RawTile.BOMB_REALLY_CLOSE:
-      return new BombReallyClose();
+      return new Bomb(BombState.REALLY_CLOSE, "#ff0000");
     case RawTile.TMP_FIRE:
       return new TmpFire();
     case RawTile.FIRE:
