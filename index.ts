@@ -844,8 +844,12 @@ function drawPlayerIfGameNotOver(g: CanvasRenderingContext2D) {
         g.fillRect(playerx * TILE_SIZE, playery * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 }
 
-function drawPlayer(g: CanvasRenderingContext2D) {
+function setPlayerColor(g: CanvasRenderingContext2D) {
     g.fillStyle = "#00ff00";
+}
+
+function drawPlayer(g: CanvasRenderingContext2D) {
+    setPlayerColor(g);
     drawPlayerIfGameNotOver(g);
 }
 
