@@ -44,6 +44,12 @@ interface Tile {
   isGameOver(): boolean;
   isBombType(): boolean;
   move(x: number, y: number): void;
+  renewMonsterUp(): void;
+  renewMonsterDown(): void;
+  renewMonsterLeft(): void;
+  renewMonsterRight(): void;
+  renewTmpMonsterRight(): void;
+  renewTmpMonsterDown(): void;
 }
 
 class Air implements Tile {
@@ -123,6 +129,24 @@ class Air implements Tile {
   move(x: number, y: number): void {
     playery += y;
     playerx += x;
+  }
+
+  renewMonsterDown(): void {
+  }
+
+  renewMonsterLeft(): void {
+  }
+
+  renewMonsterRight(): void {
+  }
+
+  renewTmpMonsterDown(): void {
+  }
+
+  renewTmpMonsterRight(): void {
+  }
+
+  renewMonsterUp(): void {
   }
 
 }
@@ -207,6 +231,24 @@ class Unbreakable implements Tile {
   move(x: number, y: number): void {
   }
 
+  renewMonsterDown(): void {
+  }
+
+  renewMonsterLeft(): void {
+  }
+
+  renewMonsterRight(): void {
+  }
+
+  renewTmpMonsterDown(): void {
+  }
+
+  renewTmpMonsterRight(): void {
+  }
+
+  renewMonsterUp(): void {
+  }
+
 }
 
 class Stone implements Tile {
@@ -287,6 +329,24 @@ class Stone implements Tile {
   }
 
   move(x: number, y: number): void {
+  }
+
+  renewMonsterDown(): void {
+  }
+
+  renewMonsterLeft(): void {
+  }
+
+  renewMonsterRight(): void {
+  }
+
+  renewTmpMonsterDown(): void {
+  }
+
+  renewTmpMonsterRight(): void {
+  }
+
+  renewMonsterUp(): void {
   }
 
 }
@@ -373,6 +433,24 @@ class Bomb implements Tile {
   }
 
   move(x: number, y: number): void {
+  }
+
+  renewMonsterDown(): void {
+  }
+
+  renewMonsterLeft(): void {
+  }
+
+  renewMonsterRight(): void {
+  }
+
+  renewTmpMonsterDown(): void {
+  }
+
+  renewTmpMonsterRight(): void {
+  }
+
+  renewMonsterUp(): void {
   }
 
 }
@@ -535,6 +613,24 @@ class TmpFire implements Tile {
   move(x: number, y: number): void {
   }
 
+  renewMonsterDown(): void {
+  }
+
+  renewMonsterLeft(): void {
+  }
+
+  renewMonsterRight(): void {
+  }
+
+  renewTmpMonsterDown(): void {
+  }
+
+  renewTmpMonsterRight(): void {
+  }
+
+  renewMonsterUp(): void {
+  }
+
 }
 
 class Fire implements Tile {
@@ -617,6 +713,24 @@ class Fire implements Tile {
   move(x: number, y: number): void {
     playery += y;
     playerx += x;
+  }
+
+  renewMonsterDown(): void {
+  }
+
+  renewMonsterLeft(): void {
+  }
+
+  renewMonsterRight(): void {
+  }
+
+  renewTmpMonsterDown(): void {
+  }
+
+  renewTmpMonsterRight(): void {
+  }
+
+  renewMonsterUp(): void {
   }
 
 }
@@ -703,6 +817,24 @@ class ExtraBomb implements Tile {
     playerx += x;
     bombs++;
     map[playery][playerx] = new Air();
+  }
+
+  renewMonsterDown(): void {
+  }
+
+  renewMonsterLeft(): void {
+  }
+
+  renewMonsterRight(): void {
+  }
+
+  renewTmpMonsterDown(): void {
+  }
+
+  renewTmpMonsterRight(): void {
+  }
+
+  renewMonsterUp(): void {
   }
 
 }
@@ -799,6 +931,30 @@ class Monster implements Tile {
   }
 
   move(x: number, y: number): void {
+  }
+
+  renewMonsterDown(): void {
+    this.state = new MonsterDownState();
+  }
+
+  renewMonsterLeft(): void {
+    this.state = new MonsterLeftState();
+  }
+
+  renewMonsterRight(): void {
+    this.state = new MonsterRightState();
+  }
+
+  renewTmpMonsterDown(): void {
+    this.state = new TmpMonsterDownState()
+  }
+
+  renewTmpMonsterRight(): void {
+    this.state = new TmpMonsterRightState();
+  }
+
+  renewMonsterUp(): void {
+    this.state = new MonsterUpState();
   }
 
 }
@@ -1267,36 +1423,36 @@ function updateMap() {
       } else if (map[y][x].isFire()) {
         map[y][x] = new Air();
       } else if (map[y][x].isTmpMonsterDown()) {
-        map[y][x] = new Monster(new MonsterDownState());
+        map[y][x].renewMonsterDown();
       } else if (map[y][x].isTmpMonsterRight()) {
-        map[y][x] = new Monster(new MonsterRightState());
+        map[y][x].renewMonsterRight();
       } else if (map[y][x].isMonsterRight()) {
         if (map[y][x + 1].isAir()) {
           map[y][x] = new Air();
           map[y][x + 1] = new Monster(new TmpMonsterRightState());
         } else {
-          map[y][x] = new Monster(new MonsterDownState());
+          map[y][x].renewMonsterDown();
         }
       } else if (map[y][x].isMonsterDown()) {
         if (map[y + 1][x].isAir()) {
           map[y][x] = new Air();
           map[y + 1][x] = new Monster(new TmpMonsterDownState());
         } else {
-          map[y][x] = new Monster(new MonsterLeftState());
+          map[y][x].renewMonsterLeft();
         }
       } else if (map[y][x].isMonsterLeft()) {
         if (map[y][x - 1].isAir()) {
           map[y][x] = new Air();
           map[y][x - 1] = new Monster(new MonsterLeftState());
         } else {
-          map[y][x] = new Monster(new MonsterUpState());
+          map[y][x].renewMonsterUp();
         }
       } else if (map[y][x].isMonsterUp()) {
         if (map[y - 1][x].isAir()) {
           map[y][x] = new Air();
           map[y - 1][x] = new Monster(new MonsterUpState());
         } else {
-          map[y][x] = new Monster(new MonsterRightState());
+          map[y][x].renewMonsterRight();
         }
       }
     }
