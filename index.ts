@@ -291,37 +291,6 @@ class Stone implements Tile {
 
 }
 
-interface BombState{
-  isNormal(): boolean;
-  isClose(): boolean;
-  isReallyClose(): boolean;
-  color(g: CanvasRenderingContext2D): void,
-  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void
-}
-
-class Normal implements BombState{
-  isClose(): boolean {
-    return false;
-  }
-
-  isNormal(): boolean {
-    return true;
-  }
-
-  isReallyClose(): boolean {
-    return false;
-  }
-
-  color(g: CanvasRenderingContext2D): void {
-    g.fillStyle = "#770000";
-  }
-
-  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
-    g.fillRect(x, y, w, h);
-  }
-
-}
-
 class Bomb implements Tile {
 
   constructor(private bombState: BombState){
@@ -408,6 +377,37 @@ class Bomb implements Tile {
 
 }
 
+interface BombState{
+  isNormal(): boolean;
+  isClose(): boolean;
+  isReallyClose(): boolean;
+  color(g: CanvasRenderingContext2D): void,
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void
+}
+
+class Normal implements BombState{
+  isClose(): boolean {
+    return false;
+  }
+
+  isNormal(): boolean {
+    return true;
+  }
+
+  isReallyClose(): boolean {
+    return false;
+  }
+
+  color(g: CanvasRenderingContext2D): void {
+    g.fillStyle = "#770000";
+  }
+
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+    g.fillRect(x, y, w, h);
+  }
+
+}
+
 class Close implements BombState{
 
 
@@ -433,91 +433,6 @@ class Close implements BombState{
 
 }
 
-class BombClose implements Tile {
-  constructor(private bombState: BombState){
-  }
-
-  isAir(): boolean {
-    return false;
-  }
-
-  isBomb(): boolean {
-    return this.bombState.isNormal();
-  }
-
-  isBombClose(): boolean {
-    return this.bombState.isClose();
-  }
-
-  isBombReallyClose(): boolean {
-    return this.bombState.isReallyClose();
-  }
-
-  isExtraBomb(): boolean {
-    return false;
-  }
-
-  isFire(): boolean {
-    return false;
-  }
-
-  isMonsterDown(): boolean {
-    return false;
-  }
-
-  isMonsterLeft(): boolean {
-    return false;
-  }
-
-  isMonsterRight(): boolean {
-    return false;
-  }
-
-  isMonsterUp(): boolean {
-    return false;
-  }
-
-  isStone(): boolean {
-    return false;
-  }
-
-  isTmpFire(): boolean {
-    return false;
-  }
-
-  isTmpMonsterDown(): boolean {
-    return false;
-  }
-
-  isTmpMonsterRight(): boolean {
-    return false;
-  }
-
-  isUnbreakable(): boolean {
-    return false;
-  }
-
-  color(g: CanvasRenderingContext2D): void {
-    g.fillStyle = "#cc0000";
-  }
-
-  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
-    g.fillRect(x, y, w, h);
-  }
-
-  isGameOver(): boolean {
-    return false;
-  }
-
-  isBombType(): boolean {
-    return true;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-}
-
 class ReallyClose implements BombState{
   isClose(): boolean {
     return false;
@@ -537,91 +452,6 @@ class ReallyClose implements BombState{
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
-  }
-
-}
-
-class BombReallyClose implements Tile {
-  constructor(private bombState: BombState){
-  }
-
-  isAir(): boolean {
-    return false;
-  }
-
-  isBomb(): boolean {
-    return this.bombState.isNormal();
-  }
-
-  isBombClose(): boolean {
-    return this.bombState.isClose();
-  }
-
-  isBombReallyClose(): boolean {
-    return this.bombState.isReallyClose();
-  }
-
-  isExtraBomb(): boolean {
-    return false;
-  }
-
-  isFire(): boolean {
-    return false;
-  }
-
-  isMonsterDown(): boolean {
-    return false;
-  }
-
-  isMonsterLeft(): boolean {
-    return false;
-  }
-
-  isMonsterRight(): boolean {
-    return false;
-  }
-
-  isMonsterUp(): boolean {
-    return false;
-  }
-
-  isStone(): boolean {
-    return false;
-  }
-
-  isTmpFire(): boolean {
-    return false;
-  }
-
-  isTmpMonsterDown(): boolean {
-    return false;
-  }
-
-  isTmpMonsterRight(): boolean {
-    return false;
-  }
-
-  isUnbreakable(): boolean {
-    return false;
-  }
-
-  color(g: CanvasRenderingContext2D): void {
-    g.fillStyle = "#ff0000";
-  }
-
-  fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
-    g.fillRect(x, y, w, h);
-  }
-
-  isGameOver(): boolean {
-    return false;
-  }
-
-  isBombType(): boolean {
-    return true;
-  }
-
-  move(x: number, y: number): void {
   }
 
 }
@@ -1422,9 +1252,9 @@ function updateMap() {
   for (let y = 1; y < map.length; y++) {
     for (let x = 1; x < map[y].length; x++) {
       if (map[y][x].isBomb()) {
-        map[y][x] = new BombClose(new Close());
+        map[y][x] = new Bomb(new Close());
       } else if (map[y][x].isBombClose()) {
-        map[y][x] = new BombReallyClose(new ReallyClose());
+        map[y][x] = new Bomb(new ReallyClose());
       } else if (map[y][x].isBombReallyClose()) {
         explode(x + 0, y - 1, new Fire());
         explode(x + 0, y + 1, new TmpFire());
