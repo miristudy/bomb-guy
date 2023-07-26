@@ -22,6 +22,94 @@ enum RawTile {
   MONSTER_LEFT,
 }
 
+interface MonsterState {
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void;
+  updateTile(y: number, x: number): void;
+}
+
+class MonsterUpState implements MonsterState {
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+    g.fillStyle = "#cc00cc";
+    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+
+  updateTile(y: number, x: number): void {
+    if (map[y - 1][x].isAir()) {
+      map[y][x] = new Air();
+      map[y - 1][x] = new Monster(new MonsterUpState());
+      return;
+    }
+    map[y][x] = new Monster(new MonsterRightState());
+  }
+}
+
+class MonsterRightState implements MonsterState {
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+    g.fillStyle = "#cc00cc";
+    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+
+  updateTile(y: number, x: number): void {
+    if (map[y][x + 1].isAir()) {
+      map[y][x] = new Air();
+      map[y][x + 1] = new Monster(new MonsterTmpRightState());
+      return;
+    }
+    map[y][x] = new Monster(new MonsterDownState());
+  }
+}
+
+class MonsterTmpRightState implements MonsterState {
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+  updateTile(y: number, x: number): void {
+    map[y][x] = new Monster(new MonsterRightState());
+  }
+}
+
+class MonsterLeftState implements MonsterState {
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+    g.fillStyle = "#cc00cc";
+    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+
+  updateTile(y: number, x: number): void {
+    if (map[y][x - 1].isAir()) {
+      map[y][x] = new Air();
+      map[y][x - 1] = new Monster(new MonsterLeftState());
+      return;
+    }
+    map[y][x] = new Monster(new MonsterUpState());
+  }
+}
+
+class MonsterDownState implements MonsterState {
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+    g.fillStyle = "#cc00cc";
+    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+
+  updateTile(y: number, x: number): void {
+    if (map[y + 1][x].isAir()) {
+      map[y][x] = new Air();
+      map[y + 1][x] = new Monster(new MonsterTmpDownState());
+      return;
+    }
+    map[y][x] = new Monster(new MonsterLeftState());
+  }
+}
+
+class MonsterTmpDownState implements MonsterState {
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+
+  updateTile(y: number, x: number) {
+    map[y][x] = new Monster(new MonsterDownState());
+  }
+}
+
 interface Tile {
   isAir(): boolean;
   isUnbreakable(): boolean;
@@ -32,6 +120,8 @@ interface Tile {
   draw(g: CanvasRenderingContext2D, x: number, y: number): void;
   explode(x: number, y: number, type: Tile): void;
 }
+
+
 
 class Air implements Tile {
   isAir() { return true; }
@@ -259,28 +349,22 @@ class ExtraBomb implements Tile {
   }
 }
 
-class MonsterUp implements Tile {
-  isAir() { return false; }
-  isUnbreakable() { return false; }
-  isGameOver() { return true; }
+class Monster implements Tile {
+  constructor(private state: MonsterState) { }
 
-  hasBomb() { return false; }
+  hasBomb(): boolean { return false; }
 
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
+  isAir(): boolean { return false; }
 
-  updateTile(y: number, x: number) {
-    if (map[y - 1][x].isAir()) {
-      map[y][x] = new Air();
-      map[y - 1][x] = new MonsterUp();
-      return;
-    }
-    map[y][x] = new MonsterRight();
-  }
+  isGameOver(): boolean { return false; }
+
+  isUnbreakable(): boolean { return false; }
 
   movePlayer(y: number, x: number): void {
+  }
+
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+    this.state.draw(g, x, y);
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -288,147 +372,9 @@ class MonsterUp implements Tile {
       bombs++;
     map[y][x] = type;
   }
-}
 
-class MonsterRight implements Tile {
-  isAir() { return false; }
-  isUnbreakable() { return false; }
-  isGameOver() { return true; }
-
-  hasBomb() { return false; }
-
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  updateTile(y: number, x: number) {
-    if (map[y][x + 1].isAir()) {
-      map[y][x] = new Air();
-      map[y][x + 1] = new TmpMonsterRight();
-      return;
-    }
-    map[y][x] = new MonsterDown();
-  }
-
-  movePlayer(y: number, x: number): void {
-  }
-
-  explode(x: number, y: number, type: Tile): void {
-    if (map[y][x].hasBomb())
-      bombs++;
-    map[y][x] = type;
-  }
-}
-
-class TmpMonsterRight implements Tile {
-  isAir() { return false; }
-  isUnbreakable() { return false; }
-  isGameOver() { return false; }
-
-  hasBomb() { return false; }
-
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  updateTile(y: number, x: number) {
-    map[y][x] = new MonsterRight();
-  }
-
-  movePlayer(y: number, x: number): void {
-  }
-
-  explode(x: number, y: number, type: Tile): void {
-    if (map[y][x].hasBomb())
-      bombs++;
-    map[y][x] = type;
-  }
-}
-
-class MonsterDown implements Tile {
-  isAir() { return false; }
-  isUnbreakable() { return false; }
-  isGameOver() { return true; }
-
-  hasBomb() { return false; }
-
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  updateTile(y: number, x: number) {
-    if (map[y + 1][x].isAir()) {
-      map[y][x] = new Air();
-      map[y + 1][x] = new TmpMonsterDown();
-      return;
-    }
-    map[y][x] = new MonsterLeft();
-  }
-
-  movePlayer(y: number, x: number): void {
-  }
-
-  explode(x: number, y: number, type: Tile): void {
-    if (map[y][x].hasBomb())
-      bombs++;
-    map[y][x] = type;
-  }
-}
-
-class TmpMonsterDown implements Tile {
-  isAir() { return false; }
-  isUnbreakable() { return false; }
-  isGameOver() { return false; }
-  hasBomb() { return false; }
-
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  updateTile(y: number, x: number) {
-    map[y][x] = new MonsterDown();
-  }
-
-  movePlayer(y: number, x: number): void {
-  }
-
-  explode(x: number, y: number, type: Tile): void {
-    if (map[y][x].hasBomb())
-      bombs++;
-    map[y][x] = type;
-  }
-}
-
-class MonsterLeft implements Tile {
-  isAir() { return false; }
-  isUnbreakable() { return false; }
-  isGameOver() { return true; }
-
-  hasBomb() { return false; }
-
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  updateTile(y: number, x: number) {
-    if (map[y][x - 1].isAir()) {
-      map[y][x] = new Air();
-      map[y][x - 1] = new MonsterLeft();
-      return;
-    }
-    map[y][x] = new MonsterUp();
-  }
-
-  movePlayer(y: number, x: number): void {
-  }
-
-  explode(x: number, y: number, type: Tile): void {
-    if (map[y][x].hasBomb())
-      bombs++;
-    map[y][x] = type;
+  updateTile(y: number, x: number): void {
+    this.state.updateTile(y, x);
   }
 }
 
@@ -535,12 +481,12 @@ function transformTile(tile: RawTile) {
     case RawTile.TMP_FIRE: return new TmpFire();
     case RawTile.FIRE: return new Fire();
     case RawTile.EXTRA_BOMB: return new ExtraBomb();
-    case RawTile.MONSTER_UP: return new MonsterUp();
-    case RawTile.MONSTER_RIGHT: return new MonsterRight();
-    case RawTile.TMP_MONSTER_RIGHT: return new TmpMonsterRight();
-    case RawTile.MONSTER_DOWN: return new MonsterDown();
-    case RawTile.TMP_MONSTER_DOWN: return new TmpMonsterDown();
-    case RawTile.MONSTER_LEFT: return new MonsterLeft();
+    case RawTile.MONSTER_UP: return new Monster(new MonsterUpState());
+    case RawTile.MONSTER_RIGHT: return new Monster(new MonsterRightState());
+    case RawTile.TMP_MONSTER_RIGHT: return new Monster(new MonsterTmpRightState());
+    case RawTile.MONSTER_DOWN: return new Monster(new MonsterDownState());
+    case RawTile.TMP_MONSTER_DOWN: return new Monster(new MonsterTmpDownState());
+    case RawTile.MONSTER_LEFT: return new Monster(new MonsterLeftState());
     default: return assertExhausted(tile);
   }
 }
@@ -622,6 +568,10 @@ function gameLoop() {
   let before = Date.now();
   update();
   draw();
+  setSleep(before);
+}
+
+function setSleep(before: number) {
   let after = Date.now();
   let frameTime = after - before;
   let sleep = SLEEP - frameTime;
