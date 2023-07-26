@@ -51,38 +51,33 @@ class Left implements Input {
   handle(): void {
     map[playery][playerx - 1].move(-1, 0);
   }
-
 }
 
 class Right implements Input {
   handle(): void {
     map[playery][playerx + 1].move(1, 0);
   }
-
 }
 
 class Up implements Input {
   handle(): void {
     map[playery - 1][playerx].move(0, -1);
   }
-
 }
 
 class Down implements Input {
   handle(): void {
     map[playery + 1][playerx].move(0, 1);
   }
-
 }
 
 class Place implements Input {
   handle(): void {
     if (bombs > 0) {
-      map[playery][playerx] = new Bomb();
+      map[playery][playerx] = new Bomb(new Init());
       bombs--;
     }
   }
-
 }
 
 interface Tile {
@@ -96,13 +91,7 @@ interface Tile {
 
   update(x: number, y: number): void;
 
-  updateMonsterUp(x: number, y: number): void;
-
-  updateMonsterRight(x: number, y: number): void;
-
-  updateMonsterDown(x: number, y: number): void;
-
-  updateMonsterLeft(x: number, y: number): void;
+  isAir(): boolean;
 }
 
 class Air implements Tile {
@@ -124,24 +113,8 @@ class Air implements Tile {
   update(x: number, y: number): void {
   }
 
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new Air();
-    map[y - 1][x] = new MonsterUp();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new Air();
-    map[y][x + 1] = new TmpMonsterRight();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new Air();
-    map[y + 1][x] = new TmpMonsterDown();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new Air();
-    map[y][x - 1] = new MonsterLeft();
+  isAir(): boolean {
+    return true;
   }
 }
 
@@ -163,22 +136,9 @@ class Unbreakable implements Tile {
   update(x: number, y: number): void {
   }
 
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
+  isAir(): boolean {
+    return false;
   }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
 }
 
 class Stone implements Tile {
@@ -204,117 +164,42 @@ class Stone implements Tile {
   update(x: number, y: number): void {
   }
 
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
+  isAir(): boolean {
+    return false;
   }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
 }
 
-class Bomb implements Tile {
+interface BombState {
+  draw(x: number, y: number, g: CanvasRenderingContext2D): void;
+  update(x: number, y: number): void;
+}
+
+class Init implements BombState {
   draw(x: number, y: number, g: CanvasRenderingContext2D): void {
     g.fillStyle = "#770000";
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  explode(x: number, y: number, tile: Tile): void {
-    bombs++;
-    map[y][x] = tile;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-  updateGameOver(): void {
-  }
-
   update(x: number, y: number): void {
-    map[y][x] = new BombClose();
+    map[y][x] = new Bomb(new Close());
   }
-
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
 }
 
-class BombClose implements Tile {
+class Close implements BombState {
   draw(x: number, y: number, g: CanvasRenderingContext2D): void {
     g.fillStyle = "#cc0000";
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  explode(x: number, y: number, tile: Tile): void {
-    bombs++;
-    map[y][x] = tile;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-  updateGameOver(): void {
-  }
-
   update(x: number, y: number): void {
-    map[y][x] = new BombReallyClose();
+    map[y][x] = new Bomb(new ReallyClose());
   }
-
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
 }
 
-class BombReallyClose implements Tile {
+class ReallyClose implements BombState {
   draw(x: number, y: number, g: CanvasRenderingContext2D): void {
     g.fillStyle = "#ff0000";
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  explode(x: number, y: number, tile: Tile): void {
-    bombs++;
-    map[y][x] = tile;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-  updateGameOver(): void {
   }
 
   update(x: number, y: number): void {
@@ -323,32 +208,48 @@ class BombReallyClose implements Tile {
     bombs++;
   }
 
-  private explodeAround(y: number, x: number) {
+  private explodeAround(y: number, x: number): void {
     map[y - 1][x].explode(x, y - 1, new Fire());
-    map[y + 1][x].explode(x, y + 1, new TmpFire());
+    map[y + 1][x].explode(x, y + 1, new TmpTile(new Fire()));
     map[y][x - 1].explode(x - 1, y, new Fire());
-    map[y][x + 1].explode(x + 1, y, new TmpFire());
+    map[y][x + 1].explode(x + 1, y, new TmpTile(new Fire()));
   }
-
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
 }
 
-class TmpFire implements Tile {
+class Bomb implements Tile {
+
+  constructor(private state: BombState) {
+  }
+
+  draw(x: number, y: number, g: CanvasRenderingContext2D): void {
+    this.state.draw(x, y, g);
+  }
+
+  explode(x: number, y: number, tile: Tile): void {
+    bombs++;
+    map[y][x] = tile;
+  }
+
+  move(x: number, y: number): void {
+  }
+
+  updateGameOver(): void {
+  }
+
+  update(x: number, y: number): void {
+    this.state.update(x, y);
+  }
+
+  isAir(): boolean {
+    return false;
+  }
+}
+
+class TmpTile implements Tile {
+
+  constructor(private origin: Tile) {
+  }
+
   draw(x: number, y: number, g: CanvasRenderingContext2D): void {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
@@ -364,25 +265,12 @@ class TmpFire implements Tile {
   }
 
   update(x: number, y: number): void {
-    map[y][x] = new Fire();
+    map[y][x] = this.origin;
   }
 
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
+  isAir(): boolean {
+    return false;
   }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
 }
 
 class Fire implements Tile {
@@ -408,22 +296,9 @@ class Fire implements Tile {
     map[y][x] = new Air();
   }
 
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
+  isAir(): boolean {
+    return false;
   }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
 }
 
 class ExtraBomb implements Tile {
@@ -449,25 +324,106 @@ class ExtraBomb implements Tile {
   update(x: number, y: number): void {
   }
 
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
+  isAir(): boolean {
+    return false;
   }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
 }
 
-class MonsterUp implements Tile {
+class MoveStrategy {
+
+  constructor(private sight: Sight) {
+  }
+
+  update(x: number, y: number): void {
+    this.sight = this.sight.canGo(x, y) ? this.sight : this.sight.turnRight();
+    this.sight.go(x, y);
+  }
+}
+
+interface Sight {
+  canGo(x: number, y: number): boolean;
+
+  go(x: number, y: number): void;
+
+  turnRight(): Sight;
+}
+
+class UpSight implements Sight {
+  canGo(x: number, y: number): boolean {
+    return map[y - 1][x].isAir();
+  }
+
+  go(x: number, y: number): void {
+    if (this.canGo(x, y)) {
+      map[y][x] = new Air();
+      map[y - 1][x] = new Monster(this);
+    }
+  }
+
+  turnRight(): Sight {
+    return new RightSight();
+  }
+}
+
+class RightSight implements Sight {
+  canGo(x: number, y: number): boolean {
+    return map[y][x + 1].isAir();
+  }
+
+  go(x: number, y: number): void {
+    if (this.canGo(x, y)) {
+      map[y][x] = new Air();
+      map[y][x + 1] = new TmpTile(new Monster(this));
+    }
+  }
+
+  turnRight(): Sight {
+    return new DownSight();
+  }
+}
+
+class DownSight implements Sight {
+  canGo(x: number, y: number): boolean {
+    return map[y + 1][x].isAir();
+  }
+
+  go(x: number, y: number): void {
+    if (this.canGo(x, y)) {
+      map[y][x] = new Air();
+      map[y + 1][x] = new TmpTile(new Monster(this));
+    }
+  }
+
+  turnRight(): Sight {
+    return new LeftSight();
+  }
+}
+
+class LeftSight implements Sight {
+  canGo(x: number, y: number): boolean {
+    return map[y][x - 1].isAir();
+  }
+
+  go(x: number, y: number): void {
+    if (this.canGo(x, y)) {
+      map[y][x] = new Air();
+      map[y][x - 1] = new Monster(this);
+    }
+  }
+
+  turnRight(): Sight {
+    return new UpSight();
+  }
+}
+
+class Monster implements Tile {
+
+  private strategy: MoveStrategy;
+  
+  constructor(sight: Sight) {
+    this.strategy = new MoveStrategy(sight);
+  }
+  
   draw(x: number, y: number, g: CanvasRenderingContext2D): void {
     g.fillStyle = "#cc00cc";
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -485,212 +441,11 @@ class MonsterUp implements Tile {
   }
 
   update(x: number, y: number): void {
-    map[y - 1][x].updateMonsterUp(x, y);
+    this.strategy.update(x, y);
   }
 
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
-}
-
-class MonsterRight implements Tile {
-  draw(x: number, y: number, g: CanvasRenderingContext2D): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  explode(x: number, y: number, tile: Tile): void {
-    map[y][x] = tile;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-  updateGameOver(): void {
-    gameOver = true;
-  }
-
-  update(x: number, y: number): void {
-    map[y][x + 1].updateMonsterRight(x, y);
-  }
-
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
-}
-
-class TmpMonsterRight implements Tile {
-  draw(x: number, y: number, g: CanvasRenderingContext2D): void {
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  explode(x: number, y: number, tile: Tile): void {
-    map[y][x] = tile;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-  updateGameOver(): void {
-  }
-
-  update(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
-}
-
-class MonsterDown implements Tile {
-  draw(x: number, y: number, g: CanvasRenderingContext2D): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  explode(x: number, y: number, tile: Tile): void {
-    map[y][x] = tile;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-  updateGameOver(): void {
-    gameOver = true;
-  }
-
-  update(x: number, y: number): void {
-    map[y + 1][x].updateMonsterDown(x, y);
-  }
-
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-}
-
-class TmpMonsterDown implements Tile {
-  draw(x: number, y: number, g: CanvasRenderingContext2D): void {
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  explode(x: number, y: number, tile: Tile): void {
-    map[y][x] = tile;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-  updateGameOver(): void {
-  }
-
-  update(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
-  }
-
-}
-
-class MonsterLeft implements Tile {
-  draw(x: number, y: number, g: CanvasRenderingContext2D): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-
-  explode(x: number, y: number, tile: Tile): void {
-    map[y][x] = tile;
-  }
-
-  move(x: number, y: number): void {
-  }
-
-  updateGameOver(): void {
-  }
-
-  update(x: number, y: number): void {
-    map[y][x - 1].updateMonsterLeft(x, y);
-  }
-
-  updateMonsterUp(x: number, y: number): void {
-    map[y][x] = new MonsterRight();
-  }
-
-  updateMonsterRight(x: number, y: number): void {
-    map[y][x] = new MonsterDown();
-  }
-
-  updateMonsterDown(x: number, y: number): void {
-    map[y][x] = new MonsterLeft();
-  }
-
-  updateMonsterLeft(x: number, y: number): void {
-    map[y][x] = new MonsterUp();
+  isAir(): boolean {
+    return false;
   }
 }
 
@@ -777,29 +532,29 @@ function transformTile(tile: RawTile): Tile {
     case RawTile.STONE:
       return new Stone();
     case RawTile.BOMB:
-      return new Bomb();
+      return new Bomb(new Init());
     case RawTile.BOMB_CLOSE:
-      return new BombClose();
+      return new Bomb(new Close());
     case RawTile.BOMB_REALLY_CLOSE:
-      return new BombReallyClose();
+      return new Bomb(new ReallyClose());
     case RawTile.TMP_FIRE:
-      return new TmpFire();
+      return new TmpTile(new Fire());
     case RawTile.FIRE:
       return new Fire();
     case RawTile.EXTRA_BOMB:
       return new ExtraBomb();
     case RawTile.MONSTER_UP:
-      return new MonsterUp();
+      return new Monster(new UpSight());
     case RawTile.MONSTER_RIGHT:
-      return new MonsterRight();
+      return new Monster(new RightSight());
     case RawTile.TMP_MONSTER_RIGHT:
-      return new TmpMonsterRight();
+      return new TmpTile(new Monster(new RightSight()));
     case RawTile.MONSTER_DOWN:
-      return new MonsterDown();
+      return new Monster(new DownSight());
     case RawTile.TMP_MONSTER_DOWN:
-      return new TmpMonsterDown();
+      return new TmpTile(new Monster(new DownSight()));
     case RawTile.MONSTER_LEFT:
-      return new MonsterLeft();
+      return new Monster(new LeftSight());
     default:
       return assertExhausted(tile);
   }
