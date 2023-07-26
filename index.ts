@@ -53,6 +53,7 @@ interface Tile {
   renewTmpMonsterRight(): void;
   renewTmpMonsterDown(): void;
   explode(x: number, y: number, type: Tile): void;
+  updateTile(x: number, y: number): void;
 }
 
 class Air implements Tile {
@@ -162,6 +163,9 @@ class Air implements Tile {
     map[y][x] = type;
   }
 
+  updateTile(x: number, y: number): void {
+  }
+
 }
 
 class Unbreakable implements Tile {
@@ -269,6 +273,9 @@ class Unbreakable implements Tile {
   }
 
   explode(x: number, y: number, type: Tile): void {
+  }
+
+  updateTile(x: number, y: number): void {
   }
 
 }
@@ -383,6 +390,9 @@ class Stone implements Tile {
       return ;
     }
     map[y][x] = type;
+  }
+
+  updateTile(x: number, y: number): void {
   }
 
 }
@@ -502,6 +512,10 @@ class Bomb implements Tile {
     map[y][x] = type;
   }
 
+  updateTile(x: number, y: number): void {
+    this.bombState.updateTile(x, y);
+  }
+
 }
 
 interface BombState{
@@ -510,6 +524,7 @@ interface BombState{
   isReallyClose(): boolean;
   color(g: CanvasRenderingContext2D): void,
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void
+  updateTile(x: number, y: number): void;
 }
 
 class Normal implements BombState{
@@ -533,10 +548,13 @@ class Normal implements BombState{
     g.fillRect(x, y, w, h);
   }
 
+  updateTile(x: number, y: number): void {
+    map[y][x].close();
+  }
+
 }
 
 class Close implements BombState{
-
 
   isClose(): boolean {
     return true;
@@ -556,6 +574,10 @@ class Close implements BombState{
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  updateTile(x: number, y: number): void {
+    map[y][x].reallyClose();
   }
 
 }
@@ -579,6 +601,15 @@ class ReallyClose implements BombState{
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
+  }
+
+  updateTile(x: number, y: number): void {
+    map[y - 1][x].explode(x, y - 1, new Fire());
+    map[y + 1][x].explode(x, y + 1, new TmpFire());
+    map[y][x - 1].explode(x - 1, y, new Fire());
+    map[y][x + 1].explode(x + 1, y, new TmpFire());
+    map[y][x] = new Fire();
+    bombs++;
   }
 
 }
@@ -688,6 +719,10 @@ class TmpFire implements Tile {
 
   explode(x: number, y: number, type: Tile): void {
     map[y][x] = type;
+  }
+
+  updateTile(x: number, y: number): void {
+    map[y][x] = new Fire();
   }
 
 }
@@ -800,6 +835,10 @@ class Fire implements Tile {
 
   explode(x: number, y: number, type: Tile): void {
     map[y][x] = type;
+  }
+
+  updateTile(x: number, y: number): void {
+    map[y][x] = new Air();
   }
 
 }
@@ -916,6 +955,9 @@ class ExtraBomb implements Tile {
     map[y][x] = type;
   }
 
+  updateTile(x: number, y: number): void {
+  }
+
 }
 
 interface MonsterState {
@@ -926,7 +968,8 @@ interface MonsterState {
     isTmpDown(): boolean,
     isLeft(): boolean,
     color(g: CanvasRenderingContext2D): void,
-    fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void
+    fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void,
+    updateTile(x: number, y: number): void;
 }
 
 class Monster implements Tile {
@@ -1046,6 +1089,10 @@ class Monster implements Tile {
     map[y][x] = new TmpFire();
   }
 
+  updateTile(x: number, y: number): void {
+    this.state.updateTile(x, y);
+  }
+
 }
 
 class MonsterUpState implements MonsterState{
@@ -1079,6 +1126,15 @@ class MonsterUpState implements MonsterState{
 
   isUp(): boolean {
     return true;
+  }
+
+  updateTile(x: number, y: number): void {
+    if (map[y - 1][x].isAir()) {
+      map[y][x] = new Air();
+      map[y - 1][x] = new Monster(new MonsterUpState());
+    } else {
+      map[y][x].renewMonsterRight();
+    }
   }
 
 }
@@ -1116,6 +1172,15 @@ class MonsterRightState implements MonsterState{
     return false;
   }
 
+  updateTile(x: number, y: number): void {
+    if (map[y][x + 1].isAir()) {
+      map[y][x] = new Air();
+      map[y][x + 1] = new Monster(new TmpMonsterRightState());
+    } else {
+      map[y][x].renewMonsterDown();
+    }
+  }
+
 }
 
 class TmpMonsterRightState implements MonsterState{
@@ -1148,6 +1213,10 @@ class TmpMonsterRightState implements MonsterState{
 
   isUp(): boolean {
     return false;
+  }
+
+  updateTile(x: number, y: number): void {
+    map[y][x].renewTmpMonsterRight();
   }
 
 }
@@ -1185,6 +1254,15 @@ class MonsterDownState implements MonsterState{
     return false;
   }
 
+  updateTile(x: number, y: number): void {
+    if (map[y + 1][x].isAir()) {
+      map[y][x] = new Air();
+      map[y + 1][x] = new Monster(new TmpMonsterDownState());
+    } else {
+      map[y][x].renewMonsterLeft();
+    }
+  }
+
 }
 
 class TmpMonsterDownState implements MonsterState{
@@ -1217,6 +1295,10 @@ class TmpMonsterDownState implements MonsterState{
 
   isUp(): boolean {
     return false;
+  }
+
+  updateTile(x: number, y: number): void {
+    map[y][x].renewMonsterDown();
   }
 
 }
@@ -1252,6 +1334,15 @@ class MonsterLeftState implements MonsterState{
 
   isUp(): boolean {
     return false;
+  }
+
+  updateTile(x: number, y: number): void {
+    if (map[y][x - 1].isAir()) {
+      map[y][x] = new Air();
+      map[y][x - 1] = new Monster(new MonsterLeftState());
+    } else {
+      map[y][x].renewMonsterUp();
+    }
   }
 
 }
@@ -1483,6 +1574,15 @@ function isGameOver() {
 }
 
 function updateMap() {
+  for (let y = 1; y < map.length; y++) {
+    for (let x = 1; x < map[y].length; x++) {
+      map[y][x].updateTile(x, y);
+    }
+  }
+}
+
+// 논의해보고 싶은 부분
+function updateMap2() {
   for (let y = 1; y < map.length; y++) {
     for (let x = 1; x < map[y].length; x++) {
       if (map[y][x].isBomb()) {
