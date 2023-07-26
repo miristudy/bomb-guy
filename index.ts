@@ -44,12 +44,15 @@ interface Tile {
   isGameOver(): boolean;
   isBombType(): boolean;
   move(x: number, y: number): void;
+  close(): void;
+  reallyClose(): void;
   renewMonsterUp(): void;
   renewMonsterDown(): void;
   renewMonsterLeft(): void;
   renewMonsterRight(): void;
   renewTmpMonsterRight(): void;
   renewTmpMonsterDown(): void;
+  explode(x: number, y: number, type: Tile): void;
 }
 
 class Air implements Tile {
@@ -147,6 +150,16 @@ class Air implements Tile {
   }
 
   renewMonsterUp(): void {
+  }
+
+  close(): void {
+  }
+
+  reallyClose(): void {
+  }
+
+  explode(x: number, y: number, type: Tile): void {
+    map[y][x] = type;
   }
 
 }
@@ -249,6 +262,15 @@ class Unbreakable implements Tile {
   renewMonsterUp(): void {
   }
 
+  close(): void {
+  }
+
+  reallyClose(): void {
+  }
+
+  explode(x: number, y: number, type: Tile): void {
+  }
+
 }
 
 class Stone implements Tile {
@@ -347,6 +369,20 @@ class Stone implements Tile {
   }
 
   renewMonsterUp(): void {
+  }
+
+  close(): void {
+  }
+
+  reallyClose(): void {
+  }
+
+  explode(x: number, y: number, type: Tile): void {
+    if (Math.random() < 0.1) {
+      map[y][x] = new ExtraBomb();
+      return ;
+    }
+    map[y][x] = type;
   }
 
 }
@@ -451,6 +487,19 @@ class Bomb implements Tile {
   }
 
   renewMonsterUp(): void {
+  }
+
+  close(): void {
+    this.bombState = new Close();
+  }
+
+  reallyClose(): void {
+    this.bombState = new ReallyClose();
+  }
+
+  explode(x: number, y: number, type: Tile): void {
+    bombs++;
+    map[y][x] = type;
   }
 
 }
@@ -631,6 +680,16 @@ class TmpFire implements Tile {
   renewMonsterUp(): void {
   }
 
+  close(): void {
+  }
+
+  reallyClose(): void {
+  }
+
+  explode(x: number, y: number, type: Tile): void {
+    map[y][x] = type;
+  }
+
 }
 
 class Fire implements Tile {
@@ -731,6 +790,16 @@ class Fire implements Tile {
   }
 
   renewMonsterUp(): void {
+  }
+
+  close(): void {
+  }
+
+  reallyClose(): void {
+  }
+
+  explode(x: number, y: number, type: Tile): void {
+    map[y][x] = type;
   }
 
 }
@@ -835,6 +904,16 @@ class ExtraBomb implements Tile {
   }
 
   renewMonsterUp(): void {
+  }
+
+  close(): void {
+  }
+
+  reallyClose(): void {
+  }
+
+  explode(x: number, y: number, type: Tile): void {
+    map[y][x] = type;
   }
 
 }
@@ -955,6 +1034,16 @@ class Monster implements Tile {
 
   renewMonsterUp(): void {
     this.state = new MonsterUpState();
+  }
+
+  close(): void {
+  }
+
+  reallyClose(): void {
+  }
+
+  explode(x: number, y: number, type: Tile): void {
+    map[y][x] = new TmpFire();
   }
 
 }
@@ -1382,17 +1471,6 @@ function transformMap() {
   }
 }
 
-function explode(x: number, y: number, type: Tile) {
-  if (map[y][x].isStone()) {
-    if (Math.random() < 0.1) map[y][x] = new ExtraBomb();
-    else map[y][x] = type;
-  } else if (!map[y][x].isUnbreakable()) {
-    if (map[y][x].isBombType())
-      bombs++;
-    map[y][x] = type;
-  }
-}
-
 function handleInputs() {
   while (!gameOver && inputs.length > 0) {
     let current = inputs.pop();
@@ -1408,14 +1486,14 @@ function updateMap() {
   for (let y = 1; y < map.length; y++) {
     for (let x = 1; x < map[y].length; x++) {
       if (map[y][x].isBomb()) {
-        map[y][x] = new Bomb(new Close());
+        map[y][x].close();
       } else if (map[y][x].isBombClose()) {
-        map[y][x] = new Bomb(new ReallyClose());
+        map[y][x].reallyClose();
       } else if (map[y][x].isBombReallyClose()) {
-        explode(x + 0, y - 1, new Fire());
-        explode(x + 0, y + 1, new TmpFire());
-        explode(x - 1, y + 0, new Fire());
-        explode(x + 1, y + 0, new TmpFire());
+        map[y - 1][x].explode(x, y - 1, new Fire());
+        map[y + 1][x].explode(x, y + 1, new TmpFire());
+        map[y][x - 1].explode(x - 1, y, new Fire());
+        map[y][x + 1].explode(x + 1, y, new TmpFire());
         map[y][x] = new Fire();
         bombs++;
       } else if (map[y][x].isTmpFire()) {
