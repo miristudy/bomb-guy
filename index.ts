@@ -397,51 +397,68 @@ class ExtraBomb implements Tile {
 }
 interface Heading {
     updateTile(y: number, x: number): void;
+    canMoveForward(y: number, x: number): boolean;
 }
 
 class LeftHeading implements Heading {
     updateTile(y: number, x: number): void {
-        if (map[y][x - 1].isAir()) {
-            map[y][x] = new Air();
-            map[y][x - 1] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
+        if (!this.canMoveForward(y, x)) {
+            map[y][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
             return;
         }
-        map[y][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Air();
+        map[y][x - 1] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
+    }
+
+    canMoveForward(y: number, x: number): boolean {
+        return map[y][x - 1].isAir();
     }
 
 }
 
 class RightHeading implements Heading {
     updateTile(y: number, x: number): void {
-        if (map[y][x + 1].isAir()) {
-            map[y][x] = new Air();
-            map[y][x + 1] = new TmpMonsterRight();
+        if (!this.canMoveForward(y, x)) {
+            map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
             return;
         }
-        map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Air();
+        map[y][x + 1] = new TmpMonsterRight();
+    }
+
+    canMoveForward(y: number, x: number): boolean {
+        return map[y][x + 1].isAir();
     }
 }
 
 class UpHeading implements Heading {
     updateTile(y: number, x: number): void {
-        if (map[y - 1][x].isAir()) {
-            map[y][x] = new Air();
-            map[y - 1][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
+        if (!this.canMoveForward(y, x)) {
+            map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
             return;
         }
-        map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Air();
+        map[y - 1][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
+    }
+
+    canMoveForward(y: number, x: number): boolean {
+        return map[y - 1][x].isAir();
     }
 
 }
 
 class DownHeading implements Heading {
     updateTile(y: number, x: number): void {
-        if (map[y + 1][x].isAir()) {
-            map[y][x] = new Air();
-            map[y + 1][x] = new TmpMonsterDown();
+        if (!this.canMoveForward(y, x)) {
+            map[y][x] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
             return;
         }
-        map[y][x] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Air();
+        map[y + 1][x] = new TmpMonsterDown();
+    }
+
+    canMoveForward(y: number, x: number): boolean {
+        return map[y + 1][x].isAir();
     }
 
 }
