@@ -23,6 +23,18 @@ enum RawTile {
   MONSTER_LEFT,
 }
 
+class Loc {
+    constructor(private y1: number, private x1: number) {
+      this.y = y1;
+      this.x = x1;
+    }
+    x: number;
+    y: number;
+
+    getX(): number { return this.x; }
+    getY(): number { return this.y; }
+}
+
 interface TmpStrategy {
     isTmp(): boolean;
 }
@@ -33,32 +45,27 @@ class MonsterTmpStrategy implements TmpStrategy {
 }
 
 interface MonsterState {
-  nextState(y: number, x: number): MonsterState;
-  isTmp(): boolean;
-  updateTile(y: number, x: number): void;
+  nextState(y: number, x: number): MonsterConfiguration;
+  nextTile(y: number, x: number): Tile;
+  nextLoc(y: number, x: number): Loc;
 }
 
 class MonsterStrategy {
   constructor(private state: MonsterState) { }
-  getState(): MonsterState { return this.state; }
 
-  // updateTile(y: number, x: number): void {
-  //   let tmp = this.state.isTmp();
-  //   let st = this.state.nextState(y, x);
-  //   // console.log("Gaming Console");
-  //   console.log(tmp, this.state, st);
-  //   // this.state = this.state.nextState(y, x);
-  //   // !tmp && map[y - 1][x]?.isAir()
-  //   //     ? ([map[y][x], map[y - 1][x]] = [new Air(), tile])
-  //   //     : (map[y][x] = tile);
-  //   if (tmp && map[y - 1][x].isAir()) {
-  //       map[y][x] = new Air();
-  //       map[y - 1][x] = new Monster(st);
-  //     // ([map[y][x], map[y - 1][x]] = [new Air(), new Monster(this.state.nextState(y, x))])
-  //     return;
-  //   }
-  //   map[y][x] = new Monster(st);
-  // }
+  updateTile(y: number, x: number, tmpStrat: TmpStrategy): void {
+    let st = this.state.nextState(y, x);
+    let nextTile = this.state.nextTile(y, x);
+    let nextLoc = this.state.nextLoc(y, x);
+    map[y][x] = !tmpStrat.isTmp() && nextTile.isAir()
+        ? ((map[y + nextLoc.getY()][x + nextLoc.getX()] = new Monster(st)), new Air()) : new Monster(st);
+    // if (!tmpStrat.isTmp() &&  nextTile.isAir()) {
+    //   map[y][x] = new Air();
+    //   map[y + nextLoc.getY()][x + nextLoc.getX()] = new Monster(st);
+    //   return;
+    // }
+    // map[y][x] = new Monster(st);
+  }
 }
 
 // up -> is Air? up : right
@@ -69,30 +76,26 @@ class MonsterStrategy {
 // tmpDown -> down
 
 class MonsterUpState implements MonsterState {
-  isTmp(): boolean { return false; }
-
-  nextState(y: number, x: number): MonsterState {
-    if (map[y - 1][x].isAir()) {
-        return new MonsterUpState();
-    }
-    return new MonsterRightState();
+  nextLoc(y: number, x: number): Loc {
+    return new Loc(- 1, 0);
   }
 
-  updateTile(y: number, x: number): void {
+  nextState(y: number, x: number): MonsterConfiguration {
     if (map[y - 1][x].isAir()) {
-      map[y][x] = new Air();
-      map[y - 1][x] = new Monster(MONSTER_UP);
-      return;
+        return MONSTER_UP;
     }
-    map[y][x] = new Monster(MONSTER_RIGHT);
+    return MONSTER_RIGHT;
   }
 
-
+  nextTile(y: number, x: number): Tile {
+    return map[y - 1][x];
+  }
 }
 
 class MonsterRightState implements MonsterState {
-  isTmp(): boolean { return false; }
-
+  nextLoc(y: number, x: number): Loc {
+    return new Loc(0, 1);
+  }
   updateTile(y: number, x: number): void {
     if (map[y][x + 1].isAir()) {
       map[y][x] = new Air();
@@ -102,76 +105,77 @@ class MonsterRightState implements MonsterState {
     map[y][x] = new Monster(MONSTER_DOWN);
   }
 
-  nextState(y: number, x: number): MonsterState {
+  nextState(y: number, x: number): MonsterConfiguration {
     if (map[y][x + 1].isAir()) {
-        return new MonsterTmpRightState();
+        return TMP_MONSTER_RIGHT;
     }
-    return new MonsterDownState();
+    return MONSTER_DOWN;
+  }
+
+  nextTile(y: number, x: number): Tile {
+    return map[y][x + 1];
   }
 }
 
 class MonsterTmpRightState implements MonsterState {
-  isTmp(): boolean { return true; }
-
-  updateTile(y: number, x: number): void {
-    map[y][x] = new Monster(MONSTER_RIGHT);
+  nextLoc(y: number, x: number): Loc {
+    return new Loc(0, 0);
   }
 
-  nextState(y: number, x: number): MonsterState {
-    return new MonsterRightState();
+  nextState(y: number, x: number): MonsterConfiguration {
+    return MONSTER_RIGHT;
+  }
+
+  nextTile(y: number, x: number): Tile {
+    return map[y][x];
   }
 }
 
 class MonsterLeftState implements MonsterState {
-  isTmp(): boolean { return false; }
-
-  updateTile(y: number, x: number): void {
-    if (map[y][x - 1].isAir()) {
-      map[y][x] = new Air();
-      map[y][x - 1] = new Monster(MONSTER_LEFT);
-      return;
-    }
-    map[y][x] = new Monster(MONSTER_UP);
+  nextLoc(y: number, x: number): Loc {
+    return new Loc(0, -1);
   }
 
-  nextState(y: number, x: number): MonsterState {
+  nextState(y: number, x: number): MonsterConfiguration {
     if (map[y][x - 1].isAir()) {
-        return new MonsterLeftState();
+        return MONSTER_LEFT;
     }
-    return new MonsterUpState();
+    return MONSTER_UP;
+  }
+
+  nextTile(y: number, x: number): Tile {
+    return map[y][x - 1];
   }
 }
 
 class MonsterDownState implements MonsterState {
-  isTmp(): boolean { return false; }
-
-  updateTile(y: number, x: number): void {
-    console.log(this, this.nextState(y, x));
-    if (map[y + 1][x].isAir()) {
-      map[y][x] = new Air();
-      map[y + 1][x] = new Monster(TMP_MONSTER_DOWN);
-      return;
-    }
-    map[y][x] = new Monster(MONSTER_LEFT);
+  nextLoc(y: number, x: number): Loc {
+    return new Loc(1, 0);
   }
 
-  nextState(y: number, x: number): MonsterState {
+  nextState(y: number, x: number): MonsterConfiguration {
     if (map[y + 1][x].isAir()) {
-      return new MonsterTmpDownState();
+      return TMP_MONSTER_DOWN
     }
-    return new MonsterLeftState();
+    return MONSTER_LEFT;
+  }
+
+  nextTile(y: number, x: number): Tile {
+    return map[y + 1][x];
   }
 }
 
 class MonsterTmpDownState implements MonsterState {
-  isTmp(): boolean { return true; }
-
-  updateTile(y: number, x: number) {
-    map[y][x] = new Monster(MONSTER_DOWN);
+  nextLoc(y: number, x: number): Loc {
+    return new Loc(0, 0);
   }
 
-  nextState(y: number, x: number): MonsterState {
-    return new MonsterDownState();
+  nextState(y: number, x: number): MonsterConfiguration {
+    return MONSTER_DOWN;
+  }
+
+  nextTile(y: number, x: number): Tile {
+    return map[y][x];
   }
 }
 
@@ -453,7 +457,7 @@ class Monster implements Tile {
   }
 
   updateTile(y: number, x: number): void {
-    this.monsterStrategy.getState().updateTile(y, x);
+    this.monsterStrategy.updateTile(y, x, this.monsterConfig.getStrategy());
   }
 }
 
