@@ -398,6 +398,7 @@ class ExtraBomb implements Tile {
 interface Heading {
     updateTile(y: number, x: number): void;
     canMoveForward(y: number, x: number): boolean;
+    moveForward(y: number, x: number): void;
 }
 
 class LeftHeading implements Heading {
@@ -406,12 +407,16 @@ class LeftHeading implements Heading {
             map[y][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
             return;
         }
-        map[y][x] = new Air();
-        map[y][x - 1] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
+        this.moveForward(y, x);
     }
 
     canMoveForward(y: number, x: number): boolean {
         return map[y][x - 1].isAir();
+    }
+
+    moveForward(y: number, x: number): void {
+        map[y][x] = new Air();
+        map[y][x - 1] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
     }
 
 }
@@ -422,12 +427,16 @@ class RightHeading implements Heading {
             map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
             return;
         }
-        map[y][x] = new Air();
-        map[y][x + 1] = new TmpMonsterRight();
+        this.moveForward(y, x);
     }
 
     canMoveForward(y: number, x: number): boolean {
         return map[y][x + 1].isAir();
+    }
+
+    moveForward(y: number, x: number): void {
+        map[y][x] = new Air();
+        map[y][x + 1] = new TmpMonsterRight();
     }
 }
 
@@ -437,12 +446,16 @@ class UpHeading implements Heading {
             map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
             return;
         }
-        map[y][x] = new Air();
-        map[y - 1][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
+        this.moveForward(y, x);
     }
 
     canMoveForward(y: number, x: number): boolean {
         return map[y - 1][x].isAir();
+    }
+
+    moveForward(y: number, x: number): void {
+        map[y][x] = new Air();
+        map[y - 1][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
     }
 
 }
@@ -453,12 +466,16 @@ class DownHeading implements Heading {
             map[y][x] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
             return;
         }
-        map[y][x] = new Air();
-        map[y + 1][x] = new TmpMonsterDown();
+        this.moveForward(y, x);
     }
 
     canMoveForward(y: number, x: number): boolean {
         return map[y + 1][x].isAir();
+    }
+
+    moveForward(y: number, x: number): void {
+        map[y][x] = new Air();
+        map[y + 1][x] = new TmpMonsterDown();
     }
 
 }
