@@ -396,7 +396,14 @@ class ExtraBomb implements Tile {
     }
 }
 
-class MonsterUp implements Tile {
+enum Heading {
+    LEFT, RIGHT, UP, DOWN
+}
+
+class ClockwiseRotationMonster implements Tile {
+    constructor(private heading: Heading) {
+    }
+
     isAir(): boolean {
         return false;
     }
@@ -428,129 +435,35 @@ class MonsterUp implements Tile {
     }
 
     updateTile(y: number, x: number): void {
-        if (map[y - 1][x].isAir()) {
-            map[y][x] = new Air();
-            map[y - 1][x] = new MonsterUp();
-            return;
+        if (this.heading == Heading.UP) {
+            if (map[y - 1][x].isAir()) {
+                map[y][x] = new Air();
+                map[y - 1][x] = new ClockwiseRotationMonster(Heading.UP);
+                return;
+            }
+            map[y][x] = new ClockwiseRotationMonster(Heading.RIGHT);
+        } else if (this.heading == Heading.LEFT) {
+            if (map[y][x - 1].isAir()) {
+                map[y][x] = new Air();
+                map[y][x - 1] = new ClockwiseRotationMonster(Heading.LEFT);
+                return;
+            }
+            map[y][x] = new ClockwiseRotationMonster(Heading.UP);
+        } else if (this.heading == Heading.RIGHT) {
+            if (map[y][x + 1].isAir()) {
+                map[y][x] = new Air();
+                map[y][x + 1] = new TmpMonsterRight();
+                return;
+            }
+            map[y][x] = new ClockwiseRotationMonster(Heading.DOWN);
+        } else if (this.heading == Heading.DOWN) {
+            if (map[y + 1][x].isAir()) {
+                map[y][x] = new Air();
+                map[y + 1][x] = new TmpMonsterDown();
+                return;
+            }
+            map[y][x] = new ClockwiseRotationMonster(Heading.LEFT);
         }
-        map[y][x] = new MonsterRight();
-    }
-}
-
-class MonsterRight implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillStyle = "#cc00cc";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    isGameOver(): Boolean {
-        return true;
-    }
-
-    movePlayer(y: number, x: number): void {
-    }
-
-    close(): void {
-    }
-
-    reallyClose(): void {
-    }
-
-    explodeFire(x: number, y: number): void {
-        map[y][x] = new Fire();
-    }
-
-    explodeTmpFire(x: number, y: number): void {
-        map[y][x] = new TmpFire();
-    }
-
-    updateTile(y: number, x: number): void {
-        if (map[y][x + 1].isAir()) {
-            map[y][x] = new Air();
-            map[y][x + 1] = new TmpMonsterRight();
-            return;
-        }
-        map[y][x] = new MonsterDown();
-    }
-}
-
-class TmpMonsterRight implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    isGameOver(): Boolean {
-        return false;
-    }
-
-    movePlayer(y: number, x: number): void {
-    }
-
-    close(): void {
-    }
-
-    reallyClose(): void {
-    }
-
-    explodeFire(x: number, y: number): void {
-        map[y][x] = new Fire();
-    }
-
-    explodeTmpFire(x: number, y: number): void {
-        map[y][x] = new TmpFire();
-    }
-
-    updateTile(y: number, x: number): void {
-        map[y][x] = new MonsterRight();
-    }
-}
-
-class MonsterDown implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillStyle = "#cc00cc";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    isGameOver(): Boolean {
-        return true;
-    }
-
-    movePlayer(y: number, x: number): void {
-    }
-
-    close(): void {
-    }
-
-    reallyClose(): void {
-    }
-
-    explodeFire(x: number, y: number): void {
-        map[y][x] = new Fire();
-    }
-
-    explodeTmpFire(x: number, y: number): void {
-        map[y][x] = new TmpFire();
-    }
-
-    updateTile(y: number, x: number): void {
-        if (map[y + 1][x].isAir()) {
-            map[y][x] = new Air();
-            map[y + 1][x] = new TmpMonsterDown();
-            return;
-        }
-        map[y][x] = new MonsterLeft();
     }
 }
 
@@ -585,22 +498,21 @@ class TmpMonsterDown implements Tile {
     }
 
     updateTile(y: number, x: number): void {
-        map[y][x] = new MonsterDown();
+        map[y][x] = new ClockwiseRotationMonster(Heading.DOWN);
     }
 }
 
-class MonsterLeft implements Tile {
+class TmpMonsterRight implements Tile {
     isAir(): boolean {
         return false;
     }
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
     isGameOver(): Boolean {
-        return true;
+        return false;
     }
 
     movePlayer(y: number, x: number): void {
@@ -621,12 +533,7 @@ class MonsterLeft implements Tile {
     }
 
     updateTile(y: number, x: number): void {
-        if (map[y][x - 1].isAir()) {
-            map[y][x] = new Air();
-            map[y][x - 1] = new MonsterLeft();
-            return;
-        }
-        map[y][x] = new MonsterUp();
+        map[y][x] = new ClockwiseRotationMonster(Heading.RIGHT);
     }
 }
 
@@ -817,15 +724,15 @@ function transformTile(tile: RawTile) {
         case RawTile.UNBREAKABLE:
             return new Unbreakable();
         case RawTile.MONSTER_UP:
-            return new MonsterUp();
+            return new ClockwiseRotationMonster(Heading.UP);
         case RawTile.MONSTER_DOWN:
-            return new MonsterDown();
+            return new ClockwiseRotationMonster(Heading.DOWN);
         case RawTile.TMP_MONSTER_DOWN:
             return new TmpMonsterDown();
         case RawTile.MONSTER_LEFT:
-            return new MonsterLeft();
+            return new ClockwiseRotationMonster(Heading.LEFT);
         case RawTile.MONSTER_RIGHT:
-            return new MonsterRight();
+            return new ClockwiseRotationMonster(Heading.RIGHT);
         case RawTile.TMP_MONSTER_RIGHT:
             return new TmpMonsterRight();
         default:
