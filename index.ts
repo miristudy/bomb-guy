@@ -4,6 +4,7 @@ const SLEEP = 1000 / FPS;
 const TPS = 2;
 const DELAY = FPS / TPS;
 
+
 enum RawTile {
   AIR,
   UNBREAKABLE,
@@ -22,97 +23,178 @@ enum RawTile {
   MONSTER_LEFT,
 }
 
+interface TmpStrategy {
+    isTmp(): boolean;
+}
+
+class MonsterTmpStrategy implements TmpStrategy {
+  constructor(private tmp: boolean) { }
+    isTmp(): boolean { return this.tmp; }
+}
+
 interface MonsterState {
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void;
+  nextState(y: number, x: number): MonsterState;
+  isTmp(): boolean;
   updateTile(y: number, x: number): void;
 }
 
+class MonsterStrategy {
+  constructor(private state: MonsterState) { }
+  getState(): MonsterState { return this.state; }
+
+  // updateTile(y: number, x: number): void {
+  //   let tmp = this.state.isTmp();
+  //   let st = this.state.nextState(y, x);
+  //   // console.log("Gaming Console");
+  //   console.log(tmp, this.state, st);
+  //   // this.state = this.state.nextState(y, x);
+  //   // !tmp && map[y - 1][x]?.isAir()
+  //   //     ? ([map[y][x], map[y - 1][x]] = [new Air(), tile])
+  //   //     : (map[y][x] = tile);
+  //   if (tmp && map[y - 1][x].isAir()) {
+  //       map[y][x] = new Air();
+  //       map[y - 1][x] = new Monster(st);
+  //     // ([map[y][x], map[y - 1][x]] = [new Air(), new Monster(this.state.nextState(y, x))])
+  //     return;
+  //   }
+  //   map[y][x] = new Monster(st);
+  // }
+}
+
+// up -> is Air? up : right
+// right -> is Air? tmpRight : down
+// tmpRight -> right
+// left -> is Air? left : up
+// down -> is Air? tmpDown : left
+// tmpDown -> down
+
 class MonsterUpState implements MonsterState {
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  isTmp(): boolean { return false; }
+
+  nextState(y: number, x: number): MonsterState {
+    if (map[y - 1][x].isAir()) {
+        return new MonsterUpState();
+    }
+    return new MonsterRightState();
   }
 
   updateTile(y: number, x: number): void {
     if (map[y - 1][x].isAir()) {
       map[y][x] = new Air();
-      map[y - 1][x] = new Monster(new MonsterUpState());
+      map[y - 1][x] = new Monster(MONSTER_UP);
       return;
     }
-    map[y][x] = new Monster(new MonsterRightState());
+    map[y][x] = new Monster(MONSTER_RIGHT);
   }
+
+
 }
 
 class MonsterRightState implements MonsterState {
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
+  isTmp(): boolean { return false; }
 
   updateTile(y: number, x: number): void {
     if (map[y][x + 1].isAir()) {
       map[y][x] = new Air();
-      map[y][x + 1] = new Monster(new MonsterTmpRightState());
+      map[y][x + 1] = new Monster(TMP_MONSTER_RIGHT);
       return;
     }
-    map[y][x] = new Monster(new MonsterDownState());
+    map[y][x] = new Monster(MONSTER_DOWN);
+  }
+
+  nextState(y: number, x: number): MonsterState {
+    if (map[y][x + 1].isAir()) {
+        return new MonsterTmpRightState();
+    }
+    return new MonsterDownState();
   }
 }
 
 class MonsterTmpRightState implements MonsterState {
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
+  isTmp(): boolean { return true; }
+
   updateTile(y: number, x: number): void {
-    map[y][x] = new Monster(new MonsterRightState());
+    map[y][x] = new Monster(MONSTER_RIGHT);
+  }
+
+  nextState(y: number, x: number): MonsterState {
+    return new MonsterRightState();
   }
 }
 
 class MonsterLeftState implements MonsterState {
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
+  isTmp(): boolean { return false; }
 
   updateTile(y: number, x: number): void {
     if (map[y][x - 1].isAir()) {
       map[y][x] = new Air();
-      map[y][x - 1] = new Monster(new MonsterLeftState());
+      map[y][x - 1] = new Monster(MONSTER_LEFT);
       return;
     }
-    map[y][x] = new Monster(new MonsterUpState());
+    map[y][x] = new Monster(MONSTER_UP);
+  }
+
+  nextState(y: number, x: number): MonsterState {
+    if (map[y][x - 1].isAir()) {
+        return new MonsterLeftState();
+    }
+    return new MonsterUpState();
   }
 }
 
 class MonsterDownState implements MonsterState {
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#cc00cc";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
+  isTmp(): boolean { return false; }
 
   updateTile(y: number, x: number): void {
+    console.log(this, this.nextState(y, x));
     if (map[y + 1][x].isAir()) {
       map[y][x] = new Air();
-      map[y + 1][x] = new Monster(new MonsterTmpDownState());
+      map[y + 1][x] = new Monster(TMP_MONSTER_DOWN);
       return;
     }
-    map[y][x] = new Monster(new MonsterLeftState());
+    map[y][x] = new Monster(MONSTER_LEFT);
+  }
+
+  nextState(y: number, x: number): MonsterState {
+    if (map[y + 1][x].isAir()) {
+      return new MonsterTmpDownState();
+    }
+    return new MonsterLeftState();
   }
 }
 
 class MonsterTmpDownState implements MonsterState {
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
+  isTmp(): boolean { return true; }
 
   updateTile(y: number, x: number) {
-    map[y][x] = new Monster(new MonsterDownState());
+    map[y][x] = new Monster(MONSTER_DOWN);
+  }
+
+  nextState(y: number, x: number): MonsterState {
+    return new MonsterDownState();
   }
 }
 
+class MonsterConfiguration {
+  constructor(
+      private color: string,
+      private state: MonsterState,
+      private strategy: TmpStrategy) { }
+  getColor(): string { return this.color; }
+  getState(): MonsterState { return this.state; }
+  getStrategy(): TmpStrategy { return this.strategy; }
+}
+
+const MONSTER_UP = new MonsterConfiguration("#cc00cc", new MonsterUpState(), new MonsterTmpStrategy(false));
+const MONSTER_RIGHT = new MonsterConfiguration("#cc00cc", new MonsterRightState(), new MonsterTmpStrategy(false));
+const TMP_MONSTER_RIGHT = new MonsterConfiguration(null, new MonsterTmpRightState(), new MonsterTmpStrategy(true));
+const MONSTER_DOWN = new MonsterConfiguration("#cc00cc", new MonsterDownState(), new MonsterTmpStrategy(false));
+const TMP_MONSTER_DOWN = new MonsterConfiguration(null, new MonsterTmpDownState(), new MonsterTmpStrategy(true));
+const MONSTER_LEFT = new MonsterConfiguration("#cc00cc", new MonsterLeftState(), new MonsterTmpStrategy(false));
+
+
 interface Tile {
   isAir(): boolean;
-  isUnbreakable(): boolean;
   isGameOver(): boolean;
   movePlayer(y: number, x: number): void;
   hasBomb(): boolean;
@@ -125,7 +207,6 @@ interface Tile {
 
 class Air implements Tile {
   isAir() { return true; }
-  isUnbreakable() { return false; }
   isGameOver() { return false; }
   hasBomb() { return false; }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -147,7 +228,6 @@ class Air implements Tile {
 
 class Unbreakable implements Tile {
   isAir() { return false; }
-  isUnbreakable() { return true; }
   isGameOver() { return false; }
   hasBomb() { return false; }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -166,7 +246,6 @@ class Unbreakable implements Tile {
 
 class Stone implements Tile {
   isAir() { return false; }
-  isUnbreakable() { return false; }
   isGameOver() { return false; }
   hasBomb() { return false; }
 
@@ -191,7 +270,6 @@ class Stone implements Tile {
 
 class Bomb implements Tile {
   isAir() { return false; }
-  isUnbreakable() { return false; }
   isGameOver() { return false; }
 
   hasBomb() { return true; }
@@ -217,7 +295,6 @@ class Bomb implements Tile {
 
 class BombClose implements Tile {
   isAir() { return false; }
-  isUnbreakable() { return false; }
   isGameOver() { return false; }
   hasBomb() { return true; }
 
@@ -242,7 +319,6 @@ class BombClose implements Tile {
 
 class BombReallyClose implements Tile {
   isAir() { return false; }
-  isUnbreakable() { return false; }
   isGameOver() { return false; }
   hasBomb() { return true; }
 
@@ -272,7 +348,6 @@ class BombReallyClose implements Tile {
 
 class TmpFire implements Tile {
   isAir() { return false; }
-  isUnbreakable() { return false; }
   isGameOver() { return false; }
   hasBomb() { return false; }
 
@@ -296,7 +371,6 @@ class TmpFire implements Tile {
 
 class Fire implements Tile {
   isAir() { return false; }
-  isUnbreakable() { return false; }
   isGameOver() { return true; }
   hasBomb() { return false; }
 
@@ -323,7 +397,6 @@ class Fire implements Tile {
 
 class ExtraBomb implements Tile {
   isAir() { return false; }
-  isUnbreakable() { return false; }
   isGameOver() { return false; }
   hasBomb() { return false; }
 
@@ -350,7 +423,12 @@ class ExtraBomb implements Tile {
 }
 
 class Monster implements Tile {
-  constructor(private state: MonsterState) { }
+  private monsterConfig: MonsterConfiguration;
+  private monsterStrategy: MonsterStrategy;
+  constructor(private config: MonsterConfiguration) {
+    this.monsterConfig = config;
+    this.monsterStrategy = new MonsterStrategy(config.getState());
+  }
 
   hasBomb(): boolean { return false; }
 
@@ -358,13 +436,14 @@ class Monster implements Tile {
 
   isGameOver(): boolean { return false; }
 
-  isUnbreakable(): boolean { return false; }
-
   movePlayer(y: number, x: number): void {
   }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    this.state.draw(g, x, y);
+    if (!this.monsterConfig.getStrategy().isTmp()) {
+      g.fillStyle = this.monsterConfig.getColor();
+    }
+    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -374,72 +453,38 @@ class Monster implements Tile {
   }
 
   updateTile(y: number, x: number): void {
-    this.state.updateTile(y, x);
+    this.monsterStrategy.getState().updateTile(y, x);
   }
 }
 
 interface Input {
-  isRight(): boolean;
-  isLeft(): boolean;
-  isUp(): boolean;
-  isDown(): boolean;
-  isPlace(): boolean;
   handle(): void;
 }
 
 class Right implements Input {
-  isRight() { return true; }
-  isLeft() { return false; }
-  isUp() { return false; }
-  isDown() { return false; }
-  isPlace() { return false; }
   handle() {
     map[playery][playerx + 1].movePlayer(0, 1);
   }
 }
 
 class Left implements Input {
-  isRight() { return false; }
-  isLeft() { return true; }
-  isUp() { return false; }
-  isDown() { return false; }
-  isPlace() { return false; }
-
   handle() {
     map[playery][playerx - 1].movePlayer(0, -1);
   }
 }
 class Up implements Input {
-  isRight() { return false; }
-  isLeft() { return false; }
-  isUp() { return true; }
-  isDown() { return false; }
-  isPlace() { return false; }
-
   handle() {
     map[playery - 1][playerx].movePlayer(-1, 0);
   }
 }
 
 class Down implements Input {
-  isRight() { return false; }
-  isLeft() { return false; }
-  isUp() { return false; }
-  isDown() { return true; }
-  isPlace() { return false; }
-
   handle() {
     map[playery + 1][playerx].movePlayer(1, 0);
   }
 }
 
 class Place implements Input {
-  isRight() { return false; }
-  isLeft() { return false; }
-  isUp() { return false; }
-  isDown() { return false; }
-  isPlace() { return true; }
-
   handle() {
     placeBomb();
   }
@@ -470,6 +515,7 @@ function assertExhausted(x: never): never {
   throw new Error("Unexpected object: " + x);
 }
 
+
 function transformTile(tile: RawTile) {
   switch (tile) {
     case RawTile.AIR: return new Air();
@@ -481,12 +527,12 @@ function transformTile(tile: RawTile) {
     case RawTile.TMP_FIRE: return new TmpFire();
     case RawTile.FIRE: return new Fire();
     case RawTile.EXTRA_BOMB: return new ExtraBomb();
-    case RawTile.MONSTER_UP: return new Monster(new MonsterUpState());
-    case RawTile.MONSTER_RIGHT: return new Monster(new MonsterRightState());
-    case RawTile.TMP_MONSTER_RIGHT: return new Monster(new MonsterTmpRightState());
-    case RawTile.MONSTER_DOWN: return new Monster(new MonsterDownState());
-    case RawTile.TMP_MONSTER_DOWN: return new Monster(new MonsterTmpDownState());
-    case RawTile.MONSTER_LEFT: return new Monster(new MonsterLeftState());
+    case RawTile.MONSTER_UP: return new Monster(MONSTER_UP);
+    case RawTile.MONSTER_RIGHT: return new Monster(MONSTER_RIGHT);
+    case RawTile.TMP_MONSTER_RIGHT: return new Monster(TMP_MONSTER_RIGHT);
+    case RawTile.MONSTER_DOWN: return new Monster(MONSTER_DOWN);
+    case RawTile.TMP_MONSTER_DOWN: return new Monster(TMP_MONSTER_DOWN);
+    case RawTile.MONSTER_LEFT: return new Monster(MONSTER_LEFT);
     default: return assertExhausted(tile);
   }
 }
