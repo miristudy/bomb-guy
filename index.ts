@@ -245,10 +245,10 @@ class BombReallyClose implements Tile {
     this.baseTile.moveUpToThis(x, y);
   }
   update(x: number, y: number): void {
-    explode(x + 0, y - 1, new Fire());
-    explode(x + 0, y + 1, new TmpFire());
-    explode(x - 1, y + 0, new Fire());
-    explode(x + 1, y + 0, new TmpFire());
+    explode(x, y - 1, new Fire());
+    explode(x, y + 1, new TmpFire());
+    explode(x - 1, y, new Fire());
+    explode(x + 1, y, new TmpFire());
     bombs++;
     map[y][x] = new Fire();
   }
@@ -650,7 +650,7 @@ let bombs = 1;
 let gameOver = false;
 
 function explode(x: number, y: number, type: Tile) {
-  type.explode(x, y, type);
+  map[y][x].explode(x, y, type);
 }
 
 function move(x: number, y: number) {
