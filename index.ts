@@ -24,13 +24,21 @@ enum RawTile {
 
 interface Tile {
     isAir(): boolean;
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void;
+
     isGameOver(): Boolean;
+
     movePlayer(y: number, x: number): void;
+
     close(): void;
+
     reallyClose(): void;
+
     explodeFire(x: number, y: number): void;
+
     explodeTmpFire(x: number, y: number): void;
+
     updateTile(y: number, x: number): void;
 }
 
@@ -45,6 +53,7 @@ class Air implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
     movePlayer(y: number, x: number): void {
         playery += y;
         playerx += x;
@@ -72,6 +81,7 @@ class Unbreakable implements Tile {
     isAir(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#999999";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -80,6 +90,7 @@ class Unbreakable implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -103,6 +114,7 @@ class Stone implements Tile {
     isAir(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#0000cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -111,6 +123,7 @@ class Stone implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -142,8 +155,11 @@ class Stone implements Tile {
 
 interface Bombable {
     isNormal(): boolean;
+
     isClose(): boolean;
+
     isReallyClose(): boolean;
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void;
 
     updateTile(y: number, x: number): void;
@@ -161,6 +177,7 @@ class Normal implements Bombable {
     isReallyClose(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#770000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -208,6 +225,7 @@ class ReallyClose implements Bombable {
     isReallyClose(): boolean {
         return true;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#ff0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -231,6 +249,7 @@ class Bomb implements Tile {
     isAir(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         this.status.drawBlock(y, x, g);
     }
@@ -238,6 +257,7 @@ class Bomb implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -268,15 +288,18 @@ class TmpFire implements Tile {
     isAir(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
     isGameOver(): Boolean {
         return false;
     }
 
     movePlayer(y: number, x: number): void {
     }
+
     close(): void {
     }
 
@@ -300,6 +323,7 @@ class Fire implements Tile {
     isAir(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#ffcc00";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -308,6 +332,7 @@ class Fire implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
     movePlayer(y: number, x: number): void {
         playery += y;
         playerx += x;
@@ -336,6 +361,7 @@ class ExtraBomb implements Tile {
     isAir(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#00cc00";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -344,6 +370,7 @@ class ExtraBomb implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
     movePlayer(y: number, x: number): void {
         playery += y;
         playerx += x;
@@ -382,6 +409,7 @@ class MonsterUp implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -422,6 +450,7 @@ class MonsterRight implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -453,6 +482,7 @@ class TmpMonsterRight implements Tile {
     isAir(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
@@ -460,6 +490,7 @@ class TmpMonsterRight implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -486,6 +517,7 @@ class MonsterDown implements Tile {
     isAir(): boolean {
         return false;
     }
+
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -494,6 +526,7 @@ class MonsterDown implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -533,6 +566,7 @@ class TmpMonsterDown implements Tile {
     isGameOver(): Boolean {
         return false;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -568,6 +602,7 @@ class MonsterLeft implements Tile {
     isGameOver(): Boolean {
         return true;
     }
+
     movePlayer(y: number, x: number): void {
     }
 
@@ -595,13 +630,17 @@ class MonsterLeft implements Tile {
     }
 }
 
-
 interface Input {
     isUp(): boolean;
+
     isDown(): boolean;
+
     isLeft(): boolean;
+
     isRight(): boolean;
+
     isPlace(): boolean;
+
     move(): void;
 }
 
@@ -759,22 +798,38 @@ let gameOver = false;
 
 function transformTile(tile: RawTile) {
     switch (tile) {
-        case RawTile.AIR: return new Air();
-        case RawTile.BOMB: return new Bomb(new Normal());
-        case RawTile.BOMB_CLOSE: return new Bomb(new Close());
-        case RawTile.BOMB_REALLY_CLOSE: return new Bomb(new ReallyClose());
-        case RawTile.EXTRA_BOMB: return new ExtraBomb();
-        case RawTile.FIRE: return new Fire();
-        case RawTile.TMP_FIRE: return new TmpFire();
-        case RawTile.STONE: return new Stone();
-        case RawTile.UNBREAKABLE: return new Unbreakable();
-        case RawTile.MONSTER_UP: return new MonsterUp();
-        case RawTile.MONSTER_DOWN: return new MonsterDown();
-        case RawTile.TMP_MONSTER_DOWN: return new TmpMonsterDown();
-        case RawTile.MONSTER_LEFT: return new MonsterLeft();
-        case RawTile.MONSTER_RIGHT: return new MonsterRight();
-        case RawTile.TMP_MONSTER_RIGHT: return new TmpMonsterRight();
-        default: throw new Error("Unknown tile: " + tile);
+        case RawTile.AIR:
+            return new Air();
+        case RawTile.BOMB:
+            return new Bomb(new Normal());
+        case RawTile.BOMB_CLOSE:
+            return new Bomb(new Close());
+        case RawTile.BOMB_REALLY_CLOSE:
+            return new Bomb(new ReallyClose());
+        case RawTile.EXTRA_BOMB:
+            return new ExtraBomb();
+        case RawTile.FIRE:
+            return new Fire();
+        case RawTile.TMP_FIRE:
+            return new TmpFire();
+        case RawTile.STONE:
+            return new Stone();
+        case RawTile.UNBREAKABLE:
+            return new Unbreakable();
+        case RawTile.MONSTER_UP:
+            return new MonsterUp();
+        case RawTile.MONSTER_DOWN:
+            return new MonsterDown();
+        case RawTile.TMP_MONSTER_DOWN:
+            return new TmpMonsterDown();
+        case RawTile.MONSTER_LEFT:
+            return new MonsterLeft();
+        case RawTile.MONSTER_RIGHT:
+            return new MonsterRight();
+        case RawTile.TMP_MONSTER_RIGHT:
+            return new TmpMonsterRight();
+        default:
+            throw new Error("Unknown tile: " + tile);
     }
 }
 
@@ -801,6 +856,7 @@ function handleInputs() {
         input.move();
     }
 }
+
 function updateMap() {
     for (let y = 1; y < map.length; y++) {
         for (let x = 1; x < map[y].length; x++) {
