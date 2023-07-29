@@ -171,7 +171,7 @@ enum RawTile {
     MONSTER_LEFT,
 }
 
-interface Tile2 {
+interface Tile {
     isAir(): boolean;
 
     isUnbreakable(): boolean;
@@ -203,7 +203,7 @@ interface Tile2 {
     isMonsterLeft(): boolean;
 }
 
-class Air implements Tile2 {
+class Air implements Tile {
     isAir(): boolean {
         return true;
     }
@@ -265,7 +265,7 @@ class Air implements Tile2 {
     }
 }
 
-class Unbreakable implements Tile2 {
+class Unbreakable implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -327,7 +327,7 @@ class Unbreakable implements Tile2 {
     }
 }
 
-class Stone implements Tile2 {
+class Stone implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -389,7 +389,7 @@ class Stone implements Tile2 {
     }
 }
 
-class Bomb implements Tile2 {
+class Bomb implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -451,7 +451,7 @@ class Bomb implements Tile2 {
     }
 }
 
-class BombClose implements Tile2 {
+class BombClose implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -513,7 +513,7 @@ class BombClose implements Tile2 {
     }
 }
 
-class BombReallyClose implements Tile2 {
+class BombReallyClose implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -575,7 +575,7 @@ class BombReallyClose implements Tile2 {
     }
 }
 
-class TmpFire implements Tile2 {
+class TmpFire implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -637,7 +637,7 @@ class TmpFire implements Tile2 {
     }
 }
 
-class Fire implements Tile2 {
+class Fire implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -699,7 +699,7 @@ class Fire implements Tile2 {
     }
 }
 
-class ExtraBomb implements Tile2 {
+class ExtraBomb implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -761,7 +761,7 @@ class ExtraBomb implements Tile2 {
     }
 }
 
-class MonsterUp implements Tile2 {
+class MonsterUp implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -823,7 +823,7 @@ class MonsterUp implements Tile2 {
     }
 }
 
-class MonsterRight implements Tile2 {
+class MonsterRight implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -885,7 +885,7 @@ class MonsterRight implements Tile2 {
     }
 }
 
-class TmpMonsterRight implements Tile2 {
+class TmpMonsterRight implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -947,7 +947,7 @@ class TmpMonsterRight implements Tile2 {
     }
 }
 
-class MonsterDown implements Tile2 {
+class MonsterDown implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -1009,7 +1009,7 @@ class MonsterDown implements Tile2 {
     }
 }
 
-class TmpMonsterDown implements Tile2 {
+class TmpMonsterDown implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -1071,7 +1071,7 @@ class TmpMonsterDown implements Tile2 {
     }
 }
 
-class MonsterLeft implements Tile2 {
+class MonsterLeft implements Tile {
     isAir(): boolean {
         return false;
     }
@@ -1148,7 +1148,7 @@ let rawMap: RawTile[][] = [
     [1, 2, 2, 2, 2, 0, 0, 10, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
-let map: Tile2[][];
+let map: Tile[][];
 
 function assertExhausted(x: never): never {
     throw new Error("Unexpected object: " + x);
