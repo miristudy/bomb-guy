@@ -169,7 +169,11 @@ function draw() {
 
   g.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw map
+  drawMap(g);
+  drawPlayer(g);
+}
+
+function drawMap(g: CanvasRenderingContext2D) {
   for (let y = 0; y < map.length; y++) {
     for (let x = 0; x < map[y].length; x++) {
       if (map[y][x] === Tile.UNBREAKABLE) g.fillStyle = "#999999";
@@ -177,10 +181,10 @@ function draw() {
       else if (map[y][x] === Tile.EXTRA_BOMB) g.fillStyle = "#00cc00";
       else if (map[y][x] === Tile.FIRE) g.fillStyle = "#ffcc00";
       else if (
-        map[y][x] === Tile.MONSTER_UP ||
-        map[y][x] === Tile.MONSTER_LEFT ||
-        map[y][x] === Tile.MONSTER_RIGHT ||
-        map[y][x] === Tile.MONSTER_DOWN
+          map[y][x] === Tile.MONSTER_UP ||
+          map[y][x] === Tile.MONSTER_LEFT ||
+          map[y][x] === Tile.MONSTER_RIGHT ||
+          map[y][x] === Tile.MONSTER_DOWN
       )
         g.fillStyle = "#cc00cc";
       else if (map[y][x] === Tile.BOMB) g.fillStyle = "#770000";
@@ -191,11 +195,13 @@ function draw() {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
   }
+}
 
-  // Draw player
-  g.fillStyle = "#00ff00";
-  if (!gameOver)
+function drawPlayer(g: CanvasRenderingContext2D) {
+  if (!gameOver) {
+    g.fillStyle = "#00ff00";
     g.fillRect(playerx * TILE_SIZE, playery * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
 }
 
 function gameLoop() {
