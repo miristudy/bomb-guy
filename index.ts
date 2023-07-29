@@ -6,144 +6,34 @@ const DELAY = FPS / TPS;
 
 // --------- Input ---------
 interface Input {
-    isRight(): boolean;
-
-    isLeft(): boolean;
-
-    isUp(): boolean;
-
-    isDown(): boolean;
-
-    isPlace(): boolean;
-
     handle(): void;
 }
 
 class Up implements Input {
-    isRight(): boolean {
-        return false;
-    }
-
-    isLeft(): boolean {
-        return false;
-    }
-
-    isUp(): boolean {
-        return true;
-    }
-
-    isDown(): boolean {
-        return false;
-    }
-
-    isPlace(): boolean {
-        return false;
-    }
-
     handle() {
         move(0, -1);
     }
 }
 
 class Down implements Input {
-    isRight(): boolean {
-        return false;
-    }
-
-    isLeft(): boolean {
-        return false;
-    }
-
-    isUp(): boolean {
-        return false;
-    }
-
-    isDown(): boolean {
-        return true;
-    }
-
-    isPlace(): boolean {
-        return false;
-    }
-
     handle() {
         move(0, 1);
     }
 }
 
 class Right implements Input {
-    isRight(): boolean {
-        return true;
-    }
-
-    isLeft(): boolean {
-        return false;
-    }
-
-    isUp(): boolean {
-        return false;
-    }
-
-    isDown(): boolean {
-        return false;
-    }
-
-    isPlace(): boolean {
-        return false;
-    }
-
     handle() {
         move(1, 0);
     }
 }
 
 class Left implements Input {
-    isRight(): boolean {
-        return false;
-    }
-
-    isLeft(): boolean {
-        return true;
-    }
-
-    isUp(): boolean {
-        return false;
-    }
-
-    isDown(): boolean {
-        return false;
-    }
-
-    isPlace(): boolean {
-        return false;
-    }
-
     handle() {
         move(-1, 0);
     }
 }
 
 class Place implements Input {
-    isRight(): boolean {
-        return false;
-    }
-
-    isLeft(): boolean {
-        return false;
-    }
-
-    isUp(): boolean {
-        return false;
-    }
-
-    isDown(): boolean {
-        return false;
-    }
-
-    isPlace(): boolean {
-        return true;
-    }
-
     handle() {
         placeBomb();
     }
@@ -187,8 +77,6 @@ interface Tile {
     isTmpFire(): boolean;
 
     isFire(): boolean;
-
-    isExtraBomb(): boolean;
 
     isMonsterUp(): boolean;
 
@@ -237,10 +125,6 @@ class Air implements Tile {
     }
 
     isFire(): boolean {
-        return false;
-    }
-
-    isExtraBomb(): boolean {
         return false;
     }
 
@@ -311,10 +195,6 @@ class Unbreakable implements Tile {
         return false;
     }
 
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isMonsterUp(): boolean {
         return false;
     }
@@ -379,10 +259,6 @@ class Stone implements Tile {
     }
 
     isFire(): boolean {
-        return false;
-    }
-
-    isExtraBomb(): boolean {
         return false;
     }
 
@@ -453,10 +329,6 @@ class Bomb implements Tile {
         return false;
     }
 
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isMonsterUp(): boolean {
         return false;
     }
@@ -521,10 +393,6 @@ class BombClose implements Tile {
     }
 
     isFire(): boolean {
-        return false;
-    }
-
-    isExtraBomb(): boolean {
         return false;
     }
 
@@ -595,10 +463,6 @@ class BombReallyClose implements Tile {
         return false;
     }
 
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isMonsterUp(): boolean {
         return false;
     }
@@ -663,10 +527,6 @@ class TmpFire implements Tile {
     }
 
     isFire(): boolean {
-        return false;
-    }
-
-    isExtraBomb(): boolean {
         return false;
     }
 
@@ -736,10 +596,6 @@ class Fire implements Tile {
         return true;
     }
 
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isMonsterUp(): boolean {
         return false;
     }
@@ -806,10 +662,6 @@ class ExtraBomb implements Tile {
 
     isFire(): boolean {
         return false;
-    }
-
-    isExtraBomb(): boolean {
-        return true;
     }
 
     isMonsterUp(): boolean {
@@ -882,10 +734,6 @@ class MonsterUp implements Tile {
         return false;
     }
 
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isMonsterUp(): boolean {
         return true;
     }
@@ -950,10 +798,6 @@ class MonsterRight implements Tile {
     }
 
     isFire(): boolean {
-        return false;
-    }
-
-    isExtraBomb(): boolean {
         return false;
     }
 
@@ -1024,10 +868,6 @@ class TmpMonsterRight implements Tile {
         return false;
     }
 
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isMonsterUp(): boolean {
         return false;
     }
@@ -1091,10 +931,6 @@ class MonsterDown implements Tile {
     }
 
     isFire(): boolean {
-        return false;
-    }
-
-    isExtraBomb(): boolean {
         return false;
     }
 
@@ -1165,10 +1001,6 @@ class TmpMonsterDown implements Tile {
         return false;
     }
 
-    isExtraBomb(): boolean {
-        return false;
-    }
-
     isMonsterUp(): boolean {
         return false;
     }
@@ -1232,10 +1064,6 @@ class MonsterLeft implements Tile {
     }
 
     isFire(): boolean {
-        return false;
-    }
-
-    isExtraBomb(): boolean {
         return false;
     }
 
