@@ -88,14 +88,7 @@ function placeBomb() {
 }
 
 function update() {
-  while (!gameOver && inputs.length > 0) {
-    let current = inputs.pop();
-    if (current === Input.LEFT) move(-1, 0);
-    else if (current === Input.RIGHT) move(1, 0);
-    else if (current === Input.UP) move(0, -1);
-    else if (current === Input.DOWN) move(0, 1);
-    else if (current === Input.PLACE) placeBomb();
-  }
+  handleInputs();
 
   if (
     map[playery][playerx] === Tile.FIRE ||
@@ -108,7 +101,21 @@ function update() {
 
   if (--delay > 0) return;
   delay = DELAY;
+  updateMap();
+}
 
+function handleInputs() {
+  while (!gameOver && inputs.length > 0) {
+    let current = inputs.pop();
+    if (current === Input.LEFT) move(-1, 0);
+    else if (current === Input.RIGHT) move(1, 0);
+    else if (current === Input.UP) move(0, -1);
+    else if (current === Input.DOWN) move(0, 1);
+    else if (current === Input.PLACE) placeBomb();
+  }
+}
+
+function updateMap() {
   for (let y = 1; y < map.length; y++) {
     for (let x = 1; x < map[y].length; x++) {
       if (map[y][x] === Tile.BOMB) {
