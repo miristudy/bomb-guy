@@ -201,6 +201,8 @@ interface Tile {
     isTmpMonsterDown(): boolean;
 
     isMonsterLeft(): boolean;
+
+    color(g: CanvasRenderingContext2D): void;
 }
 
 class Air implements Tile {
@@ -262,6 +264,10 @@ class Air implements Tile {
 
     isMonsterLeft(): boolean {
         return false;
+    }
+
+    color(g: CanvasRenderingContext2D): void {
+        // do nothing
     }
 }
 
@@ -325,6 +331,10 @@ class Unbreakable implements Tile {
     isMonsterLeft(): boolean {
         return false;
     }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#999999";
+    }
 }
 
 class Stone implements Tile {
@@ -386,6 +396,10 @@ class Stone implements Tile {
 
     isMonsterLeft(): boolean {
         return false;
+    }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#0000cc";
     }
 }
 
@@ -449,6 +463,10 @@ class Bomb implements Tile {
     isMonsterLeft(): boolean {
         return false;
     }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#770000";
+    }
 }
 
 class BombClose implements Tile {
@@ -510,6 +528,10 @@ class BombClose implements Tile {
 
     isMonsterLeft(): boolean {
         return false;
+    }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc0000";
     }
 }
 
@@ -573,6 +595,10 @@ class BombReallyClose implements Tile {
     isMonsterLeft(): boolean {
         return false;
     }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#ff0000";
+    }
 }
 
 class TmpFire implements Tile {
@@ -634,6 +660,10 @@ class TmpFire implements Tile {
 
     isMonsterLeft(): boolean {
         return false;
+    }
+
+    color(g: CanvasRenderingContext2D): void {
+        // do nothing
     }
 }
 
@@ -697,6 +727,10 @@ class Fire implements Tile {
     isMonsterLeft(): boolean {
         return false;
     }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#ffcc00";
+    }
 }
 
 class ExtraBomb implements Tile {
@@ -758,6 +792,10 @@ class ExtraBomb implements Tile {
 
     isMonsterLeft(): boolean {
         return false;
+    }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#00cc00";
     }
 }
 
@@ -821,6 +859,10 @@ class MonsterUp implements Tile {
     isMonsterLeft(): boolean {
         return false;
     }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
+    }
 }
 
 class MonsterRight implements Tile {
@@ -882,6 +924,10 @@ class MonsterRight implements Tile {
 
     isMonsterLeft(): boolean {
         return false;
+    }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
     }
 }
 
@@ -945,6 +991,10 @@ class TmpMonsterRight implements Tile {
     isMonsterLeft(): boolean {
         return false;
     }
+
+    color(g: CanvasRenderingContext2D): void {
+        // do nothing
+    }
 }
 
 class MonsterDown implements Tile {
@@ -1006,6 +1056,10 @@ class MonsterDown implements Tile {
 
     isMonsterLeft(): boolean {
         return false;
+    }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
     }
 }
 
@@ -1069,6 +1123,10 @@ class TmpMonsterDown implements Tile {
     isMonsterLeft(): boolean {
         return false;
     }
+
+    color(g: CanvasRenderingContext2D): void {
+        // do nothing
+    }
 }
 
 class MonsterLeft implements Tile {
@@ -1130,6 +1188,10 @@ class MonsterLeft implements Tile {
 
     isMonsterLeft(): boolean {
         return true;
+    }
+
+    color(g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
     }
 }
 
@@ -1363,28 +1425,11 @@ function draw() {
 function drawMap(g: CanvasRenderingContext2D) {
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
-            colorOfTile(y, x, g);
+            map[y][x].color(g);
             if (!map[y][x].isAir())
                 g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
     }
-}
-
-function colorOfTile(y: number, x: number, g: CanvasRenderingContext2D) {
-    if (map[y][x].isUnbreakable()) g.fillStyle = "#999999";
-    else if (map[y][x].isStone()) g.fillStyle = "#0000cc";
-    else if (map[y][x].isExtraBomb()) g.fillStyle = "#00cc00";
-    else if (map[y][x].isFire()) g.fillStyle = "#ffcc00";
-    else if (
-        map[y][x].isMonsterUp() ||
-        map[y][x].isMonsterLeft() ||
-        map[y][x].isMonsterRight() ||
-        map[y][x].isMonsterDown()
-    )
-        g.fillStyle = "#cc00cc";
-    else if (map[y][x].isBomb()) g.fillStyle = "#770000";
-    else if (map[y][x].isBombClose()) g.fillStyle = "#cc0000";
-    else if (map[y][x].isBombReallyClose()) g.fillStyle = "#ff0000";
 }
 
 function drawPlayer(g: CanvasRenderingContext2D) {
