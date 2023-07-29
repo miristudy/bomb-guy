@@ -93,6 +93,10 @@ interface Tile {
     draw(g: CanvasRenderingContext2D, x: number, y: number): void;
 
     move(x: number, y: number): void;
+
+    isBombFamily(): boolean;
+
+    isKillable(): boolean;
 }
 
 class Air implements Tile {
@@ -159,6 +163,14 @@ class Air implements Tile {
     move(x: number, y: number): void {
         playery += y;
         playerx += x;
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return false;
     }
 }
 
@@ -227,6 +239,14 @@ class Unbreakable implements Tile {
     move(x: number, y: number): void {
         // do nothing
     }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return false;
+    }
 }
 
 class Stone implements Tile {
@@ -293,6 +313,14 @@ class Stone implements Tile {
 
     move(x: number, y: number): void {
         // do nothing
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return false;
     }
 }
 
@@ -361,6 +389,14 @@ class Bomb implements Tile {
     move(x: number, y: number): void {
         // do nothing
     }
+
+    isBombFamily(): boolean {
+        return true;
+    }
+
+    isKillable(): boolean {
+        return false;
+    }
 }
 
 class BombClose implements Tile {
@@ -427,6 +463,14 @@ class BombClose implements Tile {
 
     move(x: number, y: number): void {
         // do nothing
+    }
+
+    isBombFamily(): boolean {
+        return true;
+    }
+
+    isKillable(): boolean {
+        return false;
     }
 }
 
@@ -495,6 +539,14 @@ class BombReallyClose implements Tile {
     move(x: number, y: number): void {
         // do nothing
     }
+
+    isBombFamily(): boolean {
+        return true;
+    }
+
+    isKillable(): boolean {
+        return false;
+    }
 }
 
 class TmpFire implements Tile {
@@ -560,6 +612,14 @@ class TmpFire implements Tile {
 
     move(x: number, y: number): void {
         // do nothing
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return false;
     }
 }
 
@@ -628,6 +688,14 @@ class Fire implements Tile {
     move(x: number, y: number): void {
         playery += y;
         playerx += x;
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return true;
     }
 }
 
@@ -699,6 +767,14 @@ class ExtraBomb implements Tile {
         bombs++;
         map[playery][playerx] = new Air();
     }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return false;
+    }
 }
 
 class MonsterUp implements Tile {
@@ -765,6 +841,14 @@ class MonsterUp implements Tile {
 
     move(x: number, y: number): void {
         // do nothing
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return true;
     }
 }
 
@@ -833,6 +917,14 @@ class MonsterRight implements Tile {
     move(x: number, y: number): void {
         // do nothing
     }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return true;
+    }
 }
 
 class TmpMonsterRight implements Tile {
@@ -898,6 +990,14 @@ class TmpMonsterRight implements Tile {
 
     move(x: number, y: number): void {
         // do nothing
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return false;
     }
 }
 
@@ -966,6 +1066,14 @@ class MonsterDown implements Tile {
     move(x: number, y: number): void {
         // do nothing
     }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return true;
+    }
 }
 
 class TmpMonsterDown implements Tile {
@@ -1031,6 +1139,14 @@ class TmpMonsterDown implements Tile {
 
     move(x: number, y: number): void {
         // do nothing
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return false;
     }
 }
 
@@ -1098,6 +1214,14 @@ class MonsterLeft implements Tile {
 
     move(x: number, y: number): void {
         // do nothing
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return true;
     }
 }
 
@@ -1183,11 +1307,7 @@ function explodeFire(x: number, y: number) {
         else
             map[y][x] = new Fire();
     } else if (!map[y][x].isUnbreakable()) {
-        if (
-            map[y][x].isBomb() ||
-            map[y][x].isBombClose() ||
-            map[y][x].isBombReallyClose()
-        )
+        if (map[y][x].isBombFamily())
             bombs++;
         map[y][x] = new Fire();
     }
@@ -1200,11 +1320,7 @@ function explodeTmpFire(x: number, y: number) {
         else
             map[y][x] = new TmpFire();
     } else if (!map[y][x].isUnbreakable()) {
-        if (
-            map[y][x].isBomb() ||
-            map[y][x].isBombClose() ||
-            map[y][x].isBombReallyClose()
-        )
+        if (map[y][x].isBombFamily())
             bombs++;
         map[y][x] = new TmpFire();
     }
@@ -1224,13 +1340,7 @@ function placeBomb() {
 function update() {
     handleInputs();
 
-    if (
-        map[playery][playerx].isFire() ||
-        map[playery][playerx].isMonsterDown() ||
-        map[playery][playerx].isMonsterUp() ||
-        map[playery][playerx].isMonsterLeft() ||
-        map[playery][playerx].isMonsterRight()
-    )
+    if (map[playery][playerx].isKillable())
         gameOver = true;
 
     if (--delay > 0) return;
