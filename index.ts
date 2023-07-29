@@ -202,7 +202,7 @@ interface Tile {
 
     isMonsterLeft(): boolean;
 
-    color(g: CanvasRenderingContext2D): void;
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void;
 }
 
 class Air implements Tile {
@@ -266,7 +266,7 @@ class Air implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         // do nothing
     }
 }
@@ -332,8 +332,9 @@ class Unbreakable implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#999999";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -398,8 +399,9 @@ class Stone implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#0000cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -464,8 +466,9 @@ class Bomb implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#770000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -530,8 +533,9 @@ class BombClose implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc0000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -596,8 +600,9 @@ class BombReallyClose implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#ff0000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -662,8 +667,8 @@ class TmpFire implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
-        // do nothing
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -728,8 +733,9 @@ class Fire implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#ffcc00";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -794,8 +800,9 @@ class ExtraBomb implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#00cc00";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -860,8 +867,9 @@ class MonsterUp implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -926,8 +934,9 @@ class MonsterRight implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -992,8 +1001,8 @@ class TmpMonsterRight implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
-        // do nothing
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -1058,8 +1067,9 @@ class MonsterDown implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -1124,8 +1134,8 @@ class TmpMonsterDown implements Tile {
         return false;
     }
 
-    color(g: CanvasRenderingContext2D): void {
-        // do nothing
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -1190,8 +1200,9 @@ class MonsterLeft implements Tile {
         return true;
     }
 
-    color(g: CanvasRenderingContext2D): void {
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -1425,9 +1436,7 @@ function draw() {
 function drawMap(g: CanvasRenderingContext2D) {
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
-            map[y][x].color(g);
-            if (!map[y][x].isAir())
-                g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            map[y][x].draw(g, x, y);
         }
     }
 }
