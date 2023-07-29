@@ -203,6 +203,8 @@ interface Tile {
     isMonsterLeft(): boolean;
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void;
+
+    move(x: number, y: number): void;
 }
 
 class Air implements Tile {
@@ -268,6 +270,11 @@ class Air implements Tile {
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         // do nothing
+    }
+
+    move(x: number, y: number): void {
+        playery += y;
+        playerx += x;
     }
 }
 
@@ -336,6 +343,10 @@ class Unbreakable implements Tile {
         g.fillStyle = "#999999";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    move(x: number, y: number): void {
+        // do nothing
+    }
 }
 
 class Stone implements Tile {
@@ -402,6 +413,10 @@ class Stone implements Tile {
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#0000cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    move(x: number, y: number): void {
+        // do nothing
     }
 }
 
@@ -470,6 +485,10 @@ class Bomb implements Tile {
         g.fillStyle = "#770000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    move(x: number, y: number): void {
+        // do nothing
+    }
 }
 
 class BombClose implements Tile {
@@ -536,6 +555,10 @@ class BombClose implements Tile {
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    move(x: number, y: number): void {
+        // do nothing
     }
 }
 
@@ -604,6 +627,10 @@ class BombReallyClose implements Tile {
         g.fillStyle = "#ff0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    move(x: number, y: number): void {
+        // do nothing
+    }
 }
 
 class TmpFire implements Tile {
@@ -669,6 +696,10 @@ class TmpFire implements Tile {
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    move(x: number, y: number): void {
+        // do nothing
     }
 }
 
@@ -737,6 +768,11 @@ class Fire implements Tile {
         g.fillStyle = "#ffcc00";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    move(x: number, y: number): void {
+        playery += y;
+        playerx += x;
+    }
 }
 
 class ExtraBomb implements Tile {
@@ -803,6 +839,13 @@ class ExtraBomb implements Tile {
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#00cc00";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    move(x: number, y: number): void {
+        playery += y;
+        playerx += x;
+        bombs++;
+        map[playery][playerx] = new Air();
     }
 }
 
@@ -871,6 +914,10 @@ class MonsterUp implements Tile {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    move(x: number, y: number): void {
+        // do nothing
+    }
 }
 
 class MonsterRight implements Tile {
@@ -938,6 +985,10 @@ class MonsterRight implements Tile {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    move(x: number, y: number): void {
+        // do nothing
+    }
 }
 
 class TmpMonsterRight implements Tile {
@@ -1003,6 +1054,10 @@ class TmpMonsterRight implements Tile {
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    move(x: number, y: number): void {
+        // do nothing
     }
 }
 
@@ -1071,6 +1126,10 @@ class MonsterDown implements Tile {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    move(x: number, y: number): void {
+        // do nothing
+    }
 }
 
 class TmpMonsterDown implements Tile {
@@ -1136,6 +1195,10 @@ class TmpMonsterDown implements Tile {
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    move(x: number, y: number): void {
+        // do nothing
     }
 }
 
@@ -1203,6 +1266,10 @@ class MonsterLeft implements Tile {
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    move(x: number, y: number): void {
+        // do nothing
     }
 }
 
@@ -1316,18 +1383,7 @@ function explodeTmpFire(x: number, y: number) {
 }
 
 function move(x: number, y: number) {
-    if (
-        map[playery + y][playerx + x].isAir() ||
-        map[playery + y][playerx + x].isFire()
-    ) {
-        playery += y;
-        playerx += x;
-    } else if (map[playery + y][playerx + x].isExtraBomb()) {
-        playery += y;
-        playerx += x;
-        bombs++;
-        map[playery][playerx] = new Air();
-    }
+    map[playery + y][playerx + x].move(x, y);
 }
 
 function placeBomb() {
