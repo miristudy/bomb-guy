@@ -436,7 +436,7 @@ class RightHeading implements Heading {
 
     moveForward(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y][x + 1] = new TmpMonsterRight();
+        map[y][x + 1] = new TmpMonster(TmpMonsterHeading.RIGHT);
     }
 }
 
@@ -475,7 +475,7 @@ class DownHeading implements Heading {
 
     moveForward(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y + 1][x] = new TmpMonsterDown();
+        map[y + 1][x] = new TmpMonster(TmpMonsterHeading.DOWN);
     }
 
 }
@@ -530,42 +530,12 @@ class Monster implements Tile {
     }
 }
 
-class TmpMonsterDown implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    isGameOver(): Boolean {
-        return false;
-    }
-
-    movePlayer(y: number, x: number): void {
-    }
-
-    close(): void {
-    }
-
-    reallyClose(): void {
-    }
-
-    explodeFire(x: number, y: number): void {
-        map[y][x] = new Fire();
-    }
-
-    explodeTmpFire(x: number, y: number): void {
-        map[y][x] = new TmpFire();
-    }
-
-    updateTile(y: number, x: number): void {
-        map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
-    }
+enum TmpMonsterHeading {
+    DOWN, RIGHT
 }
-
-class TmpMonsterRight implements Tile {
+class TmpMonster implements Tile {
+    constructor(private heading: TmpMonsterHeading) {
+    }
     isAir(): boolean {
         return false;
     }
@@ -596,7 +566,11 @@ class TmpMonsterRight implements Tile {
     }
 
     updateTile(y: number, x: number): void {
-        map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
+        if (this.heading === TmpMonsterHeading.DOWN) {
+            map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
+        } else if (this.heading == TmpMonsterHeading.RIGHT) {
+            map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
+        }
     }
 }
 
@@ -791,13 +765,13 @@ function transformTile(tile: RawTile) {
         case RawTile.MONSTER_DOWN:
             return new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
         case RawTile.TMP_MONSTER_DOWN:
-            return new TmpMonsterDown();
+            return new TmpMonster(TmpMonsterHeading.DOWN);
         case RawTile.MONSTER_LEFT:
             return new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
         case RawTile.MONSTER_RIGHT:
             return new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
         case RawTile.TMP_MONSTER_RIGHT:
-            return new TmpMonsterRight();
+            return new TmpMonster(TmpMonsterHeading.RIGHT);
         default:
             throw new Error("Unknown tile: " + tile);
     }
