@@ -29,7 +29,7 @@ interface Tile {
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void;
   isGameOver(): boolean;
   isBombType(): boolean;
-  move(x: number, y: number): void;
+  move(player:Player, x: number, y: number): void;
   close(): void;
   reallyClose(): void;
   renewMonsterUp(): void;
@@ -60,9 +60,8 @@ class Air implements Tile {
     return false;
   }
 
-  move(x: number, y: number): void {
-    player.setX(player.getX() + x);
-    player.setY(player.getY() + y);
+  move(player:Player, x: number, y: number): void {
+    player.move(x, y)
   }
 
   renewMonsterDown(): void {
@@ -119,7 +118,7 @@ class Unbreakable implements Tile {
     return false;
   }
 
-  move(x: number, y: number): void {
+  move(player:Player, x: number, y: number): void {
   }
 
   renewMonsterDown(): void {
@@ -175,7 +174,7 @@ class Stone implements Tile {
     return false;
   }
 
-  move(x: number, y: number): void {
+  move(player:Player, x: number, y: number): void {
   }
 
   renewMonsterDown(): void {
@@ -240,7 +239,7 @@ class Bomb implements Tile {
     return true;
   }
 
-  move(x: number, y: number): void {
+  move(player:Player, x: number, y: number): void {
   }
 
   renewMonsterDown(): void {
@@ -396,7 +395,7 @@ class TmpFire implements Tile {
     return false;
   }
 
-  move(x: number, y: number): void {
+  move(player:Player, x: number, y: number): void {
   }
 
   renewMonsterDown(): void {
@@ -454,9 +453,8 @@ class Fire implements Tile {
     return false;
   }
 
-  move(x: number, y: number): void {
-    player.setX(player.getX() + x);
-    player.setY(player.getY() + y);
+  move(player:Player, x: number, y: number): void {
+    player.move(x, y)
   }
 
   renewMonsterDown(): void {
@@ -514,11 +512,10 @@ class ExtraBomb implements Tile {
     return false;
   }
 
-  move(x: number, y: number): void {
-    player.setX(player.getX() + x);
-    player.setY(player.getY() + y);
+  move(player:Player, x: number, y: number): void {
+    player.move(x, y)
     bombs++;
-    map[player.getY()][player.getX()] = new Air();
+    player.renewAir();
   }
 
   renewMonsterDown(): void {
@@ -590,7 +587,7 @@ class Monster implements Tile {
     return false;
   }
 
-  move(x: number, y: number): void {
+  move(player:Player, x: number, y: number): void {
   }
 
   renewMonsterDown(): void {
@@ -916,7 +913,7 @@ class Up implements Input {
   }
 
   move(): void {
-    map[player.getY() + -1][player.getX()].move(0, -1);
+    player.moveUp();
   }
 
 }
@@ -943,7 +940,7 @@ class Down implements Input {
   }
 
   move(): void {
-    map[player.getY() + 1][player.getX()].move(0, 1);
+    player.moveDown();
   }
 
 }
@@ -970,7 +967,7 @@ class Right implements Input {
   }
 
   move(): void {
-    map[player.getY()][player.getX() + 1].move(1, 0);
+    player.moveRight()
   }
 
 }
@@ -997,7 +994,7 @@ class Left implements Input {
   }
 
   move(): void {
-    map[player.getY()][player.getX() + -1].move(-1, 0);
+    player.moveLeft();
   }
 
 }
@@ -1024,10 +1021,7 @@ class Place implements Input {
   }
 
   move(): void {
-    if (bombs > 0) {
-      map[player.getY()][player.getX()] = new Bomb(new Normal());
-      bombs--;
-    }
+    player.movePlace();
   }
 
 }
@@ -1036,20 +1030,47 @@ class Player {
   private x = 1;
   private y = 1;
 
-  getX() {
-    return this.x;
+  renewAir() {
+    map[this.y][this.x] = new Air();
   }
 
-  getY() {
-    return this.y;
+  move(x: number, y:number){
+    this.x += x;
+    this.y += y;
   }
 
-  setX(x: number) {
-    this.x = x;
+  moveUp(){
+    map[this.y + -1][this.x].move(player, 0, -1);
   }
 
-  setY(y: number) {
-    this.y = y;
+  moveDown(){
+    map[this.y + 1][this.x].move(player, 0, 1);
+  }
+
+  moveLeft(){
+    map[this.y][this.x + -1].move(player, -1, 0);
+  }
+
+  moveRight(){
+    map[this.y][this.x + 1].move(player, 1, 0);
+  }
+
+  movePlace(){
+    if (bombs > 0) {
+      map[this.y][this.x] = new Bomb(new Normal());
+      bombs--;
+    }
+  }
+
+  draw(g: CanvasRenderingContext2D) {
+    if (!gameOver){
+      g.fillStyle = "#00ff00";
+      g.fillRect(this.x * TILE_SIZE, this.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+  }
+
+  isGameOver() {
+    return map[this.y][this.x].isGameOver()
   }
 
 }
@@ -1129,10 +1150,6 @@ function handleInputs() {
   }
 }
 
-function isGameOver() {
-  return map[player.getY()][player.getX()].isGameOver()
-}
-
 function updateMap() {
   for (let y = 1; y < map.length; y++) {
     for (let x = 1; x < map[y].length; x++) {
@@ -1143,7 +1160,7 @@ function updateMap() {
 
 function update() {
   handleInputs();
-  if (isGameOver())
+  if (player.isGameOver())
     gameOver = true;
 
   if (--delay > 0) return;
@@ -1153,9 +1170,7 @@ function update() {
 }
 
 function drawPlayer(g: CanvasRenderingContext2D) {
-  g.fillStyle = "#00ff00";
-  if (!gameOver)
-    g.fillRect(player.getX() * TILE_SIZE, player.getY() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  player.draw(g);
 }
 
 function drawMap(g: CanvasRenderingContext2D) {
