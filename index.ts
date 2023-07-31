@@ -394,7 +394,7 @@ class RightHeading implements Heading {
 
     moveForward(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y][x + 1] = new TmpMonster(TmpMonsterHeading.RIGHT);
+        map[y][x + 1] = new TmpMonster(new TmpMonsterRightHeading());
     }
 }
 
@@ -433,7 +433,7 @@ class DownHeading implements Heading {
 
     moveForward(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y + 1][x] = new TmpMonster(TmpMonsterHeading.DOWN);
+        map[y + 1][x] = new TmpMonster(new TmpMonsterDownHeading());
     }
 
 }
@@ -487,10 +487,22 @@ class Monster implements Tile {
         this.monsterMoveStrategy.updateTile(y, x, this.heading);
     }
 }
-
-enum TmpMonsterHeading {
-    DOWN, RIGHT
+interface TmpMonsterHeading {
+    updateTile(y: number, x: number): void;
 }
+
+class TmpMonsterDownHeading implements TmpMonsterHeading {
+    updateTile(y: number, x: number): void {
+        map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
+    }
+}
+
+class TmpMonsterRightHeading implements TmpMonsterHeading {
+    updateTile(y: number, x: number): void {
+        map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
+    }
+}
+
 class TmpMonster implements Tile {
     constructor(private heading: TmpMonsterHeading) {
     }
@@ -524,11 +536,7 @@ class TmpMonster implements Tile {
     }
 
     updateTile(y: number, x: number): void {
-        if (this.heading === TmpMonsterHeading.DOWN) {
-            map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
-        } else if (this.heading == TmpMonsterHeading.RIGHT) {
-            map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
-        }
+        this.heading.updateTile(y, x);
     }
 }
 
@@ -613,13 +621,13 @@ function transformTile(tile: RawTile) {
         case RawTile.MONSTER_DOWN:
             return new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
         case RawTile.TMP_MONSTER_DOWN:
-            return new TmpMonster(TmpMonsterHeading.DOWN);
+            return new TmpMonster(new TmpMonsterDownHeading());
         case RawTile.MONSTER_LEFT:
             return new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
         case RawTile.MONSTER_RIGHT:
             return new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
         case RawTile.TMP_MONSTER_RIGHT:
-            return new TmpMonster(TmpMonsterHeading.RIGHT);
+            return new TmpMonster(new TmpMonsterRightHeading());
         default:
             throw new Error("Unknown tile: " + tile);
     }
