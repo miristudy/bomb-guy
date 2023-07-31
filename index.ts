@@ -361,11 +361,11 @@ interface Heading {
 
 class LeftHeading implements Heading {
     updateTile(y: number, x: number): void {
-        if (!this.canMoveForward(y, x)) {
-            map[y][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
+        if (this.canMoveForward(y, x)) {
+            this.moveForward(y, x);
             return;
         }
-        this.moveForward(y, x);
+        map[y][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
     }
 
     canMoveForward(y: number, x: number): boolean {
@@ -381,11 +381,11 @@ class LeftHeading implements Heading {
 
 class RightHeading implements Heading {
     updateTile(y: number, x: number): void {
-        if (!this.canMoveForward(y, x)) {
-            map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
+        if (this.canMoveForward(y, x)) {
+            this.moveForward(y, x);
             return;
         }
-        this.moveForward(y, x);
+        map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
     }
 
     canMoveForward(y: number, x: number): boolean {
@@ -400,11 +400,11 @@ class RightHeading implements Heading {
 
 class UpHeading implements Heading {
     updateTile(y: number, x: number): void {
-        if (!this.canMoveForward(y, x)) {
-            map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
+        if (this.canMoveForward(y, x)) {
+            this.moveForward(y, x);
             return;
         }
-        this.moveForward(y, x);
+        map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
     }
 
     canMoveForward(y: number, x: number): boolean {
@@ -420,11 +420,11 @@ class UpHeading implements Heading {
 
 class DownHeading implements Heading {
     updateTile(y: number, x: number): void {
-        if (!this.canMoveForward(y, x)) {
-            map[y][x] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
+        if (this.canMoveForward(y, x)) {
+            this.moveForward(y, x);
             return;
         }
-        this.moveForward(y, x);
+        map[y][x] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
     }
 
     canMoveForward(y: number, x: number): boolean {
