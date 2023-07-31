@@ -154,30 +154,12 @@ class Stone implements Tile {
 }
 
 interface Bombable {
-    isNormal(): boolean;
-
-    isClose(): boolean;
-
-    isReallyClose(): boolean;
-
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void;
 
     updateTile(y: number, x: number): void;
 }
 
 class Normal implements Bombable {
-    isNormal(): boolean {
-        return true;
-    }
-
-    isClose(): boolean {
-        return false;
-    }
-
-    isReallyClose(): boolean {
-        return false;
-    }
-
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#770000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -190,18 +172,6 @@ class Normal implements Bombable {
 }
 
 class Close implements Bombable {
-    isNormal(): boolean {
-        return false;
-    }
-
-    isClose(): boolean {
-        return true;
-    }
-
-    isReallyClose(): boolean {
-        return false;
-    }
-
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#cc0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -214,18 +184,6 @@ class Close implements Bombable {
 }
 
 class ReallyClose implements Bombable {
-    isClose(): boolean {
-        return false;
-    }
-
-    isNormal(): boolean {
-        return false;
-    }
-
-    isReallyClose(): boolean {
-        return true;
-    }
-
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
         g.fillStyle = "#ff0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -575,144 +533,34 @@ class TmpMonster implements Tile {
 }
 
 interface Input {
-    isUp(): boolean;
-
-    isDown(): boolean;
-
-    isLeft(): boolean;
-
-    isRight(): boolean;
-
-    isPlace(): boolean;
-
     move(): void;
 }
 
 class Up implements Input {
-    isDown(): boolean {
-        return false;
-    }
-
-    isLeft(): boolean {
-        return false;
-    }
-
-    isPlace(): boolean {
-        return false;
-    }
-
-    isRight(): boolean {
-        return false;
-    }
-
-    isUp(): boolean {
-        return true;
-    }
-
     move(): void {
         map[playery - 1][playerx].movePlayer(-1, 0);
     }
 }
 
 class Down implements Input {
-    isDown(): boolean {
-        return true;
-    }
-
-    isLeft(): boolean {
-        return false;
-    }
-
-    isPlace(): boolean {
-        return false;
-    }
-
-    isRight(): boolean {
-        return false;
-    }
-
-    isUp(): boolean {
-        return false;
-    }
-
     move(): void {
         map[playery + 1][playerx].movePlayer(1, 0);
     }
 }
 
 class Right implements Input {
-    isDown(): boolean {
-        return false;
-    }
-
-    isLeft(): boolean {
-        return false;
-    }
-
-    isPlace(): boolean {
-        return false;
-    }
-
-    isRight(): boolean {
-        return true;
-    }
-
-    isUp(): boolean {
-        return false;
-    }
-
     move(): void {
         map[playery][playerx + 1].movePlayer(0, 1);
     }
 }
 
 class Left implements Input {
-    isDown(): boolean {
-        return false;
-    }
-
-    isLeft(): boolean {
-        return true;
-    }
-
-    isPlace(): boolean {
-        return false;
-    }
-
-    isRight(): boolean {
-        return false;
-    }
-
-    isUp(): boolean {
-        return false;
-    }
-
     move(): void {
         map[playery][playerx - 1].movePlayer(0, -1);
     }
 }
 
 class Place implements Input {
-    isDown(): boolean {
-        return false;
-    }
-
-    isLeft(): boolean {
-        return false;
-    }
-
-    isPlace(): boolean {
-        return true;
-    }
-
-    isRight(): boolean {
-        return false;
-    }
-
-    isUp(): boolean {
-        return false;
-    }
-
     move(): void {
         placeBomb();
     }
