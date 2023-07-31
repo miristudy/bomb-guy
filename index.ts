@@ -190,14 +190,17 @@ class ReallyClose implements Bombable {
     }
 
     updateTile(y: number, x: number): void {
+        this.explode(y, x);
+        bombs++;
+    }
+
+    private explode(y: number, x: number) {
         map[y - 1][x].explodeFire(x, y - 1);
         map[y + 1][x].explodeTmpFire(x, y + 1);
         map[y][x - 1].explodeFire(x - 1, y);
         map[y][x + 1].explodeTmpFire(x + 1, y);
         map[y][x] = new Fire();
-        bombs++;
     }
-
 }
 
 class Bomb implements Tile {
