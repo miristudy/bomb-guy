@@ -61,8 +61,8 @@ class Air implements Tile {
   }
 
   move(x: number, y: number): void {
-    playery += y;
-    playerx += x;
+    player.setX(player.getX() + x);
+    player.setY(player.getY() + y);
   }
 
   renewMonsterDown(): void {
@@ -455,8 +455,8 @@ class Fire implements Tile {
   }
 
   move(x: number, y: number): void {
-    playery += y;
-    playerx += x;
+    player.setX(player.getX() + x);
+    player.setY(player.getY() + y);
   }
 
   renewMonsterDown(): void {
@@ -515,10 +515,10 @@ class ExtraBomb implements Tile {
   }
 
   move(x: number, y: number): void {
-    playery += y;
-    playerx += x;
+    player.setX(player.getX() + x);
+    player.setY(player.getY() + y);
     bombs++;
-    map[playery][playerx] = new Air();
+    map[player.getY()][player.getX()] = new Air();
   }
 
   renewMonsterDown(): void {
@@ -916,7 +916,7 @@ class Up implements Input {
   }
 
   move(): void {
-    map[playery + -1][playerx].move(0, -1);
+    map[player.getY() + -1][player.getX()].move(0, -1);
   }
 
 }
@@ -943,7 +943,7 @@ class Down implements Input {
   }
 
   move(): void {
-    map[playery + 1][playerx].move(0, 1);
+    map[player.getY() + 1][player.getX()].move(0, 1);
   }
 
 }
@@ -970,7 +970,7 @@ class Right implements Input {
   }
 
   move(): void {
-    map[playery][playerx + 1].move(1, 0);
+    map[player.getY()][player.getX() + 1].move(1, 0);
   }
 
 }
@@ -997,7 +997,7 @@ class Left implements Input {
   }
 
   move(): void {
-    map[playery][playerx + -1].move(-1, 0);
+    map[player.getY()][player.getX() + -1].move(-1, 0);
   }
 
 }
@@ -1025,15 +1025,37 @@ class Place implements Input {
 
   move(): void {
     if (bombs > 0) {
-      map[playery][playerx] = new Bomb(new Normal());
+      map[player.getY()][player.getX()] = new Bomb(new Normal());
       bombs--;
     }
   }
 
 }
 
-let playerx = 1;
-let playery = 1;
+class Player {
+  private x = 1;
+  private y = 1;
+
+  getX() {
+    return this.x;
+  }
+
+  getY() {
+    return this.y;
+  }
+
+  setX(x: number) {
+    this.x = x;
+  }
+
+  setY(y: number) {
+    this.y = y;
+  }
+
+}
+
+let player = new Player();
+
 let rawMap: RawTile[][] = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 2, 2, 2, 2, 2, 1],
@@ -1108,7 +1130,7 @@ function handleInputs() {
 }
 
 function isGameOver() {
-  return map[playery][playerx].isGameOver()
+  return map[player.getY()][player.getX()].isGameOver()
 }
 
 function updateMap() {
@@ -1133,7 +1155,7 @@ function update() {
 function drawPlayer(g: CanvasRenderingContext2D) {
   g.fillStyle = "#00ff00";
   if (!gameOver)
-    g.fillRect(playerx * TILE_SIZE, playery * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    g.fillRect(player.getX() * TILE_SIZE, player.getY() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 }
 
 function drawMap(g: CanvasRenderingContext2D) {
