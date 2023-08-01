@@ -97,6 +97,8 @@ interface Tile {
     isBombFamily(): boolean;
 
     isKillable(): boolean;
+
+    update(x: number, y: number): void;
 }
 
 class Air implements Tile {
@@ -171,6 +173,10 @@ class Air implements Tile {
 
     isKillable(): boolean {
         return false;
+    }
+
+    update(x: number, y: number): void {
+        // do nothing
     }
 }
 
@@ -247,6 +253,10 @@ class Unbreakable implements Tile {
     isKillable(): boolean {
         return false;
     }
+
+    update(x: number, y: number): void {
+        // do nothing
+    }
 }
 
 class Stone implements Tile {
@@ -321,6 +331,10 @@ class Stone implements Tile {
 
     isKillable(): boolean {
         return false;
+    }
+
+    update(x: number, y: number): void {
+        // do nothing
     }
 }
 
@@ -397,6 +411,10 @@ class Bomb implements Tile {
     isKillable(): boolean {
         return false;
     }
+
+    update(x: number, y: number): void {
+        map[y][x] = new BombClose();
+    }
 }
 
 class BombClose implements Tile {
@@ -471,6 +489,10 @@ class BombClose implements Tile {
 
     isKillable(): boolean {
         return false;
+    }
+
+    update(x: number, y: number): void {
+        map[y][x] = new BombReallyClose();
     }
 }
 
@@ -547,6 +569,15 @@ class BombReallyClose implements Tile {
     isKillable(): boolean {
         return false;
     }
+
+    update(x: number, y: number): void {
+        explodeFire(x, y - 1);
+        explodeTmpFire(x, y + 1);
+        explodeFire(x - 1, y);
+        explodeTmpFire(x + 1, y);
+        map[y][x] = new Fire();
+        bombs++;
+    }
 }
 
 class TmpFire implements Tile {
@@ -620,6 +651,10 @@ class TmpFire implements Tile {
 
     isKillable(): boolean {
         return false;
+    }
+
+    update(x: number, y: number): void {
+        map[y][x] = new Fire();
     }
 }
 
@@ -696,6 +731,10 @@ class Fire implements Tile {
 
     isKillable(): boolean {
         return true;
+    }
+
+    update(x: number, y: number): void {
+        map[y][x] = new Air();
     }
 }
 
@@ -775,6 +814,10 @@ class ExtraBomb implements Tile {
     isKillable(): boolean {
         return false;
     }
+
+    update(x: number, y: number): void {
+        // do nothing
+    }
 }
 
 class MonsterUp implements Tile {
@@ -849,6 +892,15 @@ class MonsterUp implements Tile {
 
     isKillable(): boolean {
         return true;
+    }
+
+    update(x: number, y: number): void {
+        if (map[y - 1][x].isAir()) {
+            map[y][x] = new Air();
+            map[y - 1][x] = new MonsterUp();
+        } else {
+            map[y][x] = new MonsterRight();
+        }
     }
 }
 
@@ -925,6 +977,15 @@ class MonsterRight implements Tile {
     isKillable(): boolean {
         return true;
     }
+
+    update(x: number, y: number): void {
+        if (map[y][x + 1].isAir()) {
+            map[y][x] = new Air();
+            map[y][x + 1] = new TmpMonsterRight();
+        } else {
+            map[y][x] = new MonsterDown();
+        }
+    }
 }
 
 class TmpMonsterRight implements Tile {
@@ -998,6 +1059,10 @@ class TmpMonsterRight implements Tile {
 
     isKillable(): boolean {
         return false;
+    }
+
+    update(x: number, y: number): void {
+        map[y][x] = new MonsterRight();
     }
 }
 
@@ -1074,6 +1139,15 @@ class MonsterDown implements Tile {
     isKillable(): boolean {
         return true;
     }
+
+    update(x: number, y: number): void {
+        if (map[y + 1][x].isAir()) {
+            map[y][x] = new Air();
+            map[y + 1][x] = new TmpMonsterDown();
+        } else {
+            map[y][x] = new MonsterLeft();
+        }
+    }
 }
 
 class TmpMonsterDown implements Tile {
@@ -1147,6 +1221,10 @@ class TmpMonsterDown implements Tile {
 
     isKillable(): boolean {
         return false;
+    }
+
+    update(x: number, y: number): void {
+        map[y][x] = new MonsterDown();
     }
 }
 
@@ -1222,6 +1300,15 @@ class MonsterLeft implements Tile {
 
     isKillable(): boolean {
         return true;
+    }
+
+    update(x: number, y: number): void {
+        if (map[y][x - 1].isAir()) {
+            map[y][x] = new Air();
+            map[y][x - 1] = new MonsterLeft();
+        } else {
+            map[y][x] = new MonsterUp();
+        }
     }
 }
 
@@ -1364,54 +1451,7 @@ function updateMap() {
 }
 
 function updateTile(x: number, y: number) {
-    if (map[y][x].isBomb()) {
-        map[y][x] = new BombClose();
-    } else if (map[y][x].isBombClose()) {
-        map[y][x] = new BombReallyClose();
-    } else if (map[y][x].isBombReallyClose()) {
-        explodeFire(x, y - 1);
-        explodeTmpFire(x, y + 1);
-        explodeFire(x - 1, y);
-        explodeTmpFire(x + 1, y);
-        map[y][x] = new Fire();
-        bombs++;
-    } else if (map[y][x].isTmpFire()) {
-        map[y][x] = new Fire();
-    } else if (map[y][x].isFire()) {
-        map[y][x] = new Air();
-    } else if (map[y][x].isTmpMonsterDown()) {
-        map[y][x] = new MonsterDown();
-    } else if (map[y][x].isTmpMonsterRight()) {
-        map[y][x] = new MonsterRight();
-    } else if (map[y][x].isMonsterRight()) {
-        if (map[y][x + 1].isAir()) {
-            map[y][x] = new Air();
-            map[y][x + 1] = new TmpMonsterRight();
-        } else {
-            map[y][x] = new MonsterDown();
-        }
-    } else if (map[y][x].isMonsterDown()) {
-        if (map[y + 1][x].isAir()) {
-            map[y][x] = new Air();
-            map[y + 1][x] = new TmpMonsterDown();
-        } else {
-            map[y][x] = new MonsterLeft();
-        }
-    } else if (map[y][x].isMonsterLeft()) {
-        if (map[y][x - 1].isAir()) {
-            map[y][x] = new Air();
-            map[y][x - 1] = new MonsterLeft();
-        } else {
-            map[y][x] = new MonsterUp();
-        }
-    } else if (map[y][x].isMonsterUp()) {
-        if (map[y - 1][x].isAir()) {
-            map[y][x] = new Air();
-            map[y - 1][x] = new MonsterUp();
-        } else {
-            map[y][x] = new MonsterRight();
-        }
-    }
+    map[y][x].update(x, y);
 }
 
 function createGraphics(): CanvasRenderingContext2D {
