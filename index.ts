@@ -68,28 +68,6 @@ interface Tile {
 
     isStone(): boolean;
 
-    isBomb(): boolean;
-
-    isBombClose(): boolean;
-
-    isBombReallyClose(): boolean;
-
-    isTmpFire(): boolean;
-
-    isFire(): boolean;
-
-    isMonsterUp(): boolean;
-
-    isMonsterRight(): boolean;
-
-    isTmpMonsterRight(): boolean;
-
-    isMonsterDown(): boolean;
-
-    isTmpMonsterDown(): boolean;
-
-    isMonsterLeft(): boolean;
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void;
 
     move(x: number, y: number): void;
@@ -111,50 +89,6 @@ class Air implements Tile {
     }
 
     isStone(): boolean {
-        return false;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
         return false;
     }
 
@@ -193,50 +127,6 @@ class Unbreakable implements Tile {
         return false;
     }
 
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#999999";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -272,50 +162,6 @@ class Stone implements Tile {
         return true;
     }
 
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#0000cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -348,50 +194,6 @@ class Bomb implements Tile {
     }
 
     isStone(): boolean {
-        return false;
-    }
-
-    isBomb(): boolean {
-        return true;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
         return false;
     }
 
@@ -430,50 +232,6 @@ class BombClose implements Tile {
         return false;
     }
 
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return true;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -506,50 +264,6 @@ class BombReallyClose implements Tile {
     }
 
     isStone(): boolean {
-        return false;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return true;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
         return false;
     }
 
@@ -593,50 +307,6 @@ class TmpFire implements Tile {
         return false;
     }
 
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return true;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
@@ -668,50 +338,6 @@ class Fire implements Tile {
     }
 
     isStone(): boolean {
-        return false;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return true;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
         return false;
     }
 
@@ -751,50 +377,6 @@ class ExtraBomb implements Tile {
         return false;
     }
 
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#00cc00";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -830,50 +412,6 @@ class MonsterUp implements Tile {
     }
 
     isStone(): boolean {
-        return false;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return true;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
         return false;
     }
 
@@ -917,50 +455,6 @@ class MonsterRight implements Tile {
         return false;
     }
 
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return true;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillStyle = "#cc00cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -1001,50 +495,6 @@ class TmpMonsterRight implements Tile {
         return false;
     }
 
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return true;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
@@ -1076,50 +526,6 @@ class MonsterDown implements Tile {
     }
 
     isStone(): boolean {
-        return false;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return true;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
         return false;
     }
 
@@ -1163,50 +569,6 @@ class TmpMonsterDown implements Tile {
         return false;
     }
 
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return true;
-    }
-
-    isMonsterLeft(): boolean {
-        return false;
-    }
-
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
@@ -1239,50 +601,6 @@ class MonsterLeft implements Tile {
 
     isStone(): boolean {
         return false;
-    }
-
-    isBomb(): boolean {
-        return false;
-    }
-
-    isBombClose(): boolean {
-        return false;
-    }
-
-    isBombReallyClose(): boolean {
-        return false;
-    }
-
-    isTmpFire(): boolean {
-        return false;
-    }
-
-    isFire(): boolean {
-        return false;
-    }
-
-    isMonsterUp(): boolean {
-        return false;
-    }
-
-    isMonsterRight(): boolean {
-        return false;
-    }
-
-    isTmpMonsterRight(): boolean {
-        return false;
-    }
-
-    isMonsterDown(): boolean {
-        return false;
-    }
-
-    isTmpMonsterDown(): boolean {
-        return false;
-    }
-
-    isMonsterLeft(): boolean {
-        return true;
     }
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
