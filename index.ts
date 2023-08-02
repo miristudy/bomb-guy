@@ -402,7 +402,10 @@ class ExtraBomb implements Tile {
     }
 }
 
-class MonsterUp implements Tile {
+class Monster implements Tile {
+    constructor(private up: boolean, private right: boolean, private down: boolean, private left: boolean) {
+    }
+
     isAir(): boolean {
         return false;
     }
@@ -433,51 +436,34 @@ class MonsterUp implements Tile {
     }
 
     update(x: number, y: number): void {
-        if (map[y - 1][x].isAir()) {
-            map[y][x] = new Air();
-            map[y - 1][x] = new MonsterUp();
-        } else {
-            map[y][x] = new MonsterRight();
-        }
-    }
-}
-
-class MonsterRight implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    isUnbreakable(): boolean {
-        return false;
-    }
-
-    isStone(): boolean {
-        return false;
-    }
-
-    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillStyle = "#cc00cc";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    move(x: number, y: number): void {
-        // do nothing
-    }
-
-    isBombFamily(): boolean {
-        return false;
-    }
-
-    isKillable(): boolean {
-        return true;
-    }
-
-    update(x: number, y: number): void {
-        if (map[y][x + 1].isAir()) {
-            map[y][x] = new Air();
-            map[y][x + 1] = new TmpMonsterRight();
-        } else {
-            map[y][x] = new MonsterDown();
+        if (this.up) {
+            if (map[y - 1][x].isAir()) {
+                map[y][x] = new Air();
+                map[y - 1][x] = new Monster(true, false, false, false);
+            } else {
+                map[y][x] = new Monster(false, true, false, false);
+            }
+        } else if (this.right) {
+            if (map[y][x + 1].isAir()) {
+                map[y][x] = new Air();
+                map[y][x + 1] = new TmpMonsterRight();
+            } else {
+                map[y][x] = new Monster(false, false, true, false);
+            }
+        } else if (this.down) {
+            if (map[y + 1][x].isAir()) {
+                map[y][x] = new Air();
+                map[y + 1][x] = new TmpMonsterDown();
+            } else {
+                map[y][x] = new Monster(false, false, false, true);
+            }
+        } else if (this.left) {
+            if (map[y][x - 1].isAir()) {
+                map[y][x] = new Air();
+                map[y][x - 1] = new Monster(false, false, false, true);
+            } else {
+                map[y][x] = new Monster(true, false, false, false);
+            }
         }
     }
 }
@@ -512,47 +498,7 @@ class TmpMonsterRight implements Tile {
     }
 
     update(x: number, y: number): void {
-        map[y][x] = new MonsterRight();
-    }
-}
-
-class MonsterDown implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    isUnbreakable(): boolean {
-        return false;
-    }
-
-    isStone(): boolean {
-        return false;
-    }
-
-    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillStyle = "#cc00cc";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    move(x: number, y: number): void {
-        // do nothing
-    }
-
-    isBombFamily(): boolean {
-        return false;
-    }
-
-    isKillable(): boolean {
-        return true;
-    }
-
-    update(x: number, y: number): void {
-        if (map[y + 1][x].isAir()) {
-            map[y][x] = new Air();
-            map[y + 1][x] = new TmpMonsterDown();
-        } else {
-            map[y][x] = new MonsterLeft();
-        }
+        map[y][x] = new Monster(false, true, false, false);
     }
 }
 
@@ -586,50 +532,9 @@ class TmpMonsterDown implements Tile {
     }
 
     update(x: number, y: number): void {
-        map[y][x] = new MonsterDown();
+        map[y][x] = new Monster(false, false, true, false);
     }
 }
-
-class MonsterLeft implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    isUnbreakable(): boolean {
-        return false;
-    }
-
-    isStone(): boolean {
-        return false;
-    }
-
-    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillStyle = "#cc00cc";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    move(x: number, y: number): void {
-        // do nothing
-    }
-
-    isBombFamily(): boolean {
-        return false;
-    }
-
-    isKillable(): boolean {
-        return true;
-    }
-
-    update(x: number, y: number): void {
-        if (map[y][x - 1].isAir()) {
-            map[y][x] = new Air();
-            map[y][x - 1] = new MonsterLeft();
-        } else {
-            map[y][x] = new MonsterUp();
-        }
-    }
-}
-
 // --------- Tile ---------
 
 let playerx = 1;
@@ -672,17 +577,17 @@ function transformTile(tile: RawTile) {
         case RawTile.EXTRA_BOMB:
             return new ExtraBomb();
         case RawTile.MONSTER_UP:
-            return new MonsterUp();
+            return new Monster(true, false, false, false);
         case RawTile.MONSTER_RIGHT:
-            return new MonsterRight();
+            return new Monster(false, true, false, false);
         case RawTile.TMP_MONSTER_RIGHT:
             return new TmpMonsterRight();
         case RawTile.MONSTER_DOWN:
-            return new MonsterDown();
+            return new Monster(false, false, true, false);
         case RawTile.TMP_MONSTER_DOWN:
             return new TmpMonsterDown();
         case RawTile.MONSTER_LEFT:
-            return new MonsterLeft();
+            return new Monster(false, false, false, true);
         default:
             return assertExhausted(tile);
     }
