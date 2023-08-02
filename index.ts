@@ -24,11 +24,9 @@ enum RawTile {
 
 interface Tile {
   isAir(): boolean;
-
   color(g: CanvasRenderingContext2D): void;
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void;
   isGameOver(): boolean;
-  isBombType(): boolean;
   move(player:Player, x: number, y: number): void;
   close(): void;
   reallyClose(): void;
@@ -36,16 +34,12 @@ interface Tile {
   renewMonsterDown(): void;
   renewMonsterLeft(): void;
   renewMonsterRight(): void;
-  renewTmpMonsterRight(): void;
-  renewTmpMonsterDown(): void;
   explode(x: number, y: number, type: Tile): void;
   updateTile(x: number, y: number): void;
 }
 
 class Air implements Tile {
-  isBombType(): boolean {
-    return false;
-  }
+
   isAir(): boolean {
     return true;
   }
@@ -71,12 +65,6 @@ class Air implements Tile {
   }
 
   renewMonsterRight(): void {
-  }
-
-  renewTmpMonsterDown(): void {
-  }
-
-  renewTmpMonsterRight(): void {
   }
 
   renewMonsterUp(): void {
@@ -114,10 +102,6 @@ class Unbreakable implements Tile {
     return false;
   }
 
-  isBombType(): boolean {
-    return false;
-  }
-
   move(player:Player, x: number, y: number): void {
   }
 
@@ -128,12 +112,6 @@ class Unbreakable implements Tile {
   }
 
   renewMonsterRight(): void {
-  }
-
-  renewTmpMonsterDown(): void {
-  }
-
-  renewTmpMonsterRight(): void {
   }
 
   renewMonsterUp(): void {
@@ -170,10 +148,6 @@ class Stone implements Tile {
     return false;
   }
 
-  isBombType(): boolean {
-    return false;
-  }
-
   move(player:Player, x: number, y: number): void {
   }
 
@@ -184,12 +158,6 @@ class Stone implements Tile {
   }
 
   renewMonsterRight(): void {
-  }
-
-  renewTmpMonsterDown(): void {
-  }
-
-  renewTmpMonsterRight(): void {
   }
 
   renewMonsterUp(): void {
@@ -236,10 +204,6 @@ class Bomb implements Tile {
     return false;
   }
 
-  isBombType(): boolean {
-    return true;
-  }
-
   move(player:Player, x: number, y: number): void {
   }
 
@@ -250,12 +214,6 @@ class Bomb implements Tile {
   }
 
   renewMonsterRight(): void {
-  }
-
-  renewTmpMonsterDown(): void {
-  }
-
-  renewTmpMonsterRight(): void {
   }
 
   renewMonsterUp(): void {
@@ -348,10 +306,6 @@ class TmpFire implements Tile {
     return false;
   }
 
-  isBombType(): boolean {
-    return false;
-  }
-
   move(player:Player, x: number, y: number): void {
   }
 
@@ -362,12 +316,6 @@ class TmpFire implements Tile {
   }
 
   renewMonsterRight(): void {
-  }
-
-  renewTmpMonsterDown(): void {
-  }
-
-  renewTmpMonsterRight(): void {
   }
 
   renewMonsterUp(): void {
@@ -406,10 +354,6 @@ class Fire implements Tile {
     return true;
   }
 
-  isBombType(): boolean {
-    return false;
-  }
-
   move(player:Player, x: number, y: number): void {
     player.move(x, y)
   }
@@ -421,12 +365,6 @@ class Fire implements Tile {
   }
 
   renewMonsterRight(): void {
-  }
-
-  renewTmpMonsterDown(): void {
-  }
-
-  renewTmpMonsterRight(): void {
   }
 
   renewMonsterUp(): void {
@@ -465,10 +403,6 @@ class ExtraBomb implements Tile {
     return false;
   }
 
-  isBombType(): boolean {
-    return false;
-  }
-
   move(player:Player, x: number, y: number): void {
     player.move(x, y)
     bombs++;
@@ -482,12 +416,6 @@ class ExtraBomb implements Tile {
   }
 
   renewMonsterRight(): void {
-  }
-
-  renewTmpMonsterDown(): void {
-  }
-
-  renewTmpMonsterRight(): void {
   }
 
   renewMonsterUp(): void {
@@ -509,19 +437,13 @@ class ExtraBomb implements Tile {
 }
 
 interface MonsterState {
-    isUp(): boolean,
-    isRight(): boolean,
-    isTmpRight(): boolean,
-    isDown(): boolean,
-    isTmpDown(): boolean,
-    isLeft(): boolean,
     color(g: CanvasRenderingContext2D): void,
     fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void,
     updateTile(x: number, y: number): void;
 }
 
 class Monster implements Tile {
-  constructor(private state: MonsterUpState) {
+  constructor(private state: MonsterState) {
   }
 
   isAir(): boolean {
@@ -533,15 +455,11 @@ class Monster implements Tile {
   }
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
-    g.fillRect(x, y, w, h);
+    this.state.fillRect(g, x, y, w, h);
   }
 
   isGameOver(): boolean {
     return true;
-  }
-
-  isBombType(): boolean {
-    return false;
   }
 
   move(player:Player, x: number, y: number): void {
@@ -557,14 +475,6 @@ class Monster implements Tile {
 
   renewMonsterRight(): void {
     this.state = new MonsterRightState();
-  }
-
-  renewTmpMonsterDown(): void {
-    this.state = new TmpMonsterDownState()
-  }
-
-  renewTmpMonsterRight(): void {
-    this.state = new TmpMonsterRightState();
   }
 
   renewMonsterUp(): void {
@@ -596,30 +506,6 @@ class MonsterUpState implements MonsterState{
     g.fillRect(x, y, w, h);
   }
 
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isTmpDown(): boolean {
-    return false;
-  }
-
-  isTmpRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return true;
-  }
-
   updateTile(x: number, y: number): void {
     map.updateMonsterUpState(x, y);
   }
@@ -635,30 +521,6 @@ class MonsterRightState implements MonsterState{
     g.fillRect(x, y, w, h);
   }
 
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return true;
-  }
-
-  isTmpDown(): boolean {
-    return false;
-  }
-
-  isTmpRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return false;
-  }
-
   updateTile(x: number, y: number): void {
     map.updateMonsterRightState(x, y)
   }
@@ -671,30 +533,6 @@ class TmpMonsterRightState implements MonsterState{
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
-  }
-
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isTmpDown(): boolean {
-    return false;
-  }
-
-  isTmpRight(): boolean {
-    return true;
-  }
-
-  isUp(): boolean {
-    return false;
   }
 
   updateTile(x: number, y: number): void {
@@ -712,30 +550,6 @@ class MonsterDownState implements MonsterState{
     g.fillRect(x, y, w, h);
   }
 
-  isDown(): boolean {
-    return true;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isTmpDown(): boolean {
-    return false;
-  }
-
-  isTmpRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return false;
-  }
-
   updateTile(x: number, y: number): void {
     map.updateMonsterDownState(x, y);
   }
@@ -748,30 +562,6 @@ class TmpMonsterDownState implements MonsterState{
 
   fillRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillRect(x, y, w, h);
-  }
-
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isTmpDown(): boolean {
-    return true;
-  }
-
-  isTmpRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return false;
   }
 
   updateTile(x: number, y: number): void {
@@ -789,30 +579,6 @@ class MonsterLeftState implements MonsterState{
     g.fillRect(x, y, w, h);
   }
 
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return true;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isTmpDown(): boolean {
-    return false;
-  }
-
-  isTmpRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return false;
-  }
-
   updateTile(x: number, y: number): void {
     map.updateMonsterLeftState(x, y);
   }
@@ -820,35 +586,10 @@ class MonsterLeftState implements MonsterState{
 }
 
 interface Input {
-  isUp(): boolean;
-  isDown(): boolean;
-  isLeft(): boolean;
-  isRight(): boolean;
-  isPlace(): boolean;
   move(): void;
 }
 
 class Up implements Input {
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isPlace(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return true;
-  }
-
   move(): void {
     player.moveUp();
   }
@@ -856,26 +597,6 @@ class Up implements Input {
 }
 
 class Down implements Input {
-  isDown(): boolean {
-    return true;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isPlace(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return false;
-  }
-
   move(): void {
     player.moveDown();
   }
@@ -883,26 +604,6 @@ class Down implements Input {
 }
 
 class Right implements Input {
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isPlace(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return true;
-  }
-
-  isUp(): boolean {
-    return false;
-  }
-
   move(): void {
     player.moveRight()
   }
@@ -910,26 +611,6 @@ class Right implements Input {
 }
 
 class Left implements Input {
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return true;
-  }
-
-  isPlace(): boolean {
-    return false;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return false;
-  }
-
   move(): void {
     player.moveLeft();
   }
@@ -937,26 +618,6 @@ class Left implements Input {
 }
 
 class Place implements Input {
-  isDown(): boolean {
-    return false;
-  }
-
-  isLeft(): boolean {
-    return false;
-  }
-
-  isPlace(): boolean {
-    return true;
-  }
-
-  isRight(): boolean {
-    return false;
-  }
-
-  isUp(): boolean {
-    return false;
-  }
-
   move(): void {
     player.movePlace();
   }
@@ -1007,21 +668,13 @@ class Player {
   }
 
   isGameOver() {
-    return map.getBombMap()[this.y][this.x].isGameOver()
+    return map.isGameOver(this.x, this.y);
   }
 
 }
 
 class BombMap {
   private map: Tile[][];
-
-  getBombMap(){
-    return this.map;
-  }
-
-  setBombMap(map: Tile[][]){
-    this.map = map;
-  }
 
   init() {
     this.map = new Array(rawMap.length);
@@ -1121,6 +774,26 @@ class BombMap {
     this.map[y][x] = new Bomb(new Normal());
   }
 
+  draw(g: CanvasRenderingContext2D) {
+    for (let y = 0; y < this.map.length; y++) {
+      for (let x = 0; x < this.map[y].length; x++) {
+        this.map[y][x].color(g);
+        this.map[y][x].fillRect(g, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+      }
+    }
+  }
+
+  update() {
+    for (let y = 1; y < this.map.length; y++) {
+      for (let x = 1; x < this.map[y].length; x++) {
+        this.map[y][x].updateTile(x, y);
+      }
+    }
+  }
+
+  isGameOver(x: number, y: number) {
+    return this.map[y][x].isGameOver();
+  }
 }
 
 let player = new Player();
@@ -1189,13 +862,6 @@ function handleInputs() {
   }
 }
 
-function updateMap() {
-  for (let y = 1; y < map.getBombMap().length; y++) {
-    for (let x = 1; x < map.getBombMap()[y].length; x++) {
-      map.getBombMap()[y][x].updateTile(x, y);
-    }
-  }
-}
 
 function update() {
   handleInputs();
@@ -1205,20 +871,7 @@ function update() {
   if (--delay > 0) return;
   delay = DELAY;
 
-  updateMap();
-}
-
-function drawPlayer(g: CanvasRenderingContext2D) {
-  player.draw(g);
-}
-
-function drawMap(g: CanvasRenderingContext2D) {
-  for (let y = 0; y < map.getBombMap().length; y++) {
-    for (let x = 0; x < map.getBombMap()[y].length; x++) {
-      map.getBombMap()[y][x].color(g);
-      map.getBombMap()[y][x].fillRect(g, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-  }
+  map.update()
 }
 
 function createGraphics() {
@@ -1231,8 +884,8 @@ function createGraphics() {
 
 function draw() {
   let g = createGraphics();
-  drawMap(g);
-  drawPlayer(g);
+  map.draw(g);
+  player.draw(g);
 }
 
 function setSleepTime(after: number, before: number) {
