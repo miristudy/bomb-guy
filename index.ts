@@ -115,6 +115,50 @@ class TmpFireExplode implements ExplodeStrategy {
     }
 }
 
+interface BombState {
+    update(x: number, y: number): void;
+    getColor(): string;
+}
+
+class BombInit implements BombState {
+    private color: string = "#770000";
+
+    update(x: number, y: number): void {
+        map[y][x] = new Bomb(new BombClose());
+    }
+
+    getColor(): string {
+        return this.color;
+    }
+}
+
+class BombClose implements BombState {
+    private color: string = "#cc0000";
+    update(x: number, y: number): void {
+        map[y][x] = new Bomb(new BombReallyClose());
+    }
+
+    getColor(): string {
+        return this.color;
+    }
+}
+
+class BombReallyClose implements BombState {
+    private color: string = "#ff0000";
+    update(x: number, y: number): void {
+        explode(x, y - 1, new FireExplode());
+        explode(x, y + 1, new TmpFireExplode());
+        explode(x - 1, y, new FireExplode());
+        explode(x + 1, y, new TmpFireExplode());
+        map[y][x] = new Fire();
+        bombs++;
+    }
+
+    getColor(): string {
+        return this.color;
+    }
+}
+
 // --------- Tile ---------
 
 enum RawTile {
@@ -259,6 +303,9 @@ class Stone implements Tile {
 }
 
 class Bomb implements Tile {
+    constructor(private bombState: BombState) {
+    }
+
     isAir(): boolean {
         return false;
     }
@@ -272,7 +319,7 @@ class Bomb implements Tile {
     }
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillStyle = "#770000";
+        g.fillStyle = this.bombState.getColor();
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
@@ -289,82 +336,7 @@ class Bomb implements Tile {
     }
 
     update(x: number, y: number): void {
-        map[y][x] = new BombClose();
-    }
-}
-
-class BombClose implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    isUnbreakable(): boolean {
-        return false;
-    }
-
-    isStone(): boolean {
-        return false;
-    }
-
-    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillStyle = "#cc0000";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    move(x: number, y: number): void {
-        // do nothing
-    }
-
-    isBombFamily(): boolean {
-        return true;
-    }
-
-    isKillable(): boolean {
-        return false;
-    }
-
-    update(x: number, y: number): void {
-        map[y][x] = new BombReallyClose();
-    }
-}
-
-class BombReallyClose implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    isUnbreakable(): boolean {
-        return false;
-    }
-
-    isStone(): boolean {
-        return false;
-    }
-
-    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillStyle = "#ff0000";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    move(x: number, y: number): void {
-        // do nothing
-    }
-
-    isBombFamily(): boolean {
-        return true;
-    }
-
-    isKillable(): boolean {
-        return false;
-    }
-
-    update(x: number, y: number): void {
-        explode(x, y - 1, new FireExplode());
-        explode(x, y + 1, new TmpFireExplode());
-        explode(x - 1, y, new FireExplode());
-        explode(x + 1, y, new TmpFireExplode());
-        map[y][x] = new Fire();
-        bombs++;
+        this.bombState.update(x, y);
     }
 }
 
@@ -611,11 +583,11 @@ function transformTile(tile: RawTile) {
         case RawTile.STONE:
             return new Stone();
         case RawTile.BOMB:
-            return new Bomb();
+            return new Bomb(new BombInit());
         case RawTile.BOMB_CLOSE:
-            return new BombClose();
+            return new Bomb(new BombClose());
         case RawTile.BOMB_REALLY_CLOSE:
-            return new BombReallyClose();
+            return new Bomb(new BombReallyClose());
         case RawTile.TMP_FIRE:
             return new TmpFire();
         case RawTile.FIRE:
@@ -674,7 +646,7 @@ function move(x: number, y: number) {
 
 function placeBomb() {
     if (bombs > 0) {
-        map[playery][playerx] = new Bomb();
+        map[playery][playerx] = new Bomb(new BombInit());
         bombs--;
     }
 }
