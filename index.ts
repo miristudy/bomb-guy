@@ -99,6 +99,22 @@ class MonsterMoveStrategy {
     }
 }
 
+interface ExplodeStrategy {
+    explode(x: number, y: number): void;
+}
+
+class FireExplode implements ExplodeStrategy {
+    explode(x: number, y: number): void {
+        map[y][x] = new Fire();
+    }
+}
+
+class TmpFireExplode implements ExplodeStrategy {
+    explode(x: number, y: number): void {
+        map[y][x] = new TmpFire();
+    }
+}
+
 // --------- Tile ---------
 
 enum RawTile {
@@ -343,10 +359,10 @@ class BombReallyClose implements Tile {
     }
 
     update(x: number, y: number): void {
-        explodeFire(x, y - 1);
-        explodeTmpFire(x, y + 1);
-        explodeFire(x - 1, y);
-        explodeTmpFire(x + 1, y);
+        explode(x, y - 1, new FireExplode());
+        explode(x, y + 1, new TmpFireExplode());
+        explode(x - 1, y, new FireExplode());
+        explode(x + 1, y, new TmpFireExplode());
         map[y][x] = new Fire();
         bombs++;
     }
@@ -639,30 +655,16 @@ let delay = 0;
 let bombs = 1;
 let gameOver = false;
 
-// type 에 사용하는 Tile 이 Fire 와 TmpFire 밖에 없어 메소드 전문화
-function explodeFire(x: number, y: number) {
+function explode(x: number, y: number, explodeStrategy: ExplodeStrategy) {
     if (map[y][x].isStone()) {
         if (Math.random() < 0.1)
             map[y][x] = new ExtraBomb()
         else
-            map[y][x] = new Fire();
+            explodeStrategy.explode(x, y);
     } else if (!map[y][x].isUnbreakable()) {
         if (map[y][x].isBombFamily())
             bombs++;
-        map[y][x] = new Fire();
-    }
-}
-
-function explodeTmpFire(x: number, y: number) {
-    if (map[y][x].isStone()) {
-        if (Math.random() < 0.1)
-            map[y][x] = new ExtraBomb();
-        else
-            map[y][x] = new TmpFire();
-    } else if (!map[y][x].isUnbreakable()) {
-        if (map[y][x].isBombFamily())
-            bombs++;
-        map[y][x] = new TmpFire();
+        explodeStrategy.explode(x, y);
     }
 }
 
