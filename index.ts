@@ -41,6 +41,64 @@ class Place implements Input {
 
 // --------- Input ---------
 
+interface MonsterDirection {
+    update(x: number, y: number): void;
+}
+
+class MonsterUp implements MonsterDirection {
+    update(x: number, y: number): void {
+        if (map[y - 1][x].isAir()) {
+            map[y][x] = new Air();
+            map[y - 1][x] = new Monster(new MonsterMoveStrategy(new MonsterUp()));
+        } else {
+            map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterRight()));
+        }
+    }
+}
+
+class MonsterRight implements MonsterDirection {
+    update(x: number, y: number): void {
+        if (map[y][x + 1].isAir()) {
+            map[y][x] = new Air();
+            map[y][x + 1] = new TmpMonsterRight();
+        } else {
+            map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterDown()));
+        }
+    }
+}
+
+class MonsterDown implements MonsterDirection {
+    update(x: number, y: number): void {
+        if (map[y + 1][x].isAir()) {
+            map[y][x] = new Air();
+            map[y + 1][x] = new TmpMonsterDown();
+        } else {
+            map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterLeft()));
+        }
+    }
+}
+
+class MonsterLeft implements MonsterDirection {
+    update(x: number, y: number): void {
+        if (map[y][x - 1].isAir()) {
+            map[y][x] = new Air();
+            map[y][x - 1] = new Monster(new MonsterMoveStrategy(new MonsterLeft()));
+        } else {
+            map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterUp()));
+        }
+    }
+}
+
+class MonsterMoveStrategy {
+    constructor(private direction: MonsterDirection) {
+        // do nothing
+    }
+
+    update(x: number, y: number): void {
+        this.direction.update(x, y);
+    }
+}
+
 // --------- Tile ---------
 
 enum RawTile {
@@ -403,7 +461,7 @@ class ExtraBomb implements Tile {
 }
 
 class Monster implements Tile {
-    constructor(private up: boolean, private right: boolean, private down: boolean, private left: boolean) {
+    constructor(private moveStrategy: MonsterMoveStrategy) {
     }
 
     isAir(): boolean {
@@ -436,35 +494,7 @@ class Monster implements Tile {
     }
 
     update(x: number, y: number): void {
-        if (this.up) {
-            if (map[y - 1][x].isAir()) {
-                map[y][x] = new Air();
-                map[y - 1][x] = new Monster(true, false, false, false);
-            } else {
-                map[y][x] = new Monster(false, true, false, false);
-            }
-        } else if (this.right) {
-            if (map[y][x + 1].isAir()) {
-                map[y][x] = new Air();
-                map[y][x + 1] = new TmpMonsterRight();
-            } else {
-                map[y][x] = new Monster(false, false, true, false);
-            }
-        } else if (this.down) {
-            if (map[y + 1][x].isAir()) {
-                map[y][x] = new Air();
-                map[y + 1][x] = new TmpMonsterDown();
-            } else {
-                map[y][x] = new Monster(false, false, false, true);
-            }
-        } else if (this.left) {
-            if (map[y][x - 1].isAir()) {
-                map[y][x] = new Air();
-                map[y][x - 1] = new Monster(false, false, false, true);
-            } else {
-                map[y][x] = new Monster(true, false, false, false);
-            }
-        }
+        this.moveStrategy.update(x, y);
     }
 }
 
@@ -498,7 +528,7 @@ class TmpMonsterRight implements Tile {
     }
 
     update(x: number, y: number): void {
-        map[y][x] = new Monster(false, true, false, false);
+        map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterRight()));
     }
 }
 
@@ -532,7 +562,7 @@ class TmpMonsterDown implements Tile {
     }
 
     update(x: number, y: number): void {
-        map[y][x] = new Monster(false, false, true, false);
+        map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterDown()));
     }
 }
 // --------- Tile ---------
@@ -577,17 +607,17 @@ function transformTile(tile: RawTile) {
         case RawTile.EXTRA_BOMB:
             return new ExtraBomb();
         case RawTile.MONSTER_UP:
-            return new Monster(true, false, false, false);
+            return new Monster(new MonsterMoveStrategy(new MonsterUp()));
         case RawTile.MONSTER_RIGHT:
-            return new Monster(false, true, false, false);
+            return new Monster(new MonsterMoveStrategy(new MonsterRight()));
         case RawTile.TMP_MONSTER_RIGHT:
             return new TmpMonsterRight();
         case RawTile.MONSTER_DOWN:
-            return new Monster(false, false, true, false);
+            return new Monster(new MonsterMoveStrategy(new MonsterDown()));
         case RawTile.TMP_MONSTER_DOWN:
             return new TmpMonsterDown();
         case RawTile.MONSTER_LEFT:
-            return new Monster(false, false, false, true);
+            return new Monster(new MonsterMoveStrategy(new MonsterLeft()));
         default:
             return assertExhausted(tile);
     }
