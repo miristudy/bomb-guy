@@ -590,36 +590,56 @@ interface Input {
 }
 
 class Up implements Input {
+
+  constructor(private player: Player){
+  }
+
   move(): void {
-    player.moveUp();
+    this.player.moveUp();
   }
 
 }
 
 class Down implements Input {
+
+  constructor(private player: Player){
+  }
+
   move(): void {
-    player.moveDown();
+    this.player.moveDown();
   }
 
 }
 
 class Right implements Input {
+
+  constructor(private player: Player){
+  }
+
   move(): void {
-    player.moveRight()
+    this.player.moveRight()
   }
 
 }
 
 class Left implements Input {
+
+  constructor(private player: Player){
+  }
+
   move(): void {
-    player.moveLeft();
+    this.player.moveLeft();
   }
 
 }
 
 class Place implements Input {
+
+  constructor(private player: Player){
+  }
+
   move(): void {
-    player.movePlace();
+    this.player.movePlace();
   }
 
 }
@@ -628,8 +648,12 @@ class Player {
   private x = 1;
   private y = 1;
 
+  constructor(private map: BombMap) {
+    this.map.init()
+  }
+
   renewAir() {
-    map.updateAir(this.x, this.y);
+    this.map.updateAir(this.x, this.y);
   }
 
   move(x: number, y:number){
@@ -638,24 +662,24 @@ class Player {
   }
 
   moveUp(){
-    map.move(this.x, this.y - 1, 0, -1);
+    this.map.move(this.x, this.y - 1, 0, -1);
   }
 
   moveDown(){
-    map.move(this.x, this.y + 1, 0, 1);
+    this.map.move(this.x, this.y + 1, 0, 1);
   }
 
   moveLeft(){
-    map.move(this.x - 1, this.y, -1, 0)
+    this.map.move(this.x - 1, this.y, -1, 0)
   }
 
   moveRight(){
-    map.move(this.x + 1, this.y, 1, 0)
+    this.map.move(this.x + 1, this.y, 1, 0)
   }
 
   movePlace(){
     if (bombs > 0) {
-      map.createBomb(this.x, this.y)
+      this.map.createBomb(this.x, this.y)
       bombs--;
     }
   }
@@ -668,7 +692,7 @@ class Player {
   }
 
   isGameOver() {
-    return map.isGameOver(this.x, this.y);
+    return this.map.isGameOver(this.x, this.y);
   }
 
 }
@@ -676,12 +700,15 @@ class Player {
 class BombMap {
   private map: Tile[][];
 
+  constructor (private rawMap: RawTile[][]) {
+    this.map = new Array(rawMap.length)
+  }
+
   init() {
-    this.map = new Array(rawMap.length);
-    for (let y = 0; y < rawMap.length; y++ ) {
-      this.map[y] = new Array(rawMap[y].length);
-      for (let x = 0; x < rawMap[y].length; x++) {
-        this.map[y][x] = transformTile(rawMap[y][x]);
+    for (let y = 0; y < this.rawMap.length; y++ ) {
+      this.map[y] = new Array(this.rawMap[y].length);
+      for (let x = 0; x < this.rawMap[y].length; x++) {
+        this.map[y][x] = transformTile(this.rawMap[y][x]);
       }
     }
   }
@@ -794,11 +821,8 @@ class BombMap {
   isGameOver(x: number, y: number) {
     return this.map[y][x].isGameOver();
   }
+
 }
-
-let player = new Player();
-let map = new BombMap();
-
 
 let rawMap: RawTile[][] = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -811,6 +835,10 @@ let rawMap: RawTile[][] = [
   [1, 2, 2, 2, 2, 0, 0, 10, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+
+
+let map = new BombMap(rawMap);
+let player = new Player(map);
 
 let inputs: Input[] = [];
 
@@ -855,16 +883,9 @@ function transformTile(rawMapElementElement: RawTile) {
   }
 }
 
-function handleInputs() {
-  while (!gameOver && inputs.length > 0) {
-    let current = inputs.pop();
-    current.move();
-  }
-}
-
 
 function update() {
-  handleInputs();
+  keyInput.handle()
   if (player.isGameOver())
     gameOver = true;
 
@@ -907,14 +928,56 @@ window.onload = () => {
   gameLoop();
 };
 
-const LEFT_KEY = "ArrowLeft";
-const UP_KEY = "ArrowUp";
-const RIGHT_KEY = "ArrowRight";
-const DOWN_KEY = "ArrowDown";
+class KeyInput {
+
+  private inputs: Input[] = [];
+
+  private LEFT_KEY = "ArrowLeft";
+  private UP_KEY = "ArrowUp";
+  private RIGHT_KEY = "ArrowRight";
+  private DOWN_KEY = "ArrowDown";
+
+  constructor(private player: Player) {
+  }
+
+  handle(){
+    while (!gameOver && this.inputs.length > 0) {
+      let input = this.inputs.pop();
+      input.move();
+    }
+  }
+
+  keyPress(key: String){
+    this.upKey(key)
+    this.downKey(key)
+    this.leftKey(key)
+    this.rightKey(key)
+    this.placeKey(key)
+  }
+
+    upKey(key: String){
+      if (key === this.UP_KEY || key === 'a') this.inputs.push(new Up(this.player))
+    }
+
+    downKey(key: String){
+        if (key === this.DOWN_KEY || key === 'w') this.inputs.push(new Down(this.player))
+    }
+
+    leftKey(key: String){
+        if (key === this.LEFT_KEY || key === 'd') this.inputs.push(new Left(this.player))
+    }
+
+    rightKey(key: String){
+        if (key === this.RIGHT_KEY || key === 's') this.inputs.push(new Right(this.player))
+    }
+
+    placeKey(key: String){
+        if (key === ' ') this.inputs.push(new Place(this.player))
+    }
+}
+
 window.addEventListener("keydown", (e) => {
-  if (e.key === LEFT_KEY || e.key === "a") inputs.push(new Left());
-  else if (e.key === UP_KEY || e.key === "w") inputs.push(new Up());
-  else if (e.key === RIGHT_KEY || e.key === "d") inputs.push(new Right());
-  else if (e.key === DOWN_KEY || e.key === "s") inputs.push(new Down());
-  else if (e.key === " ") inputs.push(new Place());
+  keyInput.keyPress(e.key)
 });
+
+const keyInput = new KeyInput(player);
