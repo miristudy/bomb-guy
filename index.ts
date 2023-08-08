@@ -143,36 +143,32 @@ class TmpFireExplode implements ExplodeStrategy {
 interface BombState {
     update(x: number, y: number): void;
 
-    getColor(): string;
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void;
 }
 
 class BombInit implements BombState {
-    private color: string = "#770000";
-
     update(x: number, y: number): void {
         map[y][x] = new Bomb(new BombClose());
     }
 
-    getColor(): string {
-        return this.color;
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+        g.fillStyle = "#770000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
 class BombClose implements BombState {
-    private color: string = "#cc0000";
-
     update(x: number, y: number): void {
         map[y][x] = new Bomb(new BombReallyClose());
     }
 
-    getColor(): string {
-        return this.color;
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+        g.fillStyle = "#cc0000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
 class BombReallyClose implements BombState {
-    private color: string = "#ff0000";
-
     update(x: number, y: number): void {
         explode(x, y - 1, new FireExplode());
         explode(x, y + 1, new TmpFireExplode());
@@ -182,8 +178,9 @@ class BombReallyClose implements BombState {
         bombs++;
     }
 
-    getColor(): string {
-        return this.color;
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+        g.fillStyle = "#ff0000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -316,8 +313,7 @@ class Bomb implements Tile {
     }
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillStyle = this.bombState.getColor();
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        this.bombState.draw(g, x, y);
     }
 
     move(x: number, y: number): void {
