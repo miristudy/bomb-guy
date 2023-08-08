@@ -605,13 +605,9 @@ function handleInputs() {
 function updateMap() {
     for (let y = 1; y < map.length; y++) {
         for (let x = 1; x < map[y].length; x++) {
-            updateTile(x, y);
+            map[y][x].update(x, y);
         }
     }
-}
-
-function updateTile(x: number, y: number) {
-    map[y][x].update(x, y);
 }
 
 function createGraphics(): CanvasRenderingContext2D {
