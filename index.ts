@@ -29,7 +29,7 @@ interface Tile {
 
     isGameOver(): Boolean;
 
-    movePlayer(y: number, x: number): void;
+    movePlayer(player: Player, y: number, x: number): void;
 
     close(): void;
 
@@ -54,9 +54,9 @@ class Air implements Tile {
         return false;
     }
 
-    movePlayer(y: number, x: number): void {
-        playery += y;
-        playerx += x;
+    movePlayer(player: Player, y: number, x: number): void {
+        player.setY(player.getY() + y);
+        player.setX(player.getX() + x);
     }
 
     close(): void {
@@ -91,7 +91,7 @@ class Unbreakable implements Tile {
         return false;
     }
 
-    movePlayer(y: number, x: number): void {
+    movePlayer(player: Player, y: number, x: number): void {
     }
 
     close(): void {
@@ -124,7 +124,7 @@ class Stone implements Tile {
         return false;
     }
 
-    movePlayer(y: number, x: number): void {
+    movePlayer(player: Player, y: number, x: number): void {
     }
 
     close(): void {
@@ -219,7 +219,7 @@ class Bomb implements Tile {
         return false;
     }
 
-    movePlayer(y: number, x: number): void {
+    movePlayer(player: Player, y: number, x: number): void {
     }
 
     close(): void {
@@ -258,7 +258,7 @@ class TmpFire implements Tile {
         return false;
     }
 
-    movePlayer(y: number, x: number): void {
+    movePlayer(player: Player, y: number, x: number): void {
     }
 
     close(): void {
@@ -294,9 +294,9 @@ class Fire implements Tile {
         return true;
     }
 
-    movePlayer(y: number, x: number): void {
-        playery += y;
-        playerx += x;
+    movePlayer(player: Player, y: number, x: number): void {
+        player.setY(player.getY() + y);
+        player.setX(player.getX() + x);
     }
 
     close(): void {
@@ -332,11 +332,11 @@ class ExtraBomb implements Tile {
         return false;
     }
 
-    movePlayer(y: number, x: number): void {
-        playery += y;
-        playerx += x;
+    movePlayer(player: Player, y: number, x: number): void {
+        player.setY(player.getY() + y);
+        player.setX(player.getX() + x);
         bombs++;
-        map[playery][playerx] = new Air();
+        map[player.getY()][player.getX()] = new Air();
     }
 
     close(): void {
@@ -471,7 +471,7 @@ class Monster implements Tile {
         return true;
     }
 
-    movePlayer(y: number, x: number): void {
+    movePlayer(player: Player, y: number, x: number): void {
     }
 
     close(): void {
@@ -523,7 +523,7 @@ class TmpMonster implements Tile {
         return false;
     }
 
-    movePlayer(y: number, x: number): void {
+    movePlayer(player: Player, y: number, x: number): void {
     }
 
     close(): void {
@@ -546,41 +546,59 @@ class TmpMonster implements Tile {
 }
 
 interface Input {
-    move(): void;
+    move(player: Player): void;
 }
 
 class Up implements Input {
-    move(): void {
-        map[playery - 1][playerx].movePlayer(-1, 0);
+    move(player: Player): void {
+        map[player.getY() - 1][player.getX()].movePlayer(player,-1, 0);
     }
 }
 
 class Down implements Input {
-    move(): void {
-        map[playery + 1][playerx].movePlayer(1, 0);
+    move(player: Player): void {
+        map[player.getY() + 1][player.getX()].movePlayer(player, 1, 0);
     }
 }
 
 class Right implements Input {
-    move(): void {
-        map[playery][playerx + 1].movePlayer(0, 1);
+    move(player: Player): void {
+        map[player.getY()][player.getX() + 1].movePlayer(player, 0, 1);
     }
 }
 
 class Left implements Input {
-    move(): void {
-        map[playery][playerx - 1].movePlayer(0, -1);
+    move(player: Player): void {
+        map[player.getY()][player.getX() - 1].movePlayer(player, 0, -1);
     }
 }
 
 class Place implements Input {
-    move(): void {
-        placeBomb();
+    move(player: Player): void {
+        placeBomb(player);
     }
 }
 
-let playerx = 1;
-let playery = 1;
+class Player {
+    constructor(private x: number, private y: number) {
+    }
+
+    getX() {
+        return this.x;
+    }
+
+    getY() {
+        return this.y;
+    }
+
+    setX(x: number) {
+        this.x = x;
+    }
+
+    setY(y: number) {
+        this.y = y;
+    }
+}
 let rawMap: RawTile[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 2, 2, 2, 2, 2, 1],
@@ -592,6 +610,7 @@ let rawMap: RawTile[][] = [
     [1, 2, 2, 2, 2, 0, 0, 10, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+let player = new Player(1, 1)
 
 let map: Tile[][];
 
@@ -648,17 +667,17 @@ function transformMap() {
     }
 }
 
-function placeBomb() {
+function placeBomb(player: Player) {
     if (bombs > 0) {
-        map[playery][playerx] = new Bomb(new Normal());
+        map[player.getY()][player.getX()] = new Bomb(new Normal());
         bombs--;
     }
 }
 
-function handleInputs() {
+function handleInputs(player: Player) {
     while (!gameOver && inputs.length > 0) {
         let input = inputs.pop();
-        input.move();
+        input.move(player);
     }
 }
 
@@ -670,15 +689,15 @@ function updateMap() {
     }
 }
 
-function markIfGameOver() {
-    if (map[playery][playerx].isGameOver()) {
+function markIfGameOver(player: Player) {
+    if (map[player.getY()][player.getX()].isGameOver()) {
         gameOver = true;
     }
 }
 
-function update() {
-    handleInputs();
-    markIfGameOver();
+function update(player: Player) {
+    handleInputs(player);
+    markIfGameOver(player);
     if (--delay > 0) return;
     delay = DELAY;
     updateMap();
@@ -700,39 +719,40 @@ function drawMap(g: CanvasRenderingContext2D) {
     }
 }
 
-function drawPlayerIfGameNotOver(g: CanvasRenderingContext2D) {
-    if (!gameOver)
-        g.fillRect(playerx * TILE_SIZE, playery * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+function drawPlayerIfGameNotOver(g: CanvasRenderingContext2D, player: Player) {
+    if (!gameOver) {
+        g.fillRect(player.getX() * TILE_SIZE, player.getY() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 function setPlayerColor(g: CanvasRenderingContext2D) {
     g.fillStyle = "#00ff00";
 }
 
-function drawPlayer(g: CanvasRenderingContext2D) {
+function drawPlayer(g: CanvasRenderingContext2D, player: Player) {
     setPlayerColor(g);
-    drawPlayerIfGameNotOver(g);
+    drawPlayerIfGameNotOver(g, player);
 }
 
-function draw() {
+function draw(player: Player) {
     let g = createGraphics();
     drawMap(g);
-    drawPlayer(g);
+    drawPlayer(g, player);
 }
 
-function gameLoop() {
+function gameLoop(player: Player) {
     let before = Date.now();
-    update();
-    draw();
+    update(player);
+    draw(player);
     let after = Date.now();
     let frameTime = after - before;
     let sleep = SLEEP - frameTime;
-    setTimeout(() => gameLoop(), sleep);
+    setTimeout(() => gameLoop(player), sleep);
 }
 
 window.onload = () => {
     transformMap();
-    gameLoop();
+    gameLoop(player);
 };
 
 const LEFT_KEY = "ArrowLeft";
