@@ -60,7 +60,7 @@ class MonsterRight implements MonsterDirection {
     update(x: number, y: number): void {
         if (map[y][x + 1].isAir()) {
             map[y][x] = new Air();
-            map[y][x + 1] = new TmpMonsterRight();
+            map[y][x + 1] = new TmpMonster(new TmpMonsterRight());
         } else {
             map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterDown()));
         }
@@ -71,7 +71,7 @@ class MonsterDown implements MonsterDirection {
     update(x: number, y: number): void {
         if (map[y + 1][x].isAir()) {
             map[y][x] = new Air();
-            map[y + 1][x] = new TmpMonsterDown();
+            map[y + 1][x] = new TmpMonster(new TmpMonsterDown());
         } else {
             map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterLeft()));
         }
@@ -96,6 +96,22 @@ class MonsterMoveStrategy {
 
     update(x: number, y: number): void {
         this.direction.update(x, y);
+    }
+}
+
+interface TmpMonsterDirection {
+    update(x: number, y: number): void;
+}
+
+class TmpMonsterRight implements TmpMonsterDirection {
+    update(x: number, y: number): void {
+        map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterRight()));
+    }
+}
+
+class TmpMonsterDown implements TmpMonsterDirection {
+    update(x: number, y: number): void {
+        map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterDown()));
     }
 }
 
@@ -486,7 +502,10 @@ class Monster implements Tile {
     }
 }
 
-class TmpMonsterRight implements Tile {
+class TmpMonster implements Tile {
+    constructor(private direction: TmpMonsterDirection) {
+    }
+
     isAir(): boolean {
         return false;
     }
@@ -516,41 +535,7 @@ class TmpMonsterRight implements Tile {
     }
 
     update(x: number, y: number): void {
-        map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterRight()));
-    }
-}
-
-class TmpMonsterDown implements Tile {
-    isAir(): boolean {
-        return false;
-    }
-
-    isUnbreakable(): boolean {
-        return false;
-    }
-
-    isStone(): boolean {
-        return false;
-    }
-
-    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-
-    move(x: number, y: number): void {
-        // do nothing
-    }
-
-    isBombFamily(): boolean {
-        return false;
-    }
-
-    isKillable(): boolean {
-        return false;
-    }
-
-    update(x: number, y: number): void {
-        map[y][x] = new Monster(new MonsterMoveStrategy(new MonsterDown()));
+        this.direction.update(x, y);
     }
 }
 // --------- Tile ---------
@@ -599,11 +584,11 @@ function transformTile(tile: RawTile) {
         case RawTile.MONSTER_RIGHT:
             return new Monster(new MonsterMoveStrategy(new MonsterRight()));
         case RawTile.TMP_MONSTER_RIGHT:
-            return new TmpMonsterRight();
+            return new TmpMonster(new TmpMonsterRight());
         case RawTile.MONSTER_DOWN:
             return new Monster(new MonsterMoveStrategy(new MonsterDown()));
         case RawTile.TMP_MONSTER_DOWN:
-            return new TmpMonsterDown();
+            return new TmpMonster(new TmpMonsterDown());
         case RawTile.MONSTER_LEFT:
             return new Monster(new MonsterMoveStrategy(new MonsterLeft()));
         default:
