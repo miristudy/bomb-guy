@@ -368,7 +368,7 @@ class LeftHeading implements Heading {
             this.moveForward(y, x);
             return;
         }
-        map[y][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Monster(new ClockwiseRotationMonsterStrategy(new UpHeading()));
     }
 
     canMoveForward(y: number, x: number): boolean {
@@ -377,7 +377,7 @@ class LeftHeading implements Heading {
 
     moveForward(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y][x - 1] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x - 1] = new Monster(new ClockwiseRotationMonsterStrategy(new LeftHeading()));
     }
 
 }
@@ -388,7 +388,7 @@ class RightHeading implements Heading {
             this.moveForward(y, x);
             return;
         }
-        map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Monster(new ClockwiseRotationMonsterStrategy(new DownHeading()));
     }
 
     canMoveForward(y: number, x: number): boolean {
@@ -407,7 +407,7 @@ class UpHeading implements Heading {
             this.moveForward(y, x);
             return;
         }
-        map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Monster(new ClockwiseRotationMonsterStrategy(new RightHeading()));
     }
 
     canMoveForward(y: number, x: number): boolean {
@@ -416,7 +416,7 @@ class UpHeading implements Heading {
 
     moveForward(y: number, x: number): void {
         map[y][x] = new Air();
-        map[y - 1][x] = new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y - 1][x] = new Monster(new ClockwiseRotationMonsterStrategy(new UpHeading()));
     }
 
 }
@@ -427,7 +427,7 @@ class DownHeading implements Heading {
             this.moveForward(y, x);
             return;
         }
-        map[y][x] = new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Monster(new ClockwiseRotationMonsterStrategy(new LeftHeading()));
     }
 
     canMoveForward(y: number, x: number): boolean {
@@ -442,18 +442,20 @@ class DownHeading implements Heading {
 }
 
 interface MonsterMoveStrategy {
-    updateTile(y: number, x: number, heading: Heading): void;
+    updateTile(y: number, x: number): void;
 }
 
 class ClockwiseRotationMonsterStrategy implements MonsterMoveStrategy {
-    updateTile(y: number, x: number, heading: Heading): void {
-        heading.updateTile(y, x);
+    constructor(private heading: Heading) {
+    }
+    updateTile(y: number, x: number): void {
+        this.heading.updateTile(y, x);
     }
 
 }
 
 class Monster implements Tile {
-    constructor(private heading: Heading, private monsterMoveStrategy: MonsterMoveStrategy) {
+    constructor(private monsterMoveStrategy: MonsterMoveStrategy) {
     }
 
     isAir(): boolean {
@@ -487,7 +489,7 @@ class Monster implements Tile {
     }
 
     updateTile(y: number, x: number): void {
-        this.monsterMoveStrategy.updateTile(y, x, this.heading);
+        this.monsterMoveStrategy.updateTile(y, x);
     }
 }
 interface TmpMonsterHeading {
@@ -496,13 +498,13 @@ interface TmpMonsterHeading {
 
 class TmpMonsterDownHeading implements TmpMonsterHeading {
     updateTile(y: number, x: number): void {
-        map[y][x] = new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Monster(new ClockwiseRotationMonsterStrategy(new DownHeading()));
     }
 }
 
 class TmpMonsterRightHeading implements TmpMonsterHeading {
     updateTile(y: number, x: number): void {
-        map[y][x] = new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
+        map[y][x] = new Monster(new ClockwiseRotationMonsterStrategy(new RightHeading()));
     }
 }
 
@@ -620,15 +622,15 @@ function transformTile(tile: RawTile) {
         case RawTile.UNBREAKABLE:
             return new Unbreakable();
         case RawTile.MONSTER_UP:
-            return new Monster(new UpHeading(), new ClockwiseRotationMonsterStrategy());
+            return new Monster(new ClockwiseRotationMonsterStrategy(new UpHeading()));
         case RawTile.MONSTER_DOWN:
-            return new Monster(new DownHeading(), new ClockwiseRotationMonsterStrategy());
+            return new Monster(new ClockwiseRotationMonsterStrategy(new DownHeading()));
         case RawTile.TMP_MONSTER_DOWN:
             return new TmpMonster(new TmpMonsterDownHeading());
         case RawTile.MONSTER_LEFT:
-            return new Monster(new LeftHeading(), new ClockwiseRotationMonsterStrategy());
+            return new Monster(new ClockwiseRotationMonsterStrategy(new LeftHeading()));
         case RawTile.MONSTER_RIGHT:
-            return new Monster(new RightHeading(), new ClockwiseRotationMonsterStrategy());
+            return new Monster(new ClockwiseRotationMonsterStrategy(new RightHeading()));
         case RawTile.TMP_MONSTER_RIGHT:
             return new TmpMonster(new TmpMonsterRightHeading());
         default:
