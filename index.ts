@@ -29,7 +29,7 @@ interface Tile {
 
     isGameOver(): Boolean;
 
-    movePlayer(player: Player, y: number, x: number): void;
+    movePlayer(player: Player, dy: number, dx: number): void;
 
     close(): void;
 
@@ -54,9 +54,8 @@ class Air implements Tile {
         return false;
     }
 
-    movePlayer(player: Player, y: number, x: number): void {
-        player.setY(player.getY() + y);
-        player.setX(player.getX() + x);
+    movePlayer(player: Player, dy: number, dx: number): void {
+        player.movePlayer(dy, dx)
     }
 
     close(): void {
@@ -295,8 +294,7 @@ class Fire implements Tile {
     }
 
     movePlayer(player: Player, y: number, x: number): void {
-        player.setY(player.getY() + y);
-        player.setX(player.getX() + x);
+        player.movePlayer(y, x);
     }
 
     close(): void {
@@ -333,10 +331,9 @@ class ExtraBomb implements Tile {
     }
 
     movePlayer(player: Player, y: number, x: number): void {
-        player.setY(player.getY() + y);
-        player.setX(player.getX() + x);
+        player.movePlayer(y, x);
         bombs++;
-        map[player.getY()][player.getX()] = new Air();
+        player.makeAir();
     }
 
     close(): void {
@@ -551,25 +548,25 @@ interface Input {
 
 class Up implements Input {
     move(player: Player): void {
-        map[player.getY() - 1][player.getX()].movePlayer(player,-1, 0);
+        player.moveTile(-1, 0);
     }
 }
 
 class Down implements Input {
     move(player: Player): void {
-        map[player.getY() + 1][player.getX()].movePlayer(player, 1, 0);
+        player.moveTile(1, 0);
     }
 }
 
 class Right implements Input {
     move(player: Player): void {
-        map[player.getY()][player.getX() + 1].movePlayer(player, 0, 1);
+        player.moveTile(0, 1);
     }
 }
 
 class Left implements Input {
     move(player: Player): void {
-        map[player.getY()][player.getX() - 1].movePlayer(player, 0, -1);
+        player.moveTile(0, -1);
     }
 }
 
@@ -583,20 +580,31 @@ class Player {
     constructor(private x: number, private y: number) {
     }
 
-    getX() {
-        return this.x;
+    makeBomb() {
+        map[player.y][player.x] = new Bomb(new Normal());
     }
 
-    getY() {
-        return this.y;
+    markIfGameOver() {
+        if (map[player.y][player.x].isGameOver()) {
+            gameOver = true;
+        }
     }
 
-    setX(x: number) {
-        this.x = x;
+    draw(g: CanvasRenderingContext2D) {
+        g.fillRect(player.x * TILE_SIZE, player.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    setY(y: number) {
-        this.y = y;
+    movePlayer(dy: number, dx: number) {
+        this.y += dy;
+        this.x += dx;
+    }
+
+    makeAir() {
+        map[player.y][player.x] = new Air();
+    }
+
+    moveTile(y: number, x: number) {
+        map[player.y + y][player.x + x].movePlayer(this,y, x);
     }
 }
 let rawMap: RawTile[][] = [
@@ -669,7 +677,7 @@ function transformMap() {
 
 function placeBomb(player: Player) {
     if (bombs > 0) {
-        map[player.getY()][player.getX()] = new Bomb(new Normal());
+        player.makeBomb();
         bombs--;
     }
 }
@@ -690,9 +698,8 @@ function updateMap() {
 }
 
 function markIfGameOver(player: Player) {
-    if (map[player.getY()][player.getX()].isGameOver()) {
-        gameOver = true;
-    }
+    player.markIfGameOver();
+
 }
 
 function update(player: Player) {
@@ -721,7 +728,7 @@ function drawMap(g: CanvasRenderingContext2D) {
 
 function drawPlayerIfGameNotOver(g: CanvasRenderingContext2D, player: Player) {
     if (!gameOver) {
-        g.fillRect(player.getX() * TILE_SIZE, player.getY() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        player.draw(g);
     }
 }
 
