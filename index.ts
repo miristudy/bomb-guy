@@ -4,9 +4,6 @@ const SLEEP = 1000 / FPS;
 const TPS = 2;
 const DELAY = FPS / TPS;
 
-const WALL_COLOR: string = "#999999";
-const STONE_COLOR: string = "#0000cc";
-
 // --------- Input ---------
 interface Input {
     handle(): void;
@@ -258,10 +255,6 @@ class Air implements Tile {
 }
 
 class Unbreakable implements Tile {
-
-    constructor(private color: string) {
-    }
-
     isAir(): boolean {
         return false;
     }
@@ -275,7 +268,42 @@ class Unbreakable implements Tile {
     }
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-        g.fillStyle = this.color;
+        g.fillStyle = "#999999";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    move(x: number, y: number): void {
+        // do nothing
+    }
+
+    isBombFamily(): boolean {
+        return false;
+    }
+
+    isKillable(): boolean {
+        return false;
+    }
+
+    update(x: number, y: number): void {
+        // do nothing
+    }
+}
+
+class Stone implements Tile {
+    isAir(): boolean {
+        return false;
+    }
+
+    isUnbreakable(): boolean {
+        return false;
+    }
+
+    isStone(): boolean {
+        return true;
+    }
+
+    draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+        g.fillStyle = "#0000cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
@@ -508,9 +536,9 @@ function transformTile(tile: RawTile) {
         case RawTile.AIR:
             return new Air();
         case RawTile.UNBREAKABLE:
-            return new Unbreakable(WALL_COLOR);
+            return new Unbreakable();
         case RawTile.STONE:
-            return new Unbreakable(STONE_COLOR);
+            return new Stone();
         case RawTile.BOMB:
             return new Bomb(new BombInit());
         case RawTile.BOMB_CLOSE:
