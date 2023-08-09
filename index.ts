@@ -191,23 +191,143 @@ class BombReallyClose implements BombState {
 
 // --------- Tile ---------
 
-enum RawTile {
-    AIR,
-    UNBREAKABLE,
-    STONE,
-    BOMB,
-    BOMB_CLOSE,
-    BOMB_REALLY_CLOSE,
-    TMP_FIRE,
-    FIRE,
-    EXTRA_BOMB,
-    MONSTER_UP,
-    MONSTER_RIGHT,
-    TMP_MONSTER_RIGHT,
-    MONSTER_DOWN,
-    TMP_MONSTER_DOWN,
-    MONSTER_LEFT,
+interface RawTileValue {
+    transform(): Tile;
 }
+
+class AirValue implements RawTileValue {
+    transform(): Tile {
+        return new Air();
+    }
+}
+
+class UnbreakableValue implements RawTileValue {
+    transform(): Tile {
+        return new Unbreakable();
+    }
+}
+
+class StoneValue implements RawTileValue {
+    transform(): Tile {
+        return new Stone();
+    }
+}
+
+class BombValue implements RawTileValue {
+    transform(): Tile {
+        return new Bomb(new BombInit());
+    }
+}
+
+class BombCloseValue implements RawTileValue {
+    transform(): Tile {
+        return new Bomb(new BombClose());
+    }
+}
+
+class BombReallyCloseValue implements RawTileValue {
+    transform(): Tile {
+        return new Bomb(new BombReallyClose());
+    }
+}
+
+class TmpFireValue implements RawTileValue {
+    transform(): Tile {
+        return new TmpTile(new TmpFire());
+    }
+}
+
+class FireValue implements RawTileValue {
+    transform(): Tile {
+        return new Fire();
+    }
+}
+
+class ExtraBombValue implements RawTileValue {
+    transform(): Tile {
+        return new ExtraBomb();
+    }
+}
+
+class MonsterUpValue implements RawTileValue {
+    transform(): Tile {
+        return new Monster(new MonsterMoveStrategy(new MonsterUp()));
+    }
+}
+
+class MonsterRightValue implements RawTileValue {
+    transform(): Tile {
+        return new Monster(new MonsterMoveStrategy(new MonsterRight()));
+    }
+}
+
+class TmpMonsterRightValue implements RawTileValue {
+    transform(): Tile {
+        return new TmpTile(new TmpMonsterRight());
+    }
+}
+
+class MonsterDownValue implements RawTileValue {
+    transform(): Tile {
+        return new Monster(new MonsterMoveStrategy(new MonsterDown()));
+    }
+}
+
+class TmpMonsterDownValue implements RawTileValue {
+    transform(): Tile {
+        return new TmpTile(new TmpMonsterDown());
+    }
+}
+
+class MonsterLeftValue implements RawTileValue {
+    transform(): Tile {
+        return new Monster(new MonsterMoveStrategy(new MonsterLeft()));
+    }
+}
+
+class RawTile2 {
+    static readonly AIR = new RawTile2(new AirValue());
+    static readonly UNBREAKABLE = new RawTile2(new UnbreakableValue());
+    static readonly STONE = new RawTile2(new StoneValue());
+    static readonly BOMB = new RawTile2(new BombValue());
+    static readonly BOMB_CLOSE = new RawTile2(new BombCloseValue());
+    static readonly BOMB_REALLY_CLOSE = new RawTile2(new BombReallyCloseValue());
+    static readonly TMP_FIRE = new RawTile2(new TmpFireValue());
+    static readonly FIRE = new RawTile2(new FireValue());
+    static readonly EXTRA_BOMB = new RawTile2(new ExtraBombValue());
+    static readonly MONSTER_UP = new RawTile2(new MonsterUpValue());
+    static readonly MONSTER_RIGHT = new RawTile2(new MonsterRightValue());
+    static readonly TMP_MONSTER_RIGHT = new RawTile2(new TmpMonsterRightValue());
+    static readonly MONSTER_DOWN = new RawTile2(new MonsterDownValue());
+    static readonly TMP_MONSTER_DOWN = new RawTile2(new TmpMonsterDownValue());
+    static readonly MONSTER_LEFT = new RawTile2(new MonsterLeftValue());
+
+    private constructor(private value: RawTileValue) {
+
+    }
+
+    transform(): Tile {
+        return this.value.transform();
+    }
+}
+
+const RAW_TILES = [
+    RawTile2.AIR,
+    RawTile2.UNBREAKABLE,
+    RawTile2.STONE,
+    RawTile2.BOMB,
+    RawTile2.BOMB_CLOSE,
+    RawTile2.BOMB_REALLY_CLOSE,
+    RawTile2.TMP_FIRE,
+    RawTile2.FIRE,
+    RawTile2.EXTRA_BOMB,
+    RawTile2.MONSTER_UP,
+    RawTile2.MONSTER_RIGHT,
+    RawTile2.TMP_MONSTER_RIGHT,
+    RawTile2.MONSTER_DOWN,
+    RawTile2.TMP_MONSTER_DOWN,
+    RawTile2.MONSTER_LEFT
+];
 
 interface Tile {
     isAir(): boolean;
@@ -515,7 +635,7 @@ class TmpTile implements Tile {
 
 // --------- Tile ---------
 
-let rawMap: RawTile[][] = [
+let rawMap: number[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 2, 2, 2, 2, 2, 1],
     [1, 0, 1, 2, 1, 2, 1, 2, 1],
@@ -570,7 +690,7 @@ class Map {
         for (let y = 0; y < rawMap.length; y++) {
             this.map[y] = new Array(rawMap[y].length);
             for (let x = 0; x < rawMap[y].length; x++) {
-                this.map[y][x] = transformTile(rawMap[y][x]);
+                this.map[y][x] = RAW_TILES[rawMap[y][x]].transform();
             }
         }
     }
@@ -637,47 +757,6 @@ class Map {
 let player = new Player();
 
 let map = new Map();
-
-function assertExhausted(x: never): never {
-    throw new Error("Unexpected object: " + x);
-}
-
-function transformTile(tile: RawTile) {
-    switch (tile) {
-        case RawTile.AIR:
-            return new Air();
-        case RawTile.UNBREAKABLE:
-            return new Unbreakable();
-        case RawTile.STONE:
-            return new Stone();
-        case RawTile.BOMB:
-            return new Bomb(new BombInit());
-        case RawTile.BOMB_CLOSE:
-            return new Bomb(new BombClose());
-        case RawTile.BOMB_REALLY_CLOSE:
-            return new Bomb(new BombReallyClose());
-        case RawTile.TMP_FIRE:
-            return new TmpTile(new TmpFire());
-        case RawTile.FIRE:
-            return new Fire();
-        case RawTile.EXTRA_BOMB:
-            return new ExtraBomb();
-        case RawTile.MONSTER_UP:
-            return new Monster(new MonsterMoveStrategy(new MonsterUp()));
-        case RawTile.MONSTER_RIGHT:
-            return new Monster(new MonsterMoveStrategy(new MonsterRight()));
-        case RawTile.TMP_MONSTER_RIGHT:
-            return new TmpTile(new TmpMonsterRight());
-        case RawTile.MONSTER_DOWN:
-            return new Monster(new MonsterMoveStrategy(new MonsterDown()));
-        case RawTile.TMP_MONSTER_DOWN:
-            return new TmpTile(new TmpMonsterDown());
-        case RawTile.MONSTER_LEFT:
-            return new Monster(new MonsterMoveStrategy(new MonsterLeft()));
-        default:
-            return assertExhausted(tile);
-    }
-}
 
 let inputs: Input[] = [];
 
