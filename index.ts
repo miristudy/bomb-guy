@@ -47,45 +47,53 @@ interface MonsterDirection {
 
 class MonsterUp implements MonsterDirection {
     update(map: Map, x: number, y: number): void {
-        if (map.getMap()[y - 1][x].isAir()) {
-            map.getMap()[y][x] = new Air();
-            map.getMap()[y - 1][x] = new Monster(new MonsterMoveStrategy(new MonsterUp()));
-        } else {
-            map.getMap()[y][x] = new Monster(new MonsterMoveStrategy(new MonsterRight()));
-        }
+        map.updateMonster(
+            x,
+            y,
+            0,
+            -1,
+            new Monster(new MonsterMoveStrategy(new MonsterUp())),
+            new Monster(new MonsterMoveStrategy(new MonsterRight()))
+        );
     }
 }
 
 class MonsterRight implements MonsterDirection {
     update(map: Map, x: number, y: number): void {
-        if (map.getMap()[y][x + 1].isAir()) {
-            map.getMap()[y][x] = new Air();
-            map.getMap()[y][x + 1] = new TmpTile(new TmpMonsterRight());
-        } else {
-            map.getMap()[y][x] = new Monster(new MonsterMoveStrategy(new MonsterDown()));
-        }
+        map.updateMonster(
+            x,
+            y,
+            1,
+            0,
+            new TmpTile(new TmpMonsterRight()),
+            new Monster(new MonsterMoveStrategy(new MonsterDown()))
+        );
     }
 }
 
 class MonsterDown implements MonsterDirection {
     update(map: Map, x: number, y: number): void {
-        if (map.getMap()[y + 1][x].isAir()) {
-            map.getMap()[y][x] = new Air();
-            map.getMap()[y + 1][x] = new TmpTile(new TmpMonsterDown());
-        } else {
-            map.getMap()[y][x] = new Monster(new MonsterMoveStrategy(new MonsterLeft()));
-        }
+        map.updateMonster(
+            x,
+            y,
+            0,
+            1,
+            new TmpTile(new TmpMonsterDown()),
+            new Monster(new MonsterMoveStrategy(new MonsterLeft()))
+        );
     }
 }
 
 class MonsterLeft implements MonsterDirection {
     update(map: Map, x: number, y: number): void {
-        if (map.getMap()[y][x - 1].isAir()) {
-            map.getMap()[y][x] = new Air();
-            map.getMap()[y][x - 1] = new Monster(new MonsterMoveStrategy(new MonsterLeft()));
-        } else {
-            map.getMap()[y][x] = new Monster(new MonsterMoveStrategy(new MonsterUp()));
-        }
+        map.updateMonster(
+            x,
+            y,
+            -1,
+            0,
+            new Monster(new MonsterMoveStrategy(new MonsterLeft())),
+            new Monster(new MonsterMoveStrategy(new MonsterUp()))
+        );
     }
 }
 
@@ -105,19 +113,19 @@ interface TmpTileStrategy {
 
 class TmpMonsterRight implements TmpTileStrategy {
     update(map: Map, x: number, y: number): void {
-        map.getMap()[y][x] = new Monster(new MonsterMoveStrategy(new MonsterRight()));
+        map.setTile(x, y, new Monster(new MonsterMoveStrategy(new MonsterRight())));
     }
 }
 
 class TmpMonsterDown implements TmpTileStrategy {
     update(map: Map, x: number, y: number): void {
-        map.getMap()[y][x] = new Monster(new MonsterMoveStrategy(new MonsterDown()));
+        map.setTile(x, y, new Monster(new MonsterMoveStrategy(new MonsterDown())));
     }
 }
 
 class TmpFire implements TmpTileStrategy {
     update(map: Map, x: number, y: number): void {
-        map.getMap()[y][x] = new Fire();
+        map.setTile(x, y, new Fire());
     }
 }
 
@@ -127,13 +135,13 @@ interface ExplodeStrategy {
 
 class FireExplode implements ExplodeStrategy {
     explode(map: Map, x: number, y: number): void {
-        map.getMap()[y][x] = new Fire();
+        map.setTile(x, y, new Fire());
     }
 }
 
 class TmpFireExplode implements ExplodeStrategy {
     explode(map: Map, x: number, y: number): void {
-        map.getMap()[y][x] = new TmpTile(new TmpFire());
+        map.setTile(x, y, new TmpTile(new TmpFire()));
     }
 }
 
@@ -145,7 +153,7 @@ interface BombState {
 
 class BombInit implements BombState {
     update(map: Map, x: number, y: number): void {
-        map.getMap()[y][x] = new Bomb(new BombClose());
+        map.setTile(x, y, new Bomb(new BombClose()));
     }
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -156,7 +164,7 @@ class BombInit implements BombState {
 
 class BombClose implements BombState {
     update(map: Map, x: number, y: number): void {
-        map.getMap()[y][x] = new Bomb(new BombReallyClose());
+        map.setTile(x, y, new Bomb(new BombReallyClose()));
     }
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -167,11 +175,11 @@ class BombClose implements BombState {
 
 class BombReallyClose implements BombState {
     update(map: Map, x: number, y: number): void {
-        explode(map, x, y - 1, new FireExplode());
-        explode(map, x, y + 1, new TmpFireExplode());
-        explode(map, x - 1, y, new FireExplode());
-        explode(map, x + 1, y, new TmpFireExplode());
-        map.getMap()[y][x] = new Fire();
+        map.explode(x, y - 1, new FireExplode());
+        map.explode(x, y + 1, new TmpFireExplode());
+        map.explode(x - 1, y, new FireExplode());
+        map.explode(x + 1, y, new TmpFireExplode());
+        map.setTile(x, y, new Fire());
         bombs++;
     }
 
@@ -391,7 +399,7 @@ class Fire implements Tile {
     }
 
     update(map: Map, x: number, y: number): void {
-        map.getMap()[y][x] = new Air();
+        map.setTile(x, y, new Air());
     }
 }
 
@@ -531,23 +539,19 @@ class Player {
     eatExtraBomb(map: Map, x: number, y: number): void {
         this.move(x, y);
         bombs++;
-        map.getMap()[this.y][this.x] = new Air();
+        map.setTile(this.x, this.y, new Air());
     }
 
     handleInput(map: Map, x: number, y: number) {
-        map.getMap()[this.y + y][this.x + x].move(map, this, x, y);
+        map.handleInput(this, this.x + x, this.y + y, x, y);
     }
 
     placeBomb(map: Map) {
-        if (bombs > 0) {
-            map.getMap()[this.y][this.x] = new Bomb(new BombInit());
-            bombs--;
-        }
+        map.placeBomb(this.x, this.y);
     }
 
     checkDeath(map: Map) {
-        if (map.getMap()[this.y][this.x].isKillable())
-            gameOver = true;
+        map.checkDeath(this.x, this.y);
     }
 
     draw(g: CanvasRenderingContext2D) {
@@ -559,12 +563,74 @@ class Player {
 }
 
 class Map {
-    private map: Tile[][];
-    getMap(): Tile[][] {
-        return this.map;
+    private readonly map: Tile[][];
+
+    constructor() {
+        this.map = new Array(rawMap.length);
+        for (let y = 0; y < rawMap.length; y++) {
+            this.map[y] = new Array(rawMap[y].length);
+            for (let x = 0; x < rawMap[y].length; x++) {
+                this.map[y][x] = transformTile(rawMap[y][x]);
+            }
+        }
     }
-    setMap(map: Tile[][]) {
-        this.map = map;
+
+    draw(g: CanvasRenderingContext2D) {
+        for (let y = 0; y < this.map.length; y++) {
+            for (let x = 0; x < this.map[y].length; x++) {
+                this.map[y][x].draw(g, x, y);
+            }
+        }
+    }
+
+    update() {
+        for (let y = 1; y < this.map.length; y++) {
+            for (let x = 1; x < this.map[y].length; x++) {
+                this.map[y][x].update(map, x, y);
+            }
+        }
+    }
+
+    explode(x: number, y: number, explodeStrategy: ExplodeStrategy) {
+        if (this.map[y][x].isStone()) {
+            if (Math.random() < 0.1)
+                this.map[y][x] = new ExtraBomb()
+            else
+                explodeStrategy.explode(map, x, y);
+        } else if (!this.map[y][x].isUnbreakable()) {
+            if (this.map[y][x].isBombFamily())
+                bombs++;
+            explodeStrategy.explode(map, x, y);
+        }
+    }
+
+    setTile(x: number, y: number, tile: Tile) {
+        this.map[y][x] = tile;
+    }
+
+    updateMonster(x: number, y: number, dx: number, dy: number, tileCanGo: Tile, tileIfBlock: Tile): void {
+        if (this.map[y + dy][x + dx].isAir()) {
+            this.map[y][x] = new Air();
+            this.map[y + dy][x + dx] = tileCanGo;
+        } else {
+            this.map[y][x] = tileIfBlock;
+        }
+    }
+
+    handleInput(player: Player, newX: number, newY: number, x: number, y: number) {
+        this.map[newY][newX].move(this, player, x, y);
+    }
+
+    placeBomb(x: number, y: number) {
+        if (bombs > 0) {
+            this.map[y][x] = new Bomb(new BombInit());
+            bombs--;
+        }
+    }
+
+    checkDeath(x: number, y: number) {
+        if (this.map[y][x].isKillable())
+            gameOver = true;
     }
 }
 
@@ -613,34 +679,11 @@ function transformTile(tile: RawTile) {
     }
 }
 
-function transformMap(map: Map) {
-    map.setMap(new Array(rawMap.length));
-    for (let y = 0; y < rawMap.length; y++) {
-        map.getMap()[y] = new Array(rawMap[y].length);
-        for (let x = 0; x < rawMap[y].length; x++) {
-            map.getMap()[y][x] = transformTile(rawMap[y][x]);
-        }
-    }
-}
-
 let inputs: Input[] = [];
 
 let delay = 0;
 let bombs = 1;
 let gameOver = false;
-
-function explode(map: Map, x: number, y: number, explodeStrategy: ExplodeStrategy) {
-    if (map.getMap()[y][x].isStone()) {
-        if (Math.random() < 0.1)
-            map.getMap()[y][x] = new ExtraBomb()
-        else
-            explodeStrategy.explode(map, x, y);
-    } else if (!map.getMap()[y][x].isUnbreakable()) {
-        if (map.getMap()[y][x].isBombFamily())
-            bombs++;
-        explodeStrategy.explode(map, x, y);
-    }
-}
 
 function update(map: Map, player: Player) {
     handleInputs(map, player);
@@ -648,21 +691,13 @@ function update(map: Map, player: Player) {
     if (--delay > 0)
         return;
     delay = DELAY;
-    updateMap(map);
+    map.update();
 }
 
 function handleInputs(map: Map, player: Player) {
     while (!gameOver && inputs.length > 0) {
         let input: Input = inputs.pop();
         input.handle(map, player);
-    }
-}
-
-function updateMap(map: Map) {
-    for (let y = 1; y < map.getMap().length; y++) {
-        for (let x = 1; x < map.getMap()[y].length; x++) {
-            map.getMap()[y][x].update(map, x, y);
-        }
     }
 }
 
@@ -675,16 +710,8 @@ function createGraphics(): CanvasRenderingContext2D {
 
 function draw(map: Map, player: Player) {
     let g = createGraphics();
-    drawMap(map, g);
+    map.draw(g);
     player.draw(g)
-}
-
-function drawMap(map: Map, g: CanvasRenderingContext2D) {
-    for (let y = 0; y < map.getMap().length; y++) {
-        for (let x = 0; x < map.getMap()[y].length; x++) {
-            map.getMap()[y][x].draw(g, x, y);
-        }
-    }
 }
 
 function gameLoop(map: Map) {
@@ -698,7 +725,6 @@ function gameLoop(map: Map) {
 }
 
 window.onload = () => {
-    transformMap(map);
     gameLoop(map);
 };
 
