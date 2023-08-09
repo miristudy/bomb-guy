@@ -11,31 +11,31 @@ interface Input {
 
 class Up implements Input {
     handle(player: Player) {
-        move(player, 0, -1);
+        player.handleInput(0, -1);
     }
 }
 
 class Down implements Input {
     handle(player: Player) {
-        move(player, 0, 1);
+        player.handleInput(0, 1);
     }
 }
 
 class Right implements Input {
     handle(player: Player) {
-        move(player, 1, 0);
+        player.handleInput(1, 0);
     }
 }
 
 class Left implements Input {
     handle(player: Player) {
-        move(player, -1, 0);
+        player.handleInput(-1, 0);
     }
 }
 
 class Place implements Input {
     handle(player: Player) {
-        placeBomb(player);
+        player.placeBomb();
     }
 }
 
@@ -237,8 +237,7 @@ class Air implements Tile {
     }
 
     move(player: Player, x: number, y: number): void {
-        player.setY(player.getY() + y);
-        player.setX(player.getX() + x);
+        player.move(x, y);
     }
 
     isBombFamily(): boolean {
@@ -380,8 +379,7 @@ class Fire implements Tile {
     }
 
     move(player: Player, x: number, y: number): void {
-        player.setY(player.getY() + y);
-        player.setX(player.getX() + x);
+        player.move(x, y);
     }
 
     isBombFamily(): boolean {
@@ -416,10 +414,7 @@ class ExtraBomb implements Tile {
     }
 
     move(player: Player, x: number, y: number): void {
-        player.setY(player.getY() + y);
-        player.setX(player.getX() + x);
-        bombs++;
-        map[player.getY()][player.getX()] = new Air();
+        player.eatExtraBomb(x, y);
     }
 
     isBombFamily(): boolean {
@@ -528,17 +523,39 @@ let map: Tile[][];
 class Player {
     private x = 1;
     private y = 1;
-    getX() {
-        return this.x;
+
+    move(x: number, y: number): void {
+        this.x += x;
+        this.y += y;
     }
-    getY() {
-        return this.y;
+
+    eatExtraBomb(x: number, y: number): void {
+        this.move(x, y);
+        bombs++;
+        map[this.y][this.x] = new Air();
     }
-    setX(x: number) {
-        this.x = x;
+
+    handleInput(x: number, y: number) {
+        map[this.y + y][this.x + x].move(this, x, y);
     }
-    setY(y: number) {
-        this.y = y;
+
+    placeBomb() {
+        if (bombs > 0) {
+            map[this.y][this.x] = new Bomb(new BombInit());
+            bombs--;
+        }
+    }
+
+    checkDeath() {
+        if (map[this.y][this.x].isKillable())
+            gameOver = true;
+    }
+
+    draw(g: CanvasRenderingContext2D) {
+        if (!gameOver) {
+            g.fillStyle = "#00ff00";
+            g.fillRect(this.x * TILE_SIZE, this.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
     }
 }
 
@@ -614,24 +631,11 @@ function explode(x: number, y: number, explodeStrategy: ExplodeStrategy) {
     }
 }
 
-function move(player: Player, x: number, y: number) {
-    map[player.getY() + y][player.getX() + x].move(player, x, y);
-}
-
-function placeBomb(player: Player) {
-    if (bombs > 0) {
-        map[player.getY()][player.getX()] = new Bomb(new BombInit());
-        bombs--;
-    }
-}
-
 function update(player: Player) {
     handleInputs(player);
-
-    if (map[player.getY()][player.getX()].isKillable())
-        gameOver = true;
-
-    if (--delay > 0) return;
+    player.checkDeath();
+    if (--delay > 0)
+        return;
     delay = DELAY;
     updateMap();
 }
@@ -661,7 +665,7 @@ function createGraphics(): CanvasRenderingContext2D {
 function draw(player: Player) {
     let g = createGraphics();
     drawMap(g);
-    drawPlayer(player, g);
+    player.draw(g)
 }
 
 function drawMap(g: CanvasRenderingContext2D) {
@@ -669,13 +673,6 @@ function drawMap(g: CanvasRenderingContext2D) {
         for (let x = 0; x < map[y].length; x++) {
             map[y][x].draw(g, x, y);
         }
-    }
-}
-
-function drawPlayer(player: Player, g: CanvasRenderingContext2D) {
-    if (!gameOver) {
-        g.fillStyle = "#00ff00";
-        g.fillRect(player.getX() * TILE_SIZE, player.getY() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
