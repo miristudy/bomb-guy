@@ -6,36 +6,36 @@ const DELAY = FPS / TPS;
 
 // --------- Input ---------
 interface Input {
-    handle(): void;
+    handle(player: Player): void;
 }
 
 class Up implements Input {
-    handle() {
-        move(0, -1);
+    handle(player: Player) {
+        move(player, 0, -1);
     }
 }
 
 class Down implements Input {
-    handle() {
-        move(0, 1);
+    handle(player: Player) {
+        move(player, 0, 1);
     }
 }
 
 class Right implements Input {
-    handle() {
-        move(1, 0);
+    handle(player: Player) {
+        move(player, 1, 0);
     }
 }
 
 class Left implements Input {
-    handle() {
-        move(-1, 0);
+    handle(player: Player) {
+        move(player, -1, 0);
     }
 }
 
 class Place implements Input {
-    handle() {
-        placeBomb();
+    handle(player: Player) {
+        placeBomb(player);
     }
 }
 
@@ -210,7 +210,7 @@ interface Tile {
 
     draw(g: CanvasRenderingContext2D, x: number, y: number): void;
 
-    move(x: number, y: number): void;
+    move(player: Player, x: number, y: number): void;
 
     isBombFamily(): boolean;
 
@@ -236,9 +236,9 @@ class Air implements Tile {
         // do nothing
     }
 
-    move(x: number, y: number): void {
-        playery += y;
-        playerx += x;
+    move(player: Player, x: number, y: number): void {
+        player.setY(player.getY() + y);
+        player.setX(player.getX() + x);
     }
 
     isBombFamily(): boolean {
@@ -272,7 +272,7 @@ class Unbreakable implements Tile {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    move(x: number, y: number): void {
+    move(player: Player, x: number, y: number): void {
         // do nothing
     }
 
@@ -307,7 +307,7 @@ class Stone implements Tile {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    move(x: number, y: number): void {
+    move(player: Player, x: number, y: number): void {
         // do nothing
     }
 
@@ -344,7 +344,7 @@ class Bomb implements Tile {
         this.bombState.draw(g, x, y);
     }
 
-    move(x: number, y: number): void {
+    move(player: Player, x: number, y: number): void {
         // do nothing
     }
 
@@ -379,9 +379,9 @@ class Fire implements Tile {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    move(x: number, y: number): void {
-        playery += y;
-        playerx += x;
+    move(player: Player, x: number, y: number): void {
+        player.setY(player.getY() + y);
+        player.setX(player.getX() + x);
     }
 
     isBombFamily(): boolean {
@@ -415,11 +415,11 @@ class ExtraBomb implements Tile {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    move(x: number, y: number): void {
-        playery += y;
-        playerx += x;
+    move(player: Player, x: number, y: number): void {
+        player.setY(player.getY() + y);
+        player.setX(player.getX() + x);
         bombs++;
-        map[playery][playerx] = new Air();
+        map[player.getY()][player.getX()] = new Air();
     }
 
     isBombFamily(): boolean {
@@ -456,7 +456,7 @@ class Monster implements Tile {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    move(x: number, y: number): void {
+    move(player: Player, x: number, y: number): void {
         // do nothing
     }
 
@@ -493,7 +493,7 @@ class TmpTile implements Tile {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    move(x: number, y: number): void {
+    move(player: Player, x: number, y: number): void {
         // do nothing
     }
 
@@ -512,8 +512,6 @@ class TmpTile implements Tile {
 
 // --------- Tile ---------
 
-let playerx = 1;
-let playery = 1;
 let rawMap: RawTile[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 2, 2, 2, 2, 2, 1],
@@ -526,6 +524,25 @@ let rawMap: RawTile[][] = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 let map: Tile[][];
+
+class Player {
+    private x = 1;
+    private y = 1;
+    getX() {
+        return this.x;
+    }
+    getY() {
+        return this.y;
+    }
+    setX(x: number) {
+        this.x = x;
+    }
+    setY(y: number) {
+        this.y = y;
+    }
+}
+
+let player = new Player();
 
 function assertExhausted(x: never): never {
     throw new Error("Unexpected object: " + x);
@@ -597,21 +614,21 @@ function explode(x: number, y: number, explodeStrategy: ExplodeStrategy) {
     }
 }
 
-function move(x: number, y: number) {
-    map[playery + y][playerx + x].move(x, y);
+function move(player: Player, x: number, y: number) {
+    map[player.getY() + y][player.getX() + x].move(player, x, y);
 }
 
-function placeBomb() {
+function placeBomb(player: Player) {
     if (bombs > 0) {
-        map[playery][playerx] = new Bomb(new BombInit());
+        map[player.getY()][player.getX()] = new Bomb(new BombInit());
         bombs--;
     }
 }
 
-function update() {
-    handleInputs();
+function update(player: Player) {
+    handleInputs(player);
 
-    if (map[playery][playerx].isKillable())
+    if (map[player.getY()][player.getX()].isKillable())
         gameOver = true;
 
     if (--delay > 0) return;
@@ -619,10 +636,10 @@ function update() {
     updateMap();
 }
 
-function handleInputs() {
+function handleInputs(player: Player) {
     while (!gameOver && inputs.length > 0) {
         let input: Input = inputs.pop();
-        input.handle();
+        input.handle(player);
     }
 }
 
@@ -641,10 +658,10 @@ function createGraphics(): CanvasRenderingContext2D {
     return g;
 }
 
-function draw() {
+function draw(player: Player) {
     let g = createGraphics();
     drawMap(g);
-    drawPlayer(g);
+    drawPlayer(player, g);
 }
 
 function drawMap(g: CanvasRenderingContext2D) {
@@ -655,17 +672,17 @@ function drawMap(g: CanvasRenderingContext2D) {
     }
 }
 
-function drawPlayer(g: CanvasRenderingContext2D) {
+function drawPlayer(player: Player, g: CanvasRenderingContext2D) {
     if (!gameOver) {
         g.fillStyle = "#00ff00";
-        g.fillRect(playerx * TILE_SIZE, playery * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        g.fillRect(player.getX() * TILE_SIZE, player.getY() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
 function gameLoop() {
     let before = Date.now();
-    update();
-    draw();
+    update(player);
+    draw(player);
     let after = Date.now();
     let frameTime = after - before;
     let sleep = SLEEP - frameTime;
