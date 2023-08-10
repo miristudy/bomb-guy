@@ -23,6 +23,44 @@ enum RawTile {
   MONSTER_LEFT,
 }
 
+class Player {
+  private x = 1;
+  private y = 1;
+
+  checkIfGameOver() {
+    if (map[this.y][this.x].isGameOver())
+      gameOver = true;
+  }
+
+  movePlayer(y: number, x: number) {
+    map[this.y + y][this.x + x].movePlayer(this, y, x);
+  }
+
+  updatePlayer(y: number, x: number) {
+    this.y += y;
+    this.x += x;
+  }
+
+  updatePlayerToAir(y: number, x: number) {
+    this.updatePlayer(y, x);
+    bombs++;
+    map[this.y][this.x] = new Air();
+  }
+
+  placeBomb() {
+    if (bombs > 0) {
+      map[this.y][this.x] = new Bomb();
+      bombs--;
+    }
+  }
+
+  drawPlayer(g: CanvasRenderingContext2D) {
+    g.fillStyle = "#00ff00";
+    if (!gameOver)
+      g.fillRect(this.x * TILE_SIZE, this.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
+}
+
 class Loc {
     constructor(private y1: number, private x1: number) {
       this.y = y1;
@@ -203,9 +241,9 @@ const MONSTER_LEFT = new MonsterConfiguration("#cc00cc", new MonsterLeftState(),
 interface Tile {
   isAir(): boolean;
   isGameOver(): boolean;
-  movePlayer(y: number, x: number): void;
+  movePlayer(player: Player, y: number, x: number): void;
   hasBomb(): boolean;
-  updateTile(y: number, x: number): void;
+  updateTile( y: number, x: number): void;
   draw(g: CanvasRenderingContext2D, x: number, y: number): void;
   explode(x: number, y: number, type: Tile): void;
 }
@@ -221,9 +259,8 @@ class Air implements Tile {
   updateTile(y: number, x: number): void {
   }
 
-  movePlayer(y: number, x: number): void {
-    playery += y;
-    playerx += x;
+  movePlayer(player: Player, y: number, x: number): void {
+    player.updatePlayer(y, x);
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -244,7 +281,7 @@ class Unbreakable implements Tile {
   updateTile(y: number, x: number) {
   }
 
-  movePlayer(y: number, x: number): void {
+  movePlayer(player: Player, y: number, x: number): void {
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -263,7 +300,7 @@ class Stone implements Tile {
   updateTile(y: number, x: number) {
   }
 
-  movePlayer(y: number, x: number): void {
+  movePlayer(player: Player, y: number, x: number): void {
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -290,7 +327,7 @@ class Bomb implements Tile {
     map[y][x] = new BombClose()
   }
 
-  movePlayer(y: number, x: number): void {
+  movePlayer(player: Player, y: number, x: number): void {
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -314,7 +351,7 @@ class BombClose implements Tile {
     map[y][x] = new BombReallyClose();
   }
 
-  movePlayer(y: number, x: number): void {
+  movePlayer(player: Player, y: number, x: number): void {
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -343,7 +380,7 @@ class BombReallyClose implements Tile {
     bombs++;
   }
 
-  movePlayer(y: number, x: number): void {
+  movePlayer(player: Player, y: number, x: number): void {
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -366,7 +403,7 @@ class TmpFire implements Tile {
     map[y][x] = new Fire();
   }
 
-  movePlayer(y: number, x: number): void {
+  movePlayer(player: Player, y: number, x: number): void {
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -390,9 +427,8 @@ class Fire implements Tile {
     map[y][x] = new Air();
   }
 
-  movePlayer(y: number, x: number): void {
-    playery += y;
-    playerx += x;
+  movePlayer(player: Player, y: number, x: number): void {
+    player.updatePlayer(y, x);
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -415,11 +451,8 @@ class ExtraBomb implements Tile {
   updateTile(y: number, x: number) {
   }
 
-  movePlayer(y: number, x: number): void {
-    playery += y;
-    playerx += x;
-    bombs++;
-    map[playery][playerx] = new Air();
+  movePlayer(player: Player, y: number, x: number): void {
+    player.updatePlayerToAir(y, x);
   }
 
   explode(x: number, y: number, type: Tile): void {
@@ -441,7 +474,7 @@ class Monster implements Tile {
 
   isGameOver(): boolean { return false; }
 
-  movePlayer(y: number, x: number): void {
+  movePlayer(player: Player, y: number, x: number): void {
   }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
@@ -463,40 +496,40 @@ class Monster implements Tile {
 }
 
 interface Input {
-  handle(): void;
+  handle(player: Player): void;
 }
 
 class Right implements Input {
-  handle() {
-    map[playery][playerx + 1].movePlayer(0, 1);
+  handle(player: Player) {
+    player.movePlayer(0, 1);
   }
 }
 
 class Left implements Input {
-  handle() {
-    map[playery][playerx - 1].movePlayer(0, -1);
+  handle(player: Player) {
+    player.movePlayer(0, -1);
   }
 }
 class Up implements Input {
-  handle() {
-    map[playery - 1][playerx].movePlayer(-1, 0);
+  handle(player: Player) {
+    player.movePlayer(-1, 0);
   }
 }
 
 class Down implements Input {
-  handle() {
-    map[playery + 1][playerx].movePlayer(1, 0);
+  handle(player: Player) {
+    player.movePlayer(1, 0);
   }
 }
 
 class Place implements Input {
-  handle() {
-    placeBomb();
+  handle(player: Player) {
+    player.placeBomb();
   }
 }
-
-let playerx = 1;
-let playery = 1;
+let player = new Player();
+// let playerx = 1;
+// let playery = 1;
 let rawMap: RawTile[][] = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 2, 2, 2, 2, 2, 1],
@@ -552,28 +585,16 @@ function transformMap() {
   }
 }
 
-function placeBomb() {
-  if (bombs > 0) {
-    map[playery][playerx] = new Bomb();
-    bombs--;
-  }
-}
-
-function update() {
-  handleInputs();
-  checkIfGameOver();
+function update(player: Player) {
+  handleInputs(player);
+  player.checkIfGameOver();
   updateMap();
 }
 
-function checkIfGameOver() {
-  if (map[playery][playerx].isGameOver())
-    gameOver = true;
-}
-
-function handleInputs() {
+function handleInputs(player: Player) {
   while (!gameOver && inputs.length > 0) {
     let current = inputs.pop();
-    current.handle()
+    current.handle(player)
   }
 }
 
@@ -588,10 +609,10 @@ function updateMap() {
   }
 }
 
-function draw() {
+function draw(player: Player) {
   let g = createGraphics();
   drawMap(g);
-  drawPlayer(g);
+  player.drawPlayer(g);
 }
 
 function createGraphics() {
@@ -609,16 +630,10 @@ function drawMap(g: CanvasRenderingContext2D) {
   }
 }
 
-function drawPlayer(g: CanvasRenderingContext2D) {
-  g.fillStyle = "#00ff00";
-  if (!gameOver)
-    g.fillRect(playerx * TILE_SIZE, playery * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-}
-
 function gameLoop() {
   let before = Date.now();
-  update();
-  draw();
+  update(player);
+  draw(player);
   setSleep(before);
 }
 
