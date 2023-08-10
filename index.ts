@@ -53,11 +53,11 @@ interface MonsterState {
 class MonsterStrategy {
   constructor(private state: MonsterState) { }
 
-  updateTile(y: number, x: number, tmpStrat: TmpStrategy): void {
+  updateTile(y: number, x: number, isTmp: boolean): void {
     let st = this.state.nextState(y, x);
     let nextTile = this.state.nextTile(y, x);
     let nextLoc = this.state.nextLoc(y, x);
-    map[y][x] = !tmpStrat.isTmp() && nextTile.isAir()
+    map[y][x] = !isTmp && nextTile.isAir()
         ? ((map[y + nextLoc.getY()][x + nextLoc.getX()] = new Monster(st)), new Air()) : new Monster(st);
     // if (!tmpStrat.isTmp() &&  nextTile.isAir()) {
     //   map[y][x] = new Air();
@@ -184,9 +184,12 @@ class MonsterConfiguration {
       private color: string,
       private state: MonsterState,
       private strategy: TmpStrategy) { }
-  getColor(): string { return this.color; }
-  getState(): MonsterState { return this.state; }
-  getStrategy(): TmpStrategy { return this.strategy; }
+
+  isTmp(): boolean { return this.strategy.isTmp(); }
+  setColor(g : CanvasRenderingContext2D) { g.fillStyle = this.color; }
+  updateTile(y: number, x: number): void {
+    new MonsterStrategy(this.state).updateTile(y, x, this.isTmp());
+  }
 }
 
 const MONSTER_UP = new MonsterConfiguration("#cc00cc", new MonsterUpState(), new MonsterTmpStrategy(false));
@@ -428,10 +431,8 @@ class ExtraBomb implements Tile {
 
 class Monster implements Tile {
   private monsterConfig: MonsterConfiguration;
-  private monsterStrategy: MonsterStrategy;
   constructor(private config: MonsterConfiguration) {
     this.monsterConfig = config;
-    this.monsterStrategy = new MonsterStrategy(config.getState());
   }
 
   hasBomb(): boolean { return false; }
@@ -444,8 +445,8 @@ class Monster implements Tile {
   }
 
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    if (!this.monsterConfig.getStrategy().isTmp()) {
-      g.fillStyle = this.monsterConfig.getColor();
+    if (!this.monsterConfig.isTmp()) {
+      this.monsterConfig.setColor(g);
     }
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
@@ -457,7 +458,7 @@ class Monster implements Tile {
   }
 
   updateTile(y: number, x: number): void {
-    this.monsterStrategy.updateTile(y, x, this.monsterConfig.getStrategy());
+    this.monsterConfig.updateTile(y, x);
   }
 }
 
