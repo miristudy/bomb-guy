@@ -5,23 +5,145 @@ const TPS = 2;
 const DELAY = FPS / TPS;
 
 
-enum RawTile {
-  AIR,
-  UNBREAKABLE,
-  STONE,
-  BOMB,
-  BOMB_CLOSE,
-  BOMB_REALLY_CLOSE,
-  TMP_FIRE,
-  FIRE,
-  EXTRA_BOMB,
-  MONSTER_UP,
-  MONSTER_RIGHT,
-  TMP_MONSTER_RIGHT,
-  MONSTER_DOWN,
-  TMP_MONSTER_DOWN,
-  MONSTER_LEFT,
+// enum RawTile {
+//   AIR,
+//   UNBREAKABLE,
+//   STONE,
+//   BOMB,
+//   BOMB_CLOSE,
+//   BOMB_REALLY_CLOSE,
+//   TMP_FIRE,
+//   FIRE,
+//   EXTRA_BOMB,
+//   MONSTER_UP,
+//   MONSTER_RIGHT,
+//   TMP_MONSTER_RIGHT,
+//   MONSTER_DOWN,
+//   TMP_MONSTER_DOWN,
+//   MONSTER_LEFT,
+// }
+
+
+
+interface RawTileValue {
+  transform(): Tile;
 }
+class AirValue implements RawTileValue {
+    transform() {
+        return new Air();
+    }
+}
+class UnbreakableValue implements RawTileValue {
+    transform() {
+        return new Unbreakable();
+    }
+}
+class StoneValue implements RawTileValue {
+    transform() {
+        return new Stone();
+    }
+}
+class BombValue implements RawTileValue {
+    transform() {
+        return new Bomb();
+    }
+}
+class BombCloseValue implements RawTileValue {
+    transform() {
+        return new BombClose();
+    }
+}
+class BombReallyCloseValue implements RawTileValue {
+    transform() {
+        return new BombReallyClose();
+    }
+}
+class TmpFireValue implements RawTileValue {
+    transform() {
+        return new TmpFire();
+    }
+}
+class FireValue implements RawTileValue {
+    transform() {
+        return new Fire();
+    }
+}
+class ExtraBombValue implements RawTileValue {
+    transform() {
+        return new ExtraBomb();
+    }
+}
+class MonsterUpValue implements RawTileValue {
+    transform() {
+        return new Monster(MONSTER_UP);
+    }
+}
+class MonsterRightValue implements RawTileValue {
+    transform() {
+        return new Monster(MONSTER_RIGHT);
+    }
+}
+class TmpMonsterRightValue implements RawTileValue {
+    transform() {
+        return new Monster(TMP_MONSTER_RIGHT);
+    }
+}
+class MonsterDownValue implements RawTileValue {
+    transform() {
+        return new Monster(MONSTER_DOWN);
+    }
+}
+class TmpMonsterDownValue implements RawTileValue {
+    transform() {
+        return new Monster(TMP_MONSTER_DOWN);
+    }
+}
+class MonsterLeftValue implements RawTileValue {
+    transform() {
+        return new Monster(MONSTER_LEFT);
+    }
+}
+
+class RawTile2 {
+  static readonly AIR = new RawTile2(new AirValue());
+  static readonly UNBREAKABLE = new RawTile2(new UnbreakableValue());
+  static readonly STONE = new RawTile2(new StoneValue());
+  static readonly BOMB = new RawTile2(new BombValue());
+  static readonly BOMB_CLOSE = new RawTile2(new BombCloseValue());
+  static readonly BOMB_REALLY_CLOSE = new RawTile2(new BombReallyCloseValue());
+  static readonly TMP_FIRE = new RawTile2(new TmpFireValue());
+  static readonly FIRE = new RawTile2(new FireValue());
+  static readonly EXTRA_BOMB = new RawTile2(new ExtraBombValue());
+  static readonly MONSTER_UP = new RawTile2(new MonsterUpValue());
+  static readonly MONSTER_RIGHT = new RawTile2(new MonsterRightValue());
+  static readonly TMP_MONSTER_RIGHT = new RawTile2(new TmpMonsterRightValue());
+  static readonly MONSTER_DOWN = new RawTile2(new MonsterDownValue());
+  static readonly TMP_MONSTER_DOWN = new RawTile2(new TmpMonsterDownValue());
+  static readonly MONSTER_LEFT = new RawTile2(new MonsterLeftValue());
+  private constructor(private readonly value: RawTileValue) {}
+
+    transform() {
+        return this.value.transform();
+    }
+}
+
+const RAW_TILES = [
+  RawTile2.AIR,
+  RawTile2.UNBREAKABLE,
+  RawTile2.STONE,
+  RawTile2.BOMB,
+  RawTile2.BOMB_CLOSE,
+  RawTile2.BOMB_REALLY_CLOSE,
+  RawTile2.TMP_FIRE,
+  RawTile2.FIRE,
+  RawTile2.EXTRA_BOMB,
+  RawTile2.MONSTER_UP,
+  RawTile2.MONSTER_RIGHT,
+  RawTile2.TMP_MONSTER_RIGHT,
+  RawTile2.MONSTER_DOWN,
+  RawTile2.TMP_MONSTER_DOWN,
+  RawTile2.MONSTER_LEFT
+];
 
 class Player {
   private x = 1;
@@ -69,7 +191,7 @@ class Map {
     for (let y = 0; y < rawMap.length; y++) {
       this.map[y] = new Array(rawMap[y].length);
       for (let x = 0; x < rawMap[y].length; x++) {
-        this.map[y][x] = transformTile(rawMap[y][x]);
+        this.map[y][x] = transformTile(RAW_TILES[rawMap[y][x]]);
       }
     }
   }
@@ -567,7 +689,7 @@ class Place implements Input {
 let player = new Player();
 // let playerx = 1;
 // let playery = 1;
-let rawMap: RawTile[][] = [
+let rawMap: number[][] = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 2, 2, 2, 2, 2, 1],
   [1, 0, 1, 2, 1, 2, 1, 2, 1],
@@ -587,41 +709,9 @@ let delay = 0;
 let bombs = 1;
 let gameOver = false;
 
-function assertExhausted(x: never): never {
-  throw new Error("Unexpected object: " + x);
+function transformTile(tile: RawTile2) {
+  return tile.transform();
 }
-
-
-function transformTile(tile: RawTile) {
-  switch (tile) {
-    case RawTile.AIR: return new Air();
-    case RawTile.UNBREAKABLE: return new Unbreakable();
-    case RawTile.STONE: return new Stone();
-    case RawTile.BOMB: return new Bomb();
-    case RawTile.BOMB_CLOSE: return new BombClose();
-    case RawTile.BOMB_REALLY_CLOSE: return new BombReallyClose();
-    case RawTile.TMP_FIRE: return new TmpFire();
-    case RawTile.FIRE: return new Fire();
-    case RawTile.EXTRA_BOMB: return new ExtraBomb();
-    case RawTile.MONSTER_UP: return new Monster(MONSTER_UP);
-    case RawTile.MONSTER_RIGHT: return new Monster(MONSTER_RIGHT);
-    case RawTile.TMP_MONSTER_RIGHT: return new Monster(TMP_MONSTER_RIGHT);
-    case RawTile.MONSTER_DOWN: return new Monster(MONSTER_DOWN);
-    case RawTile.TMP_MONSTER_DOWN: return new Monster(TMP_MONSTER_DOWN);
-    case RawTile.MONSTER_LEFT: return new Monster(MONSTER_LEFT);
-    default: return assertExhausted(tile);
-  }
-}
-
-// function transformMap() {
-//   map = new Array(rawMap.length);
-//   for (let y = 0; y < rawMap.length; y++) {
-//     map[y] = new Array(rawMap[y].length);
-//     for (let x = 0; x < rawMap[y].length; x++) {
-//       map[y][x] = transformTile(rawMap[y][x]);
-//     }
-//   }
-// }
 
 function update(map: Map, player: Player) {
   handleInputs(map, player);
@@ -636,17 +726,6 @@ function handleInputs(map: Map, player: Player) {
   }
 }
 
-// function updateMap() {
-//   if (--delay > 0) return;
-//   delay = DELAY;
-//
-//   for (let y = 1; y < map.length; y++) {
-//     for (let x = 1; x < map[y].length; x++) {
-//       map[y][x].updateTile(y, x);
-//     }
-//   }
-// }
-
 function draw(map: Map, player: Player) {
   let g = createGraphics();
   map.draw(g);
@@ -659,14 +738,6 @@ function createGraphics() {
   g.clearRect(0, 0, canvas.width, canvas.height);
   return g;
 }
-
-// function drawMap(g: CanvasRenderingContext2D) {
-//   for (let y = 0; y < map.length; y++) {
-//     for (let x = 0; x < map[y].length; x++) {
-//       map[y][x].draw(g, x, y);
-//     }
-//   }
-// }
 
 function gameLoop() {
   let before = Date.now();
