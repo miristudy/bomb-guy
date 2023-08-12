@@ -387,7 +387,7 @@ class ChangeMonsterDirection implements Tile {
     }
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillStyle = "#808000";
+        g.fillStyle = "#DEB887";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
@@ -534,6 +534,8 @@ interface MonsterMoveStrategy {
     updateTile(map: Map, y: number, x: number): void;
 
     inverse(): MonsterMoveStrategy;
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void;
 }
 
 class ClockwiseRotationMonsterStrategy implements MonsterMoveStrategy {
@@ -554,6 +556,11 @@ class ClockwiseRotationMonsterStrategy implements MonsterMoveStrategy {
 
     inverse(): MonsterMoveStrategy {
         return new CounterClockwiseRotationMonsterStrategy(this.heading.inverse());
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#cc00cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 }
 
@@ -576,6 +583,11 @@ class CounterClockwiseRotationMonsterStrategy implements MonsterMoveStrategy {
     inverse(): MonsterMoveStrategy {
         return new ClockwiseRotationMonsterStrategy(this.heading.inverse());
     }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#800080";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
 }
 
 class Monster implements Tile {
@@ -587,8 +599,7 @@ class Monster implements Tile {
     }
 
     drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
-        g.fillStyle = "#cc00cc";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        this.monsterMoveStrategy.drawBlock(y, x, g);
     }
 
     isGameOver(): Boolean {

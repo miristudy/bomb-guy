@@ -26,20 +26,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;thkwon&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Users/miridih/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/232.8660.143/WebStorm.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "Rebasing thkwon",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/Users/miridih/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/232.8660.143/WebStorm.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="es6.move.members.recent.items">
       <recent name="$PROJECT_DIR$/down.ts" />
@@ -506,7 +506,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="필요없는 메서드 제거" />
     <MESSAGE value="updateTile 클래스로 이동" />
     <MESSAGE value="안 쓰는 메서드 제거" />
     <MESSAGE value="메서드 추상화 레벨 맞추기" />
@@ -531,15 +530,15 @@
     <MESSAGE value="moveForward 할 때 전략을 파라미터에 추가" />
     <MESSAGE value="몬스터 방향을 바꾸는 타일 추가 및 적용" />
     <MESSAGE value="몬스터 방향에 따라 색 달라지도록 하기" />
-    <option name="LAST_COMMIT_MESSAGE" value="몬스터 방향에 따라 색 달라지도록 하기" />
+    <MESSAGE value="폭탄 파워업 타일 생성" />
+    <option name="LAST_COMMIT_MESSAGE" value="폭탄 파워업 타일 생성" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/index.ts</url>
-          <line>512</line>
-          <properties lambdaOrdinal="-1" />
+          <line>465</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
