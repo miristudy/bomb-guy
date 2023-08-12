@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8b49c108-d49f-432c-bf45-8d9f19392a7c" name="Changes" comment="몬스터 방향에 따라 색 달라지도록 하기">
+      <change beforePath="$PROJECT_DIR$/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/index.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2ShPE1rCHOra8Q5Cs9FZcx3EDG4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;thkwon&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/miridih/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/232.8660.143/WebStorm.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="es6.move.members.recent.items">
+      <recent name="$PROJECT_DIR$/down.ts" />
+      <recent name="$PROJECT_DIR$/up.ts" />
+      <recent name="$PROJECT_DIR$/input.ts" />
+      <recent name="$PROJECT_DIR$/monsterLeft.ts" />
+      <recent name="$PROJECT_DIR$/tmpMonsterDown.ts" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8b49c108-d49f-432c-bf45-8d9f19392a7c" name="Changes" comment="" />
+      <created>1689595724217</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1689595724217</updated>
+      <workItem from="1689595726464" duration="2835000" />
+      <workItem from="1689767407917" duration="2110000" />
+      <workItem from="1689769553647" duration="4760000" />
+      <workItem from="1689780079384" duration="1389000" />
+      <workItem from="1689848114835" duration="2984000" />
+      <workItem from="1690004508017" duration="175000" />
+      <workItem from="1690004684865" duration="16764000" />
+      <workItem from="1690102931818" duration="1740000" />
+      <workItem from="1690199383874" duration="4019000" />
+      <workItem from="1690284967731" duration="3330000" />
+      <workItem from="1690374339428" duration="937000" />
+      <workItem from="1690453937327" duration="2030000" />
+      <workItem from="1690458240406" duration="4768000" />
+      <workItem from="1690804204396" duration="2860000" />
+      <workItem from="1690808011806" duration="33000" />
+      <workItem from="1691210956042" duration="1825000" />
+      <workItem from="1691334173821" duration="62000" />
+      <workItem from="1691495379089" duration="7777000" />
+      <workItem from="1691661968464" duration="2244000" />
+      <workItem from="1691666350616" duration="227000" />
+      <workItem from="1691816111982" duration="9434000" />
+    </task>
+    <task id="LOCAL-00020" summary="Tile 인터페이스 및 구현체 작성">
+      <option name="closed" value="true" />
+      <created>1690009549243</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1690009549243</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Tile 인터페이스 및 구현체 작성">
+      <option name="closed" value="true" />
+      <created>1690009712986</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1690009712986</updated>
+    </task>
+    <task id="LOCAL-00022" summary="map을 인터페이스형을 구현한 것을 사용하도록 변환 및 is메서드 사용">
+      <option name="closed" value="true" />
+      <created>1690011045988</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1690011045988</updated>
+    </task>
+    <task id="LOCAL-00023" summary="drawBlock 메서드 생성 및 색선택 및 그리기 기능 클래스로 코드 이관">
+      <option name="closed" value="true" />
+      <created>1690012028930</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1690012028930</updated>
+    </task>
+    <task id="LOCAL-00024" summary="isGameOver 조건판별문 클래스로 이관">
+      <option name="closed" value="true" />
+      <created>1690015343779</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1690015343779</updated>
+    </task>
+    <task id="LOCAL-00025" summary="isGameOver 조건판별문 클래스로 이관">
+      <option name="closed" value="true" />
+      <created>1690015551800</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1690015551800</updated>
+    </task>
+    <task id="LOCAL-00026" summary="explode 메서드 리팩토링 하기 쉽게 변경">
+      <option name="closed" value="true" />
+      <created>1690015762762</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1690015762762</updated>
+    </task>
+    <task id="LOCAL-00027" summary="explode 메서드 전문화">
+      <option name="closed" value="true" />
+      <created>1690018763651</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1690018763651</updated>
+    </task>
+    <task id="LOCAL-00028" summary="explode 메서드 전문화">
+      <option name="closed" value="true" />
+      <created>1690019484717</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1690019484717</updated>
+    </task>
+    <task id="LOCAL-00029" summary="move 메서드 클래스로 이관">
+      <option name="closed" value="true" />
+      <created>1690019766127</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1690019766127</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Bomb 관련 클래스 통합">
+      <option name="closed" value="true" />
+      <created>1690027753196</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1690027753196</updated>
+    </task>
+    <task id="LOCAL-00031" summary="BombStatus 이넘을 인터페이스와 구현체로 변경">
+      <option name="closed" value="true" />
+      <created>1690028147510</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1690028147510</updated>
+    </task>
+    <task id="LOCAL-00032" summary="BombStatus 이넘을 인터페이스와 구현체로 변경">
+      <option name="closed" value="true" />
+      <created>1690028231931</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1690028231931</updated>
+    </task>
+    <task id="LOCAL-00033" summary="BombStatus 이넘을 인터페이스와 구현체로 변경">
+      <option name="closed" value="true" />
+      <created>1690028297642</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1690028297642</updated>
+    </task>
+    <task id="LOCAL-00034" summary="BombStatus 이넘을 인터페이스와 구현체로 변경">
+      <option name="closed" value="true" />
+      <created>1690028302893</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1690028302893</updated>
+    </task>
+    <task id="LOCAL-00035" summary="close(), reallyClose() 메서드 추가">
+      <option name="closed" value="true" />
+      <created>1690200427515</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1690200427515</updated>
+    </task>
+    <task id="LOCAL-00036" summary="explodeBomb 클래스로 이관">
+      <option name="closed" value="true" />
+      <created>1690201099056</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1690201099056</updated>
+    </task>
+    <task id="LOCAL-00037" summary="explodeBomb 클래스로 이관">
+      <option name="closed" value="true" />
+      <created>1690201164416</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1690201164416</updated>
+    </task>
+    <task id="LOCAL-00038" summary="explodeBomb 클래스로 이관">
+      <option name="closed" value="true" />
+      <created>1690201188871</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1690201188871</updated>
+    </task>
+    <task id="LOCAL-00039" summary="explodeTmpFire 클래스로 이관">
+      <option name="closed" value="true" />
+      <created>1690201520027</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1690201520027</updated>
+    </task>
+    <task id="LOCAL-00040" summary="explodeTmpFire 클래스로 이관">
+      <option name="closed" value="true" />
+      <created>1690201982260</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1690201982260</updated>
+    </task>
+    <task id="LOCAL-00041" summary="필요없는 메서드 제거">
+      <option name="closed" value="true" />
+      <created>1690202078275</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1690202078275</updated>
+    </task>
+    <task id="LOCAL-00042" summary="updateTile 클래스로 이동">
+      <option name="closed" value="true" />
+      <created>1690203280347</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1690203280347</updated>
+    </task>
+    <task id="LOCAL-00043" summary="안 쓰는 메서드 제거">
+      <option name="closed" value="true" />
+      <created>1690203405605</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1690203405605</updated>
+    </task>
+    <task id="LOCAL-00044" summary="메서드 추상화 레벨 맞추기">
+      <option name="closed" value="true" />
+      <created>1690286858797</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1690286858797</updated>
+    </task>
+    <task id="LOCAL-00045" summary="인덴트 통일">
+      <option name="closed" value="true" />
+      <created>1690458550104</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1690458550104</updated>
+    </task>
+    <task id="LOCAL-00046" summary="열거형을 통한 몬스터 객체 통일">
+      <option name="closed" value="true" />
+      <created>1690461213841</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1690461213841</updated>
+    </task>
+    <task id="LOCAL-00047" summary="열거형을 통한 몬스터 객체 통일">
+      <option name="closed" value="true" />
+      <created>1690461451871</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1690461451871</updated>
+    </task>
+    <task id="LOCAL-00048" summary="열거형을 인터페이스와 구현체를 이용하도록 개선">
+      <option name="closed" value="true" />
+      <created>1690461756275</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1690461756275</updated>
+    </task>
+    <task id="LOCAL-00049" summary="열거형을 인터페이스와 구현체를 이용하도록 개선">
+      <option name="closed" value="true" />
+      <created>1690461819742</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1690461819742</updated>
+    </task>
+    <task id="LOCAL-00050" summary="열거형을 인터페이스와 구현체를 이용하도록 개선">
+      <option name="closed" value="true" />
+      <created>1690461823523</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1690461823524</updated>
+    </task>
+    <task id="LOCAL-00051" summary="몬스터 이동 전략 인터페이스 도입 및 시계방향 회전 몬스터 이동 전략 구현">
+      <option name="closed" value="true" />
+      <created>1690462507260</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1690462507260</updated>
+    </task>
+    <task id="LOCAL-00052" summary="Heading에 canMoveForward 도입 및 if invert">
+      <option name="closed" value="true" />
+      <created>1690462891360</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1690462891360</updated>
+    </task>
+    <task id="LOCAL-00053" summary="moveForward 메서드 도입">
+      <option name="closed" value="true" />
+      <created>1690462981202</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1690462981202</updated>
+    </task>
+    <task id="LOCAL-00054" summary="TmpMonster 를 이넘을 활용해 통합">
+      <option name="closed" value="true" />
+      <created>1690804587488</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1690804587488</updated>
+    </task>
+    <task id="LOCAL-00055" summary="사용하지 않는 코드 제거">
+      <option name="closed" value="true" />
+      <created>1690804862853</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1690804862853</updated>
+    </task>
+    <task id="LOCAL-00056" summary="TmpMonster 이넘을 인터페이스 및 구현체로 변경">
+      <option name="closed" value="true" />
+      <created>1690805060537</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1690805060537</updated>
+    </task>
+    <task id="LOCAL-00057" summary="if문 반전">
+      <option name="closed" value="true" />
+      <created>1690805677917</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1690805677917</updated>
+    </task>
+    <task id="LOCAL-00058" summary="explode 메서드 추출">
+      <option name="closed" value="true" />
+      <created>1690805854611</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1690805854611</updated>
+    </task>
+    <task id="LOCAL-00059" summary="heading을 strategy의 생성자로 넣음">
+      <option name="closed" value="true" />
+      <created>1691496006638</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1691496006639</updated>
+    </task>
+    <task id="LOCAL-00060" summary="player 객체 생성">
+      <option name="closed" value="true" />
+      <created>1691496908554</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1691496908554</updated>
+    </task>
+    <task id="LOCAL-00061" summary="player getter, setter 제거">
+      <option name="closed" value="true" />
+      <created>1691498766846</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1691498766846</updated>
+    </task>
+    <task id="LOCAL-00062" summary="map getter, setter 제거">
+      <option name="closed" value="true" />
+      <created>1691507326129</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1691507326129</updated>
+    </task>
+    <task id="LOCAL-00063" summary="인덴트 수정">
+      <option name="closed" value="true" />
+      <created>1691507511635</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1691507511635</updated>
+    </task>
+    <task id="LOCAL-00064" summary="임시 커밋">
+      <option name="closed" value="true" />
+      <created>1691819908316</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1691819908317</updated>
+    </task>
+    <task id="LOCAL-00065" summary="전략패턴스럽게 변경 및 반시계방향 전략 생성">
+      <option name="closed" value="true" />
+      <created>1691820007645</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1691820007645</updated>
+    </task>
+    <task id="LOCAL-00066" summary="moveForward 할 때 전략을 파라미터에 추가">
+      <option name="closed" value="true" />
+      <created>1691822945839</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1691822945839</updated>
+    </task>
+    <task id="LOCAL-00067" summary="몬스터 방향을 바꾸는 타일 추가 및 적용">
+      <option name="closed" value="true" />
+      <created>1691823675018</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1691823675018</updated>
+    </task>
+    <task id="LOCAL-00068" summary="몬스터 방향에 따라 색 달라지도록 하기">
+      <option name="closed" value="true" />
+      <created>1691824613682</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1691824613682</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/index.js" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/jwryu" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="필요없는 메서드 제거" />
+    <MESSAGE value="updateTile 클래스로 이동" />
+    <MESSAGE value="안 쓰는 메서드 제거" />
+    <MESSAGE value="메서드 추상화 레벨 맞추기" />
+    <MESSAGE value="인덴트 통일" />
+    <MESSAGE value="열거형을 통한 몬스터 객체 통일" />
+    <MESSAGE value="열거형을 인터페이스와 구현체를 이용하도록 개선" />
+    <MESSAGE value="몬스터 이동 전략 인터페이스 도입 및 시계방향 회전 몬스터 이동 전략 구현" />
+    <MESSAGE value="Heading에 canMoveForward 도입 및 if invert" />
+    <MESSAGE value="moveForward 메서드 도입" />
+    <MESSAGE value="TmpMonster 를 이넘을 활용해 통합" />
+    <MESSAGE value="사용하지 않는 코드 제거" />
+    <MESSAGE value="TmpMonster 이넘을 인터페이스 및 구현체로 변경" />
+    <MESSAGE value="if문 반전" />
+    <MESSAGE value="explode 메서드 추출" />
+    <MESSAGE value="heading을 strategy의 생성자로 넣음" />
+    <MESSAGE value="player 객체 생성" />
+    <MESSAGE value="player getter, setter 제거" />
+    <MESSAGE value="map getter, setter 제거" />
+    <MESSAGE value="인덴트 수정" />
+    <MESSAGE value="임시 커밋" />
+    <MESSAGE value="전략패턴스럽게 변경 및 반시계방향 전략 생성" />
+    <MESSAGE value="moveForward 할 때 전략을 파라미터에 추가" />
+    <MESSAGE value="몬스터 방향을 바꾸는 타일 추가 및 적용" />
+    <MESSAGE value="몬스터 방향에 따라 색 달라지도록 하기" />
+    <option name="LAST_COMMIT_MESSAGE" value="몬스터 방향에 따라 색 달라지도록 하기" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/index.ts</url>
+          <line>512</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
