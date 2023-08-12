@@ -142,11 +142,14 @@ class Stone implements Tile {
 
     explodeFire(map: Map, x: number, y: number): void {
         let number = Math.random();
-        if (number < 0.1) {
+        if (number < 0.2) {
             map.updateTile(y, x, new ExtraBomb());
             return;
-        } else if (number < 0.3) {
+        } else if (number < 0.4) {
             map.updateTile(y, x, new ChangeMonsterDirection());
+            return;
+        } else if (number < 0.5) {
+            map.updateTile(y, x, new PowerUp())
             return;
         }
         map.updateTile(y, x, new Fire());
@@ -154,11 +157,14 @@ class Stone implements Tile {
 
     explodeTmpFire(map: Map, x: number, y: number): void {
         let number = Math.random();
-        if (number < 0.1) {
+        if (number < 0.2) {
             map.updateTile(y, x, new ExtraBomb());
             return;
-        } else if (number < 0.3) {
+        } else if (number < 0.4) {
             map.updateTile(y, x, new ChangeMonsterDirection());
+            return;
+        } else if (number < 0.5) {
+            map.updateTile(y, x, new PowerUp())
             return;
         }
         map.updateTile(y, x, new TmpFire());
@@ -357,6 +363,47 @@ class ExtraBomb implements Tile {
     movePlayer(map: Map, player: Player, y: number, x: number): void {
         player.movePlayer(y, x);
         bombs++;
+        player.makeAir(map);
+    }
+
+    close(): void {
+    }
+
+    reallyClose(): void {
+    }
+
+    explodeFire(map: Map, x: number, y: number): void {
+        map.updateTile(y, x, new Fire());
+    }
+
+    explodeTmpFire(map: Map, x: number, y: number): void {
+        map.updateTile(y, x, new TmpFire());
+    }
+
+    update(map: Map, y: number, x: number): void {
+    }
+
+    changeDirection(): void {
+    }
+}
+
+class PowerUp implements Tile {
+    isAir(): boolean {
+        return false;
+    }
+
+    drawBlock(y: number, x: number, g: CanvasRenderingContext2D): void {
+        g.fillStyle = "#F08080";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+
+    isGameOver(): Boolean {
+        return false;
+    }
+
+    movePlayer(map: Map, player: Player, y: number, x: number): void {
+        player.movePlayer(y, x);
+        power++;
         player.makeAir(map);
     }
 
@@ -783,10 +830,46 @@ class Map {
     }
 
     explode(y: number, x: number) {
-        this.map[y - 1][x].explodeFire(map, x, y - 1);
-        this.map[y + 1][x].explodeTmpFire(map, x, y + 1);
-        this.map[y][x - 1].explodeFire(map, x - 1, y);
-        this.map[y][x + 1].explodeTmpFire(map, x + 1, y);
+        for (let p = 1; p <= power; p++) {
+            if (y - p < 0 || y - p >= this.map.length || this.map[y - p][x] instanceof Unbreakable) {
+                break;
+            }
+            let isFirstAir = this.map[y - p][x].isAir();
+            this.map[y - p][x].explodeFire(map, x, y - p);
+            if (!isFirstAir) {
+                break;
+            }
+        }
+        for (let p = 1; p <= power; p++) {
+            if (y + p >= this.map.length || this.map[y + p][x] instanceof Unbreakable) {
+                break;
+            }
+            let isFirstAir = this.map[y + p][x].isAir();
+            this.map[y + p][x].explodeTmpFire(map, x, y + p);
+            if (!isFirstAir) {
+                break;
+            }
+        }
+        for (let p = 1; p <= power; p++) {
+            if (x - p < 0 || x - p >= this.map[y].length || this.map[y][x - p] instanceof Unbreakable) {
+                break;
+            }
+            let isFirstAir = this.map[y][x - p].isAir();
+            this.map[y][x - p].explodeFire(map, x - p, y);
+            if (!isFirstAir) {
+                break;
+            }
+        }
+        for (let p = 1; p <= power; p++) {
+            if (x + p >= this.map[y].length || this.map[y][x + p] instanceof Unbreakable) {
+                break;
+            }
+            let isFirstAir = this.map[y][x + p].isAir();
+            this.map[y][x + p].explodeTmpFire(map, x + p, y);
+            if (!isFirstAir) {
+                break;
+            }
+        }
         this.map[y][x] = new Fire();
     }
 
@@ -831,6 +914,7 @@ let inputs: Input[] = [];
 
 let delay = 0;
 let bombs = 1;
+let power = 1;
 let gameOver = false;
 
 function transformTile(tile: RawTile) {
