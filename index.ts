@@ -357,7 +357,7 @@ interface Heading {
 
     canMoveForward(map: Map, y: number, x: number): boolean;
 
-    moveForward(map: Map, y: number, x: number): void;
+    moveForward(map: Map, y: number, x: number, strategy: MonsterMoveStrategy): void;
 }
 
 class LeftHeading implements Heading {
@@ -373,9 +373,9 @@ class LeftHeading implements Heading {
         return map.canMoveForward(y, x - 1);
     }
 
-    moveForward(map: Map, y: number, x: number): void {
+    moveForward(map: Map, y: number, x: number, strategy: MonsterMoveStrategy): void {
         map.updateTile(y, x, new Air());
-        map.updateTile(y, x - 1, new Monster(new ClockwiseRotationMonsterStrategy(new LeftHeading())));
+        map.updateTile(y, x - 1, new Monster(strategy));
     }
 }
 
@@ -392,9 +392,9 @@ class RightHeading implements Heading {
         return map.canMoveForward(y, x + 1);
     }
 
-    moveForward(map: Map, y: number, x: number): void {
+    moveForward(map: Map, y: number, x: number, strategy: MonsterMoveStrategy): void {
         map.updateTile(y, x, new Air());
-        map.updateTile(y, x + 1, new TmpMonster(new TmpMonsterRightHeading()));
+        map.updateTile(y, x + 1, new TmpMonster(strategy));
     }
 }
 
@@ -411,9 +411,9 @@ class UpHeading implements Heading {
         return map.canMoveForward(y - 1, x);
     }
 
-    moveForward(map: Map, y: number, x: number): void {
+    moveForward(map: Map, y: number, x: number, strategy: MonsterMoveStrategy): void {
         map.updateTile(y, x, new Air());
-        map.updateTile(y - 1, x, new Monster(new ClockwiseRotationMonsterStrategy(new UpHeading())));
+        map.updateTile(y - 1, x, new Monster(strategy));
     }
 
 }
@@ -431,15 +431,17 @@ class DownHeading implements Heading {
         return map.canMoveForward(y + 1, x);
     }
 
-    moveForward(map: Map, y: number, x: number): void {
+    moveForward(map: Map, y: number, x: number, strategy: MonsterMoveStrategy): void {
         map.updateTile(y, x, new Air());
-        map.updateTile(y + 1, x, new TmpMonster(new TmpMonsterDownHeading()));
+        map.updateTile(y + 1, x, new TmpMonster(strategy));
     }
 
 }
 
 interface MonsterMoveStrategy {
     move(map: Map, y: number, x: number): void;
+
+    updateTile(map: Map, y: number, x: number): void;
 }
 
 class ClockwiseRotationMonsterStrategy implements MonsterMoveStrategy {
@@ -448,10 +450,14 @@ class ClockwiseRotationMonsterStrategy implements MonsterMoveStrategy {
 
     move(map: Map, y: number, x: number): void {
         if (this.heading.canMoveForward(map, y, x)) {
-            this.heading.moveForward(map, y, x);
+            this.heading.moveForward(map, y, x, this);
             return;
         }
         this.heading.turnRight(map, y, x);
+    }
+
+    updateTile(map: Map, y: number, x: number): void {
+        map.updateTile(y, x, new Monster(new ClockwiseRotationMonsterStrategy(this.heading)));
     }
 }
 
@@ -461,10 +467,14 @@ class CounterClockwiseRotationMonsterStrategy implements MonsterMoveStrategy {
 
     move(map: Map, y: number, x: number): void {
         if (this.heading.canMoveForward(map, y, x)) {
-            this.heading.moveForward(map, y, x);
+            this.heading.moveForward(map, y, x, this);
             return;
         }
         this.heading.turnLeft(map, y, x);
+    }
+
+    updateTile(map: Map, y: number, x: number): void {
+        map.updateTile(y, x, new Monster(new ClockwiseRotationMonsterStrategy(this.heading)));
     }
 }
 
@@ -507,24 +517,8 @@ class Monster implements Tile {
     }
 }
 
-interface TmpMonsterHeading {
-    updateTile(map: Map, y: number, x: number): void;
-}
-
-class TmpMonsterDownHeading implements TmpMonsterHeading {
-    updateTile(map: Map, y: number, x: number): void {
-        map.updateTile(y, x, new Monster(new ClockwiseRotationMonsterStrategy(new DownHeading())));
-    }
-}
-
-class TmpMonsterRightHeading implements TmpMonsterHeading {
-    updateTile(map: Map, y: number, x: number): void {
-        map.updateTile(y, x, new Monster(new ClockwiseRotationMonsterStrategy(new RightHeading())));
-    }
-}
-
 class TmpMonster implements Tile {
-    constructor(private heading: TmpMonsterHeading) {
+    constructor(private strategy: MonsterMoveStrategy) {
     }
 
     isAir(): boolean {
@@ -557,7 +551,7 @@ class TmpMonster implements Tile {
     }
 
     update(map: Map, y: number, x: number): void {
-        this.heading.updateTile(map, y, x);
+        this.strategy.updateTile(map, y, x);
     }
 }
 
@@ -734,13 +728,13 @@ function transformTile(tile: RawTile) {
         case RawTile.MONSTER_DOWN:
             return new Monster(new ClockwiseRotationMonsterStrategy(new DownHeading()));
         case RawTile.TMP_MONSTER_DOWN:
-            return new TmpMonster(new TmpMonsterDownHeading());
+            return new TmpMonster(new ClockwiseRotationMonsterStrategy(new DownHeading()));
         case RawTile.MONSTER_LEFT:
             return new Monster(new ClockwiseRotationMonsterStrategy(new LeftHeading()));
         case RawTile.MONSTER_RIGHT:
             return new Monster(new ClockwiseRotationMonsterStrategy(new RightHeading()));
         case RawTile.TMP_MONSTER_RIGHT:
-            return new TmpMonster(new TmpMonsterRightHeading());
+            return new TmpMonster(new ClockwiseRotationMonsterStrategy(new RightHeading()));
         default:
             throw new Error("Unknown tile: " + tile);
     }
