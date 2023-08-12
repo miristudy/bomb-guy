@@ -830,36 +830,14 @@ class Map {
     }
 
     explode(y: number, x: number) {
-        for (let p = 1; p <= power; p++) {
-            if (y - p < 0 || y - p >= this.map.length || this.map[y - p][x] instanceof Unbreakable) {
-                break;
-            }
-            let isFirstAir = this.map[y - p][x].isAir();
-            this.map[y - p][x].explodeFire(map, x, y - p);
-            if (!isFirstAir) {
-                break;
-            }
-        }
-        for (let p = 1; p <= power; p++) {
-            if (y + p >= this.map.length || this.map[y + p][x] instanceof Unbreakable) {
-                break;
-            }
-            let isFirstAir = this.map[y + p][x].isAir();
-            this.map[y + p][x].explodeTmpFire(map, x, y + p);
-            if (!isFirstAir) {
-                break;
-            }
-        }
-        for (let p = 1; p <= power; p++) {
-            if (x - p < 0 || x - p >= this.map[y].length || this.map[y][x - p] instanceof Unbreakable) {
-                break;
-            }
-            let isFirstAir = this.map[y][x - p].isAir();
-            this.map[y][x - p].explodeFire(map, x - p, y);
-            if (!isFirstAir) {
-                break;
-            }
-        }
+        this.upsideExplode(y, x);
+        this.downsideExplode(y, x);
+        this.leftsideExplode(x, y);
+        this.rightsideExplode(x, y);
+        this.map[y][x] = new Fire();
+    }
+
+    private rightsideExplode(x: number, y: number) {
         for (let p = 1; p <= power; p++) {
             if (x + p >= this.map[y].length || this.map[y][x + p] instanceof Unbreakable) {
                 break;
@@ -870,7 +848,45 @@ class Map {
                 break;
             }
         }
-        this.map[y][x] = new Fire();
+    }
+
+    private leftsideExplode(x: number, y: number) {
+        for (let p = 1; p <= power; p++) {
+            if (x - p < 0 || x - p >= this.map[y].length || this.map[y][x - p] instanceof Unbreakable) {
+                break;
+            }
+            let isFirstAir = this.map[y][x - p].isAir();
+            this.map[y][x - p].explodeFire(map, x - p, y);
+            if (!isFirstAir) {
+                break;
+            }
+        }
+    }
+
+    private downsideExplode(y: number, x: number) {
+        for (let p = 1; p <= power; p++) {
+            if (y + p >= this.map.length || this.map[y + p][x] instanceof Unbreakable) {
+                break;
+            }
+            let isFirstAir = this.map[y + p][x].isAir();
+            this.map[y + p][x].explodeTmpFire(map, x, y + p);
+            if (!isFirstAir) {
+                break;
+            }
+        }
+    }
+
+    private upsideExplode(y: number, x: number) {
+        for (let p = 1; p <= power; p++) {
+            if (y - p < 0 || y - p >= this.map.length || this.map[y - p][x] instanceof Unbreakable) {
+                break;
+            }
+            let isFirstAir = this.map[y - p][x].isAir();
+            this.map[y - p][x].explodeFire(map, x, y - p);
+            if (!isFirstAir) {
+                break;
+            }
+        }
     }
 
     updateTile(y: number, x: number, tile: Tile) {
