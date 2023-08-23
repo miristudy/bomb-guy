@@ -14,24 +14,26 @@ enum RawTile {
   TMP_FIRE,
   FIRE,
   EXTRA_BOMB,
-  MONSTER_UP,
-  MONSTER_RIGHT,
-  TMP_MONSTER_RIGHT,
-  MONSTER_DOWN,
-  TMP_MONSTER_DOWN,
-  MONSTER_LEFT,
+  CCW_MONSTER,
+  CW_MONSTER,
 }
 
 let rawMap: RawTile[][] = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 2, 2, 2, 2, 2, 1],
-  [1, 0, 1, 2, 1, 2, 1, 2, 1],
-  [1, 2, 2, 2, 2, 2, 2, 2, 1],
-  [1, 2, 1, 2, 1, 2, 1, 2, 1],
-  [1, 2, 2, 2, 2, 0, 0, 0, 1],
-  [1, 2, 1, 2, 1, 0, 1, 0, 1],
-  [1, 2, 2, 2, 2, 0, 0, 10, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+  [1, 0, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
+  [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+  [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
+  [1, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 1],
+  [1, 2, 1, 2, 1, 0, 1, 0, 1, 2, 1, 2, 1, 0, 1, 0, 1],
+  [1, 2, 2, 2, 2, 0, 0,10, 2, 2, 2, 2, 2, 0, 0, 9, 1],
+  [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
+  [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+  [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
+  [1, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 1],
+  [1, 2, 1, 2, 1, 0, 1, 0, 1, 2, 1, 2, 1, 0, 1, 0, 1],
+  [1, 2, 2, 2, 2, 0, 0, 9, 2, 2, 2, 2, 2, 0, 0,10, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
 // =====================================================================================================================
@@ -195,90 +197,130 @@ class Place implements Input {
   }
 }
 // =====================================================================================================================
-class MoveStrategy {
+interface MoveStrategy {
+  move(map:Map, x: number, y: number): void;
+}
+
+class ClockwiseMoveStrategy implements MoveStrategy {
 
   constructor(private sight: Sight) {
   }
 
-  update(map:Map, x: number, y: number): void {
-    this.sight = this.sight.next(map, x, y);
-    this.sight.go(map, x, y);
+  move(map:Map, x: number, y: number): void {
+    if (this.sight.canGo(map, x, y)) {
+      this.sight.go(map, x, y, this);
+      return;
+    }
+    this.sight = this.sight.turnRight();
   }
 }
 
+class CounterClockwiseMoveStrategy implements MoveStrategy {
+
+  constructor(private sight: Sight) {
+  }
+
+  move(map:Map, x: number, y: number): void {
+    if (this.sight.canGo(map, x, y)) {
+      this.sight.go(map, x, y, this);
+      return;
+    }
+    this.sight = this.sight.turnLeft();
+  }
+}
+// =====================================================================================================================
 interface Sight {
-  go(map:Map, x: number, y: number): void;
 
-  turnRight(map:Map): Sight;
+  canGo(map:Map, x: number, y: number): boolean;
 
-  next(map:Map, x: number, y: number): Sight;
+  go(map:Map, x: number, y: number, moveStrategy: MoveStrategy): void;
+
+  turnRight(): Sight;
+
+  turnLeft(): Sight;
 }
 
 class UpSight implements Sight {
-  go(map:Map, x: number, y: number): void {
-    if (map.canGo(x, y - 1)) {
-      map.setTile(x, y, new Air());
-      map.setTile(x, y - 1, new Monster(this));
-    }
+
+  canGo(map: Map, x: number, y: number): boolean {
+    return map.canGo(x, y - 1);
   }
 
-  turnRight(map:Map): Sight {
+  go(map:Map, x: number, y: number, moveStrategy: MoveStrategy): void {
+    if (map.canGo(x, y - 1)) {
+      map.setTile(x, y, new Air());
+      map.setTile(x, y - 1, new Monster(moveStrategy));
+    }
+  }
+  turnRight(): Sight {
     return new RightSight();
   }
 
-  next(map:Map, x: number, y: number): Sight {
-    return map.canGo(x, y - 1) ? this : this.turnRight(map);
+  turnLeft(): Sight {
+    return new LeftSight();
   }
 }
 
 class RightSight implements Sight {
-  go(map:Map, x: number, y: number): void {
-    if (map.canGo(x + 1, y)) {
-      map.setTile(x, y, new Air());
-      map.setTile(x + 1, y, new TmpTile(new Monster(this)));
-    }
+
+  canGo(map: Map, x: number, y: number): boolean {
+    return map.canGo(x + 1, y);
   }
 
-  turnRight(map:Map): Sight {
+  go(map:Map, x: number, y: number, moveStrategy: MoveStrategy): void {
+    if (map.canGo(x + 1, y)) {
+      map.setTile(x, y, new Air());
+      map.setTile(x + 1, y, new TmpTile(new Monster(moveStrategy)));
+    }
+  }
+  turnRight(): Sight {
     return new DownSight();
   }
 
-  next(map: Map, x: number, y: number): Sight {
-    return map.canGo(x + 1, y) ? this : this.turnRight(map);
+  turnLeft(): Sight {
+    return new UpSight();
   }
 }
 
 class DownSight implements Sight {
-  go(map:Map, x: number, y: number): void {
-    if (map.canGo(x, y + 1)) {
-      map.setTile(x, y, new Air());
-      map.setTile(x, y + 1, new TmpTile(new Monster(this)));
-    }
+
+  canGo(map: Map, x: number, y: number): boolean {
+    return map.canGo(x, y + 1);
   }
 
-  turnRight(map:Map): Sight {
+  go(map:Map, x: number, y: number, moveStrategy: MoveStrategy): void {
+    if (map.canGo(x, y + 1)) {
+      map.setTile(x, y, new Air());
+      map.setTile(x, y + 1, new TmpTile(new Monster(moveStrategy)));
+    }
+  }
+  turnRight(): Sight {
     return new LeftSight();
   }
 
-  next(map: Map, x: number, y: number): Sight {
-    return map.canGo(x, y + 1) ? this : this.turnRight(map);
+  turnLeft(): Sight {
+    return new RightSight();
   }
 }
 
 class LeftSight implements Sight {
-  go(map:Map, x: number, y: number): void {
-    if (map.canGo(x - 1, y)) {
-      map.setTile(x, y, new Air());
-      map.setTile(x - 1, y, new Monster(this));
-    }
+
+  canGo(map: Map, x: number, y: number): boolean {
+    return map.canGo(x - 1, y);
   }
 
-  turnRight(map:Map): Sight {
+  go(map:Map, x: number, y: number, moveStrategy: MoveStrategy): void {
+    if (map.canGo(x - 1, y)) {
+      map.setTile(x, y, new Air());
+      map.setTile(x - 1, y, new Monster(moveStrategy));
+    }
+  }
+  turnRight(): Sight {
     return new UpSight();
   }
 
-  next(map: Map, x: number, y: number): Sight {
-    return map.canGo(x - 1, y) ? this : this.turnRight(map);
+  turnLeft(): Sight {
+    return new DownSight();
   }
 }
 // =====================================================================================================================
@@ -548,10 +590,10 @@ class Monster implements Tile {
 
   private strategy: MoveStrategy;
   
-  constructor(sight: Sight) {
-    this.strategy = new MoveStrategy(sight);
+  constructor(moveStrategy: MoveStrategy) {
+    this.strategy = moveStrategy;
   }
-  
+
   draw(x: number, y: number, g: CanvasRenderingContext2D): void {
     g.fillStyle = "#cc00cc";
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -569,7 +611,7 @@ class Monster implements Tile {
   }
 
   update(map:Map, x: number, y: number): void {
-    this.strategy.update(map, x, y);
+    this.strategy.move(map, x, y);
   }
 
   isAir(): boolean {
@@ -641,18 +683,10 @@ function transformTile(tile: RawTile): Tile {
       return new Fire();
     case RawTile.EXTRA_BOMB:
       return new ExtraBomb();
-    case RawTile.MONSTER_UP:
-      return new Monster(new UpSight());
-    case RawTile.MONSTER_RIGHT:
-      return new Monster(new RightSight());
-    case RawTile.TMP_MONSTER_RIGHT:
-      return new TmpTile(new Monster(new RightSight()));
-    case RawTile.MONSTER_DOWN:
-      return new Monster(new DownSight());
-    case RawTile.TMP_MONSTER_DOWN:
-      return new TmpTile(new Monster(new DownSight()));
-    case RawTile.MONSTER_LEFT:
-      return new Monster(new LeftSight());
+    case RawTile.CCW_MONSTER:
+      return new Monster(new CounterClockwiseMoveStrategy(new UpSight()));
+    case RawTile.CW_MONSTER:
+      return new Monster(new ClockwiseMoveStrategy(new LeftSight()));
     default:
       return assertExhausted(tile);
   }
@@ -673,6 +707,11 @@ window.addEventListener("keydown", (e) => {
   if (e.key === LEFT_KEY || e.key === "a") inputs.push(new Left());
   else if (e.key === UP_KEY || e.key === "w") inputs.push(new Up());
   else if (e.key === RIGHT_KEY || e.key === "d") inputs.push(new Right());
-  else if (e.key === DOWN_KEY || e.key === "s") inputs.push(new Down());
-  else if (e.key === " ") inputs.push(new Place());
+  else if (e.key === DOWN_KEY || e.key === "s") {
+    inputs.push(new Down());
+    e.preventDefault();
+  } else if (e.key === " ") {
+    inputs.push(new Place());
+    e.preventDefault();
+  }
 });
