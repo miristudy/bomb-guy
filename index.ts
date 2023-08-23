@@ -4,26 +4,71 @@ const SLEEP = 1000 / FPS;
 const TPS = 2;
 const DELAY = FPS / TPS;
 
+enum Direction {
+  left = "left",
+  right = "right",
+  up = "up",
+  down = "down"
+}
 
-// enum RawTile {
-//   AIR,
-//   UNBREAKABLE,
-//   STONE,
-//   BOMB,
-//   BOMB_CLOSE,
-//   BOMB_REALLY_CLOSE,
-//   TMP_FIRE,
-//   FIRE,
-//   EXTRA_BOMB,
-//   MONSTER_UP,
-//   MONSTER_RIGHT,
-//   TMP_MONSTER_RIGHT,
-//   MONSTER_DOWN,
-//   TMP_MONSTER_DOWN,
-//   MONSTER_LEFT,
-// }
+type Nodes = {
+  x: number;
+  y: number;
+  dir: Direction;
+};
 
+const nodeDirections: Nodes[] = [
+    { x: 0, y: -1, dir: Direction.up },
+    { x: 0, y: 1, dir: Direction.down },
+    { x: -1, y: 0, dir: Direction.left },
+    { x: 1, y: 0, dir: Direction.right }
+]
 
+const oppositeDirection: {[key: string]: Direction} = {
+    [Direction.left]: Direction.right,
+    [Direction.right]: Direction.left,
+    [Direction.up]: Direction.down,
+    [Direction.down]: Direction.up
+}
+
+class PathFinder {
+  private readonly map: Tile[][];
+  // private readonly seen: {[key: string]: boolean}
+
+  constructor(map: Tile[][]) {
+    this.map = map;
+    // this.seen = {};
+  }
+
+  findShortestPath(playerY: number, playerX: number): Direction | null {
+    let queue: Nodes[] = [{ x: playerX, y: playerY, dir: null }];
+    let seen: {[key: string]: boolean } = {};
+    // console.log("short path start!")
+    while (queue.length > 0) {
+      let curr = queue.shift()!;
+      // console.log(curr);
+
+      if (this.map[curr.y][curr.x].isMonster()) {
+        // Found path to monster, return path and stop algorithm
+        return oppositeDirection[curr.dir];
+      }
+
+      for (let dirs of nodeDirections) {
+        // console.log("dir");
+
+        let x = curr.x + dirs.x, y = curr.y + dirs.y;
+        if (x >= 0 && y >= 0 && x < this.map[0].length && y < this.map.length && !this.map[y][x].isUnbreakable()) {
+          let coords = `${x},${y}`;
+          if (!seen[coords]) {
+            queue.push({ x, y, dir: dirs.dir });
+            seen[coords] = true;
+          }
+        }
+      }
+    }
+    return null; // returns null if there's no path
+  }
+}
 
 interface RawTileValue {
   transform(): Tile;
@@ -176,6 +221,10 @@ class Player {
     }
   }
 
+  findShortestDirection(map: Map) {
+    return map.findShortestDirection(this.y, this.x);
+  }
+
   drawPlayer(g: CanvasRenderingContext2D) {
     g.fillStyle = "#00ff00";
     if (!gameOver)
@@ -185,6 +234,7 @@ class Player {
 
 class Map {
   private readonly map: Tile[][];
+  private readonly pathFinder: PathFinder;
 
   constructor() {
     this.map = new Array(rawMap.length);
@@ -194,15 +244,16 @@ class Map {
         this.map[y][x] = transformTile(RAW_TILES[rawMap[y][x]]);
       }
     }
+    this.pathFinder = new PathFinder(this.map);
   }
 
-  update() {
+  update(player: Player) {
     if (--delay > 0) return;
     delay = DELAY;
 
     for (let y = 1; y < this.map.length; y++) {
       for (let x = 1; x < this.map[y].length; x++) {
-        this.map[y][x].updateTile(this, y, x);
+        this.map[y][x].updateTile(this, player, y, x);
       }
     }
   }
@@ -221,6 +272,10 @@ class Map {
 
   movePlayer(player: Player, y: number, x: number, playerY: number, playerX: number) {
     this.map[playerY + y][playerX + x].movePlayer(this, player, y, x);
+  }
+
+  findShortestDirection(playerY: number, playerX: number) {
+    return this.pathFinder.findShortestPath(playerY, playerX);
   }
 
   setTile(y: number, x: number, tile: Tile) {
@@ -250,22 +305,32 @@ class MonsterTmpStrategy implements TmpStrategy {
 }
 
 interface MonsterState {
-  nextState(map: Map, y: number, x: number): MonsterConfiguration;
-  nextIsAir(map: Map, y: number, x: number): boolean;
-  setNextTile(map: Map, y: number, x: number, tile: Tile): void;
+  nextState(map: Map, y: number, x: number, dir: Direction): MonsterState;
+  isAir(map: Map, y: number, x: number): boolean;
+  setNextTile(map: Map, y: number, x: number, nextState: MonsterState): void;
+  setTile(map: Map, y: number, x: number): void;
+  findConfig(): MonsterConfiguration;
 }
 
 class MonsterStrategy {
-  constructor(private state: MonsterState) { }
+  private readonly pathFinder: PathFinder;
 
-  updateTile(map: Map, y: number, x: number, isTmp: boolean): void {
-    let st = this.state.nextState(map, y, x);
-    if (!isTmp &&  this.state.nextIsAir(map, y, x)) {
+  constructor(private state: MonsterState) {
+  }
+
+  updateTile(map: Map, dir: Direction, y: number, x: number, isTmp: boolean): void {
+    if (dir == null) return;
+    let st = this.state.nextState(map, y, x, dir);
+
+    console.log(st);
+    console.log(isTmp);
+    if (!isTmp && this.state.isAir(map, y, x)) {
+      console.log("inside isAir");
       map.setTile(y, x, new Air());
-      this.state.setNextTile(map, y, x, new Monster(st));
+      this.state.setNextTile(map, y, x, st);
       return;
     }
-    map.setTile(y, x, new Monster(st));
+    st.setTile(map, y, x);
   }
 }
 
@@ -278,102 +343,151 @@ class MonsterStrategy {
 
 class MonsterUpState implements MonsterState {
 
-  nextState(map: Map, y: number, x: number): MonsterConfiguration {
-    if (map.isAir(y - 1, x)) {
-        return MONSTER_UP;
-    }
-    return MONSTER_RIGHT;
+  nextState(map: Map, y: number, x: number, dir: Direction): MonsterState {
+    return directionMonState[dir];
   }
 
-  nextIsAir(map: Map, y: number, x: number): boolean {
+  isAir(map: Map, y: number, x: number): boolean {
     return map.isAir(y - 1, x);
   }
 
-  setNextTile(map: Map, y: number, x: number, tile: Tile): void {
-    map.setTile(y - 1, x, tile);
+  setNextTile(map: Map, y: number, x: number, nextState: MonsterState): void {
+    map.setTile(y - 1, x, new Monster(nextState.findConfig()));
+  }
+
+  setTile(map: Map, y: number, x: number): void {
+    map.setTile(y, x, new Monster(MONSTER_UP));
+  }
+
+  findConfig(): MonsterConfiguration {
+    return MONSTER_UP;
   }
 }
 
 class MonsterRightState implements MonsterState {
-  nextState(map: Map, y: number, x: number): MonsterConfiguration {
-    if (map.isAir(y, x + 1)) {
-        return TMP_MONSTER_RIGHT;
+  nextState(map: Map, y: number, x: number, dir: Direction): MonsterState {
+    console.log("inside right state")
+    console.log(x + " " + y);
+    if (dir == Direction.right && map.isAir(y, x + 1)) {
+        return new MonsterTmpRightState();
     }
-    return MONSTER_DOWN;
+    return directionMonState[dir]
   }
 
-  nextIsAir(map: Map, y: number, x: number): boolean {
+  isAir(map: Map, y: number, x: number): boolean {
     return map.isAir(y, x + 1);
   }
 
-  setNextTile(map: Map, y: number, x: number, tile: Tile): void {
-    map.setTile(y, x + 1, tile);
+  setNextTile(map: Map, y: number, x: number, nextState: MonsterState): void {
+    console.log("inside set next tile")
+    map.setTile(y, x + 1, new Monster(nextState.findConfig()));
+  }
+
+  setTile(map: Map, y: number, x: number): void {
+    console.log("inside set tile")
+    map.setTile(y, x, new Monster(MONSTER_RIGHT));
+  }
+
+  findConfig(): MonsterConfiguration {
+    return MONSTER_RIGHT;
   }
 }
 
 class MonsterTmpRightState implements MonsterState {
 
-  nextState(map: Map, y: number, x: number): MonsterConfiguration {
-    return MONSTER_RIGHT;
+  nextState(map: Map, y: number, x: number, dir: Direction): MonsterState {
+    return new MonsterRightState();
   }
 
-  nextIsAir(map: Map, y: number, x: number): boolean {
+  isAir(map: Map, y: number, x: number): boolean {
     return map.isAir(y, x);
   }
 
-  setNextTile(map: Map, y: number, x: number, tile: Tile): void {
-    map.setTile(y, x, tile);
+  setNextTile(map: Map, y: number, x: number, nextState: MonsterState): void {
+    console.log("inside tmp set next tile")
+
+    map.setTile(y, x  + 1, new Monster(nextState.findConfig()));
+  }
+
+  setTile(map: Map, y: number, x: number): void {
+    console.log("inside tmp set tile")
+
+    map.setTile(y, x, new Monster(TMP_MONSTER_RIGHT));
+  }
+
+  findConfig(): MonsterConfiguration {
+    return TMP_MONSTER_RIGHT;
   }
 }
 
 class MonsterLeftState implements MonsterState {
 
-  nextState(map: Map, y: number, x: number): MonsterConfiguration {
-    if (map.isAir(y, x - 1)) {
-        return MONSTER_LEFT;
-    }
-    return MONSTER_UP;
+  nextState(map: Map, y: number, x: number, dir: Direction): MonsterState {
+    return directionMonState[dir];
   }
 
-  nextIsAir(map: Map, y: number, x: number): boolean {
+  isAir(map: Map, y: number, x: number): boolean {
     return map.isAir(y, x - 1);
   }
 
-  setNextTile(map: Map, y: number, x: number, tile: Tile): void {
-    map.setTile(y, x - 1, tile);
+  setNextTile(map: Map, y: number, x: number, nextState: MonsterState): void {
+    map.setTile(y, x - 1, new Monster(nextState.findConfig()));
+  }
+
+  setTile(map: Map, y: number, x: number): void {
+    map.setTile(y, x, new Monster(MONSTER_LEFT));
+  }
+
+  findConfig(): MonsterConfiguration {
+  return MONSTER_LEFT;
   }
 }
 
 class MonsterDownState implements MonsterState {
-  nextState(map: Map, y: number, x: number): MonsterConfiguration {
-    if (map.isAir(y + 1, x)) {
-      return TMP_MONSTER_DOWN
+  nextState(map: Map, y: number, x: number, dir: Direction): MonsterState {
+    if (dir == Direction.down && map.isAir(y + 1, x)) {
+      return new MonsterTmpDownState();
     }
-    return MONSTER_LEFT;
+    return directionMonState[dir];
   }
 
-  nextIsAir(map: Map, y: number, x: number): boolean {
+  isAir(map: Map, y: number, x: number): boolean {
     return map.isAir(y + 1, x);
   }
 
-  setNextTile(map: Map, y: number, x: number, tile: Tile): void {
-    map.setTile(y + 1, x, tile);
+  setNextTile(map: Map, y: number, x: number, nextState: MonsterState): void {
+    map.setTile(y + 1, x, new Monster(nextState.findConfig()));
+  }
+
+  setTile(map: Map, y: number, x: number): void {
+    map.setTile(y, x, new Monster(MONSTER_DOWN));
+  }
+
+  findConfig(): MonsterConfiguration {
+    return MONSTER_DOWN;
   }
 }
 
 class MonsterTmpDownState implements MonsterState {
-  nextState(map: Map, y: number, x: number): MonsterConfiguration {
-    return MONSTER_DOWN;
+  nextState(map: Map, y: number, x: number, dir: Direction): MonsterState {
+    return new MonsterDownState();
   }
 
-  nextIsAir(map: Map, y: number, x: number): boolean {
+  isAir(map: Map, y: number, x: number): boolean {
     return map.isAir(y, x);
   }
 
-  setNextTile(map: Map, y: number, x: number, tile: Tile): void {
-    map.setTile(y, x, tile);
+  setNextTile(map: Map, y: number, x: number, nextState: MonsterState): void {
+    map.setTile(y + 1, x, new Monster(nextState.findConfig()));
   }
 
+  setTile(map: Map, y: number, x: number): void {
+    map.setTile(y, x, new Monster(TMP_MONSTER_DOWN));
+  }
+
+  findConfig(): MonsterConfiguration {
+  return TMP_MONSTER_DOWN;
+  }
 }
 
 class MonsterConfiguration {
@@ -384,8 +498,9 @@ class MonsterConfiguration {
 
   isTmp(): boolean { return this.strategy.isTmp(); }
   setColor(g : CanvasRenderingContext2D) { g.fillStyle = this.color; }
-  updateTile(map: Map, y: number, x: number): void {
-    new MonsterStrategy(this.state).updateTile(map, y, x, this.isTmp());
+  updateTile(map: Map, player: Player, y: number, x: number): void {
+    let dir = player.findShortestDirection(map);
+    new MonsterStrategy(this.state).updateTile(map, dir, y, x, this.isTmp());
   }
 }
 
@@ -397,12 +512,31 @@ const TMP_MONSTER_DOWN = new MonsterConfiguration(null, new MonsterTmpDownState(
 const MONSTER_LEFT = new MonsterConfiguration("#cc00cc", new MonsterLeftState(), new MonsterTmpStrategy(false));
 
 
+const directionMonState: {[key: string]: MonsterState} = {
+  [Direction.left]: new MonsterLeftState(),
+  [Direction.right]: new MonsterRightState(),
+  [Direction.up]: new MonsterUpState(),
+  [Direction.down]: new MonsterDownState()
+}
+
+const stateConfig: {[key: string]: MonsterState} = {
+  [Direction.left]: new MonsterLeftState(),
+  [Direction.right]: new MonsterRightState(),
+  [Direction.up]: new MonsterUpState(),
+  [Direction.down]: new MonsterDownState()
+}
+
+
 interface Tile {
+  isMonster(): boolean;
+  isUnbreakable(): boolean;
+  isStone(): boolean;
   isAir(): boolean;
   isGameOver(): boolean;
   movePlayer(map: Map, player: Player, y: number, x: number): void;
   hasBomb(): boolean;
-  updateTile(map: Map, y: number, x: number): void;
+
+  updateTile(map: Map, player: Player, y: number, x: number): void;
   draw(g: CanvasRenderingContext2D, x: number, y: number): void;
   explode(map: Map, x: number, y: number, type: Tile): void;
 }
@@ -410,12 +544,16 @@ interface Tile {
 
 
 class Air implements Tile {
+  isMonster() { return false; }
+  isStone() { return false; }
+  isUnbreakable() { return false; }
   isAir() { return true; }
   isGameOver() { return false; }
   hasBomb() { return false; }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
   }
-  updateTile(map: Map, y: number, x: number): void {
+
+  updateTile(map: Map, player: Player, y: number, x: number): void {
   }
 
   movePlayer(map: Map, player: Player, y: number, x: number): void {
@@ -430,6 +568,9 @@ class Air implements Tile {
 }
 
 class Unbreakable implements Tile {
+  isMonster() { return false; }
+  isStone() { return false; }
+  isUnbreakable() { return true; }
   isAir() { return false; }
   isGameOver() { return false; }
   hasBomb() { return false; }
@@ -437,7 +578,8 @@ class Unbreakable implements Tile {
     g.fillStyle = "#999999";
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
-  updateTile(map: Map, y: number, x: number) {
+
+  updateTile(map: Map, player: Player, y: number, x: number): void {
   }
 
   movePlayer(map: Map, player: Player, y: number, x: number): void {
@@ -448,6 +590,9 @@ class Unbreakable implements Tile {
 }
 
 class Stone implements Tile {
+  isMonster() { return false; }
+  isStone() { return true; }
+  isUnbreakable() { return false; }
   isAir() { return false; }
   isGameOver() { return false; }
   hasBomb() { return false; }
@@ -456,7 +601,8 @@ class Stone implements Tile {
     g.fillStyle = "#0000cc";
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
-  updateTile(map: Map, y: number, x: number) {
+
+  updateTile(map: Map, player: Player, y: number, x: number): void {
   }
 
   movePlayer(map: Map, player: Player, y: number, x: number): void {
@@ -472,6 +618,9 @@ class Stone implements Tile {
 }
 
 class Bomb implements Tile {
+  isMonster() { return false; }
+  isStone() { return false; }
+  isUnbreakable() { return false; }
   isAir() { return false; }
   isGameOver() { return false; }
 
@@ -482,7 +631,7 @@ class Bomb implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  updateTile(map: Map, y: number, x: number) {
+  updateTile(map: Map, player: Player, y: number, x: number): void {
     map.setTile(y, x, new BombClose());
   }
 
@@ -497,6 +646,9 @@ class Bomb implements Tile {
 }
 
 class BombClose implements Tile {
+  isMonster() { return false; }
+  isStone() { return false; }
+  isUnbreakable() { return false; }
   isAir() { return false; }
   isGameOver() { return false; }
   hasBomb() { return true; }
@@ -506,7 +658,7 @@ class BombClose implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  updateTile(map: Map, y: number, x: number) {
+  updateTile(map: Map, player: Player, y: number, x: number): void {
     map.setTile(y, x, new BombReallyClose());
   }
 
@@ -521,6 +673,9 @@ class BombClose implements Tile {
 }
 
 class BombReallyClose implements Tile {
+  isMonster() { return false; }
+  isStone() { return false; }
+  isUnbreakable() { return false; }
   isAir() { return false; }
   isGameOver() { return false; }
   hasBomb() { return true; }
@@ -530,7 +685,7 @@ class BombReallyClose implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  updateTile(map: Map, y: number, x: number) {
+  updateTile(map: Map, player: Player, y: number, x: number): void {
     map.explode(y - 1, x, new Fire());
     map.explode(y + 1, x, new TmpFire());
     map.explode(y, x - 1, new Fire());
@@ -550,6 +705,9 @@ class BombReallyClose implements Tile {
 }
 
 class TmpFire implements Tile {
+  isMonster() { return false; }
+  isStone() { return false; }
+  isUnbreakable() { return false; }
   isAir() { return false; }
   isGameOver() { return false; }
   hasBomb() { return false; }
@@ -558,7 +716,7 @@ class TmpFire implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  updateTile(map: Map, y: number, x: number) {
+  updateTile(map: Map, player: Player, y: number, x: number): void {
     map.setTile(y, x, new Fire());
   }
 
@@ -573,6 +731,9 @@ class TmpFire implements Tile {
 }
 
 class Fire implements Tile {
+  isMonster() { return false; }
+  isStone() { return false; }
+  isUnbreakable() { return false; }
   isAir() { return false; }
   isGameOver() { return true; }
   hasBomb() { return false; }
@@ -582,7 +743,7 @@ class Fire implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  updateTile(map: Map, y: number, x: number) {
+  updateTile(map: Map, player: Player, y: number, x: number): void {
     map.setTile(y, x, new Air());
   }
 
@@ -598,6 +759,9 @@ class Fire implements Tile {
 }
 
 class ExtraBomb implements Tile {
+  isMonster() { return false; }
+  isStone() { return false; }
+  isUnbreakable() { return false; }
   isAir() { return false; }
   isGameOver() { return false; }
   hasBomb() { return false; }
@@ -607,7 +771,7 @@ class ExtraBomb implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
-  updateTile(map: Map, y: number, x: number) {
+  updateTile(map: Map, player: Player, y: number, x: number): void {
   }
 
   movePlayer(map: Map, player: Player, y: number, x: number): void {
@@ -627,11 +791,15 @@ class Monster implements Tile {
     this.monsterConfig = config;
   }
 
+  isMonster() { return true; }
+  isStone() { return false; }
+  isUnbreakable() { return false; }
+
   hasBomb(): boolean { return false; }
 
   isAir(): boolean { return false; }
 
-  isGameOver(): boolean { return false; }
+  isGameOver(): boolean { return true; }
 
   movePlayer(map: Map, player: Player, y: number, x: number): void {
   }
@@ -649,8 +817,8 @@ class Monster implements Tile {
     map.setTile(y, x, type);
   }
 
-  updateTile(map: Map, y: number, x: number): void {
-    this.monsterConfig.updateTile(map, y, x);
+  updateTile(map: Map, player: Player, y: number, x: number): void {
+    this.monsterConfig.updateTile(map, player, y, x);
   }
 }
 
@@ -716,7 +884,7 @@ function transformTile(tile: RawTile2) {
 function update(map: Map, player: Player) {
   handleInputs(map, player);
   player.checkIfGameOver(map);
-  map.update();
+  map.update(player);
 }
 
 function handleInputs(map: Map, player: Player) {
