@@ -50,6 +50,7 @@ class PathFinder {
 
       if (this.map[curr.y][curr.x].isMonster()) {
         // Found path to monster, return path and stop algorithm
+        // monsterDirection is opposite of player direction
         return oppositeDirection[curr.dir];
       }
 
