@@ -655,8 +655,10 @@ let rawMap: number[][] = [
 ];
 
 class Player {
-    private x = 1;
-    private y = 1;
+    private gameOver: boolean = false;
+
+    constructor(private x: number, private y: number, private color: string) {
+    }
 
     move(x: number, y: number): void {
         this.x += x;
@@ -670,7 +672,8 @@ class Player {
     }
 
     handleInput(map: Map, x: number, y: number) {
-        map.handleInput(this, this.x + x, this.y + y, x, y);
+        if (!this.gameOver)
+            map.handleInput(this, this.x + x, this.y + y, x, y);
     }
 
     placeBomb(map: Map) {
@@ -678,14 +681,18 @@ class Player {
     }
 
     checkDeath(map: Map) {
-        map.checkDeath(this.x, this.y);
+        map.checkDeath(this, this.x, this.y);
     }
 
     draw(g: CanvasRenderingContext2D) {
-        if (!gameOver) {
-            g.fillStyle = "#00ff00";
+        if (!this.gameOver) {
+            g.fillStyle = this.color;
             g.fillRect(this.x * TILE_SIZE, this.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
+    }
+
+    isKilled() {
+        this.gameOver = true;
     }
 }
 
@@ -755,34 +762,35 @@ class Map {
         }
     }
 
-    checkDeath(x: number, y: number) {
+    checkDeath(player: Player, x: number, y: number) {
         if (this.map[y][x].isKillable())
-            gameOver = true;
+            player.isKilled();
     }
 }
 
-let player = new Player();
+let player1 = new Player(1, 1, "#00ff00");
+let player2 = new Player(1, 8, "#ff0000");
 
 let map = new Map();
 
-let inputs: Input[] = [];
+let inputs: { player: Player, input: Input }[] = [];
 
 let delay = 0;
 let bombs = 1;
-let gameOver = false;
 
-function update(map: Map, player: Player) {
-    handleInputs(map, player);
-    player.checkDeath(map);
+function update(map: Map, player1: Player, player2: Player) {
+    handleInputs(map, player1, player2);
+    player1.checkDeath(map);
+    player2.checkDeath(map);
     if (--delay > 0)
         return;
     delay = DELAY;
     map.update();
 }
 
-function handleInputs(map: Map, player: Player) {
-    while (!gameOver && inputs.length > 0) {
-        let input: Input = inputs.pop();
+function handleInputs(map: Map, player1: Player, player2: Player) {
+    while (inputs.length > 0) {
+        let { player, input } = inputs.pop();
         input.handle(map, player);
     }
 }
@@ -794,16 +802,17 @@ function createGraphics(): CanvasRenderingContext2D {
     return g;
 }
 
-function draw(map: Map, player: Player) {
+function draw(map: Map, player1: Player, player2: Player) {
     let g = createGraphics();
     map.draw(g);
-    player.draw(g)
+    player1.draw(g);
+    player2.draw(g);
 }
 
 function gameLoop(map: Map) {
     let before = Date.now();
-    update(map, player);
-    draw(map, player);
+    update(map, player1, player2);
+    draw(map, player1, player2);
     let after = Date.now();
     let frameTime = after - before;
     let sleep = SLEEP - frameTime;
@@ -819,9 +828,15 @@ const UP_KEY = "ArrowUp";
 const RIGHT_KEY = "ArrowRight";
 const DOWN_KEY = "ArrowDown";
 window.addEventListener("keydown", (e) => {
-    if (e.key === LEFT_KEY || e.key === "a") inputs.push(new Left());
-    else if (e.key === UP_KEY || e.key === "w") inputs.push(new Up());
-    else if (e.key === RIGHT_KEY || e.key === "d") inputs.push(new Right());
-    else if (e.key === DOWN_KEY || e.key === "s") inputs.push(new Down());
-    else if (e.key === " ") inputs.push(new Place());
+    if (e.key === LEFT_KEY ) inputs.push({ player: player1, input: new Left() });
+    else if (e.key === UP_KEY ) inputs.push({ player: player1, input: new Up() });
+    else if (e.key === RIGHT_KEY ) inputs.push({ player: player1, input: new Right() });
+    else if (e.key === DOWN_KEY) inputs.push({ player: player1, input: new Down() });
+    else if (e.key === " ") inputs.push({ player: player1, input: new Place() });
+
+    if (e.key === "a") inputs.push({ player: player2, input: new Left() });
+    else if (e.key === "w") inputs.push({ player: player2, input: new Up() });
+    else if (e.key === "d") inputs.push({ player: player2, input: new Right() });
+    else if (e.key === "s") inputs.push({ player: player2, input: new Down() });
+    else if (e.key === "Shift") inputs.push({ player: player2, input: new Place() });
 });
