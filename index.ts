@@ -43,31 +43,44 @@ class PathFinder {
   findShortestPath(playerY: number, playerX: number): Direction | null {
     let queue: Nodes[] = [{ x: playerX, y: playerY, dir: null }];
     let seen: {[key: string]: boolean } = {};
-    // console.log("short path start!")
+
+    return this.processQueue(queue, seen);
+  }
+
+  private processQueue(queue: Nodes[], seen: { [key: string]: boolean }): Direction | null {
     while (queue.length > 0) {
       let curr = queue.shift()!;
-      // console.log(curr);
-
-      if (this.map[curr.y][curr.x].isMonster()) {
-        // Found path to monster, return path and stop algorithm
-        // monsterDirection is opposite of player direction
+      if (this.isMonsterFound(curr)) {
         return oppositeDirection[curr.dir];
       }
-
-      for (let dirs of nodeDirections) {
-        // console.log("dir");
-
-        let x = curr.x + dirs.x, y = curr.y + dirs.y;
-        if (x >= 0 && y >= 0 && x < this.map[0].length && y < this.map.length && !this.map[y][x].isUnbreakable()) {
-          let coords = `${x},${y}`;
-          if (!seen[coords]) {
-            queue.push({ x, y, dir: dirs.dir });
-            seen[coords] = true;
-          }
-        }
-      }
+      this.processDirections(curr, queue, seen);
     }
-    return null; // returns null if there's no path
+    return null;
+  }
+
+  private isMonsterFound(node: Nodes): boolean {
+    return this.map[node.y][node.x].isMonster()
+  }
+
+  private processDirections(currentNode: Nodes, queue: Nodes[], seen: { [key: string]: boolean }): void {
+    for (let dir of nodeDirections) {
+      this.moveInDirection(dir, currentNode, queue, seen);
+    }
+  }
+
+  private moveInDirection(dir: Nodes, currentNode: Nodes, queue: Nodes[], seen: {[key: string]: boolean }): void {
+    let x = currentNode.x + dir.x, y = currentNode.y + dir.y;
+    if (x >= 0 && y >= 0 && x < this.map[0].length && y < this.map.length && !this.map[y][x].isUnbreakable()) {
+      let coords = `${x},${y}`;
+      this.pushQueueIfNotSeen(queue, coords, seen, x, y, dir);
+    }
+  }
+
+  private pushQueueIfNotSeen(queue: Nodes[], coords: string, seen: {[key: string]: boolean }, x: number, y: number, dir: Nodes): void {
+    if (!seen[coords]) {
+      queue.push({ x, y, dir: dir.dir });
+      seen[coords] = true;
+    }
   }
 }
 
