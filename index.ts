@@ -40,17 +40,17 @@ class PathFinder {
     // this.seen = {};
   }
 
-  findShortestPath(playerY: number, playerX: number): Direction | null {
+  findShortestPath(playerY: number, playerX: number, y: number, x: number): Direction | null {
     let queue: Nodes[] = [{ x: playerX, y: playerY, dir: null }];
     let seen: {[key: string]: boolean } = {};
 
-    return this.processQueue(queue, seen);
+    return this.processQueue(queue, seen, y, x);
   }
 
-  private processQueue(queue: Nodes[], seen: { [key: string]: boolean }): Direction | null {
+  private processQueue(queue: Nodes[], seen: { [key: string]: boolean }, y: number, x: number): Direction | null {
     while (queue.length > 0) {
       let curr = queue.shift()!;
-      if (this.isMonsterFound(curr)) {
+      if (this.isMonsterFound(curr, y, x)) {
         return oppositeDirection[curr.dir];
       }
       this.processDirections(curr, queue, seen);
@@ -58,8 +58,8 @@ class PathFinder {
     return null;
   }
 
-  private isMonsterFound(node: Nodes): boolean {
-    return this.map[node.y][node.x].isMonster()
+  private isMonsterFound(node: Nodes, y: number, x: number): boolean {
+    return this.map[node.y][node.x].isMonster() && y == node.y && x == node.x;
   }
 
   private processDirections(currentNode: Nodes, queue: Nodes[], seen: { [key: string]: boolean }): void {
@@ -235,8 +235,8 @@ class Player {
     }
   }
 
-  findShortestDirection(map: Map) {
-    return map.findShortestDirection(this.y, this.x);
+  findShortestDirection(map: Map, y: number, x: number ) {
+    return map.findShortestDirection(this.y, this.x, y, x);
   }
 
   drawPlayer(g: CanvasRenderingContext2D) {
@@ -288,8 +288,8 @@ class Map {
     this.map[playerY + y][playerX + x].movePlayer(this, player, y, x);
   }
 
-  findShortestDirection(playerY: number, playerX: number) {
-    return this.pathFinder.findShortestPath(playerY, playerX);
+  findShortestDirection(playerY: number, playerX: number, y: number, x: number): Direction {
+    return this.pathFinder.findShortestPath(playerY, playerX, y, x);
   }
 
   setTile(y: number, x: number, tile: Tile) {
@@ -513,7 +513,7 @@ class MonsterConfiguration {
   isTmp(): boolean { return this.strategy.isTmp(); }
   setColor(g : CanvasRenderingContext2D) { g.fillStyle = this.color; }
   updateTile(map: Map, player: Player, y: number, x: number): void {
-    let dir = player.findShortestDirection(map);
+    let dir = player.findShortestDirection(map, y, x);
     new MonsterStrategy(this.state).updateTile(map, dir, y, x, this.isTmp());
   }
 }
@@ -871,15 +871,27 @@ class Place implements Input {
 let player = new Player();
 // let playerx = 1;
 // let playery = 1;
+// let rawMap: number[][] = [
+//   [1, 1, 1, 1, 1, 1, 1, 1, 1],
+//   [1, 0, 0, 2, 2, 2, 2, 2, 1],
+//   [1, 0, 1, 2, 1, 2, 1, 2, 1],
+//   [1, 2, 2, 2, 2, 2, 2, 2, 1],
+//   [1, 2, 1, 2, 1, 2, 1, 2, 1],
+//   [1, 2, 2, 2, 2, 0, 0, 0, 1],
+//   [1, 2, 1, 2, 1, 0, 1, 0, 1],
+//   [1, 2, 2, 2, 2, 0, 0, 10, 1],
+//   [1, 1, 1, 1, 1, 1, 1, 1, 1],
+// ];
+
 let rawMap: number[][] = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 2, 2, 2, 2, 2, 1],
-  [1, 0, 1, 2, 1, 2, 1, 2, 1],
-  [1, 2, 2, 2, 2, 2, 2, 2, 1],
-  [1, 2, 1, 2, 1, 2, 1, 2, 1],
-  [1, 2, 2, 2, 2, 0, 0, 0, 1],
-  [1, 2, 1, 2, 1, 0, 1, 0, 1],
-  [1, 2, 2, 2, 2, 0, 0, 10, 1],
+  [1, 0, 0, 0, 0, 0, 0, 10, 1],
+  [1, 0, 1, 0, 1, 0, 1, 0, 1],
+  [1, 0, 2, 2, 2, 2, 2, 2, 1],
+  [1, 0, 1, 10, 1, 2, 1, 2, 1],
+  [1, 0, 2, 2, 2, 0, 0, 0, 1],
+  [1, 0, 1, 2, 1, 0, 1, 0, 1],
+  [1, 10, 0, 0, 2, 0, 0, 10, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 // let map: Tile[][];
